@@ -1,0 +1,37 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { formatDate, pathWithBase } from "../../lib/site";
+
+const posts = (await getCollection("blog"))
+  .filter((post) => !post.data.draft)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+---
+
+<BaseLayout title="Blog" description="Blog posts and notes.">
+  <section class="intro">
+    <h1>Blog</h1>
+    <p>Posts written in Markdown.</p>
+  </section>
+
+  <ul class="entry-list">
+    {
+      posts.map((post) => (
+        <li class="entry">
+          <h2 class="entry-title">
+            <a href={pathWithBase(`blog/${post.id}/`)}>{post.data.title}</a>
+          </h2>
+          <p class="meta">
+            <time datetime={post.data.pubDate.toISOString()}>{formatDate(post.data.pubDate)}</time>
+          </p>
+          <p>{post.data.description}</p>
+          {post.data.tags.length > 0 && (
+            <ul class="tag-list">
+              {post.data.tags.map((tag) => <li>{tag}</li>)}
+            </ul>
+          )}
+        </li>
+      ))
+    }
+  </ul>
+</BaseLayout>

@@ -1,0 +1,54 @@
+---
+import { pathWithBase, site } from "../lib/site";
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title, description = site.description } = Astro.props;
+const pageTitle = title ? `${title} | ${site.name}` : site.name;
+const navItems = [
+  { label: "Blog", href: pathWithBase("blog/") },
+  { label: "Reading", href: pathWithBase("reading/") },
+  { label: "Projects", href: pathWithBase("projects/") },
+  { label: "Experience", href: pathWithBase("experience/") }
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content={description} />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{pageTitle}</title>
+  </head>
+  <body>
+    <header class="site-header">
+      <div>
+        <a class="site-title" href={pathWithBase()}>{site.name}</a>
+        <nav aria-label="Primary navigation">
+          {
+            navItems.map((item) => (
+              <a href={item.href}>{item.label}</a>
+            ))
+          }
+        </nav>
+      </div>
+      <ul class="contact-list" aria-label="Contact links">
+        {
+          site.contacts.map((contact) => (
+            <li>
+              <a href={contact.href}>{contact.label}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </header>
+    <main>
+      <slot />
+    </main>
+  </body>
+</html>

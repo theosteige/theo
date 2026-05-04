@@ -1,0 +1,13 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { site } from "../lib/site";
+---
+
+<BaseLayout>
+  <section class="intro" aria-labelledby="intro-title">
+    <h1 id="intro-title">{site.name}</h1>
+    <p>
+      This space is reserved for the main page.
+    </p>
+  </section>
+</BaseLayout>

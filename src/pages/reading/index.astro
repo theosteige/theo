@@ -1,0 +1,44 @@
+---
+import { getCollection, render } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { formatYear } from "../../lib/site";
+
+const entries = (await getCollection("reading")).sort((a, b) => {
+  const aDate = a.data.date?.valueOf() ?? 0;
+  const bDate = b.data.date?.valueOf() ?? 0;
+  return bDate - aDate;
+});
+---
+
+<BaseLayout title="Reading List" description="Reading list and notes.">
+  <section class="intro">
+    <h1>Reading List</h1>
+    <p>Books, papers, articles, and references.</p>
+  </section>
+
+  <ul class="entry-list">
+    {
+      await Promise.all(
+        entries.map(async (entry) => {
+          const { Content } = await render(entry);
+          return (
+            <li class="entry">
+              <h2 class="entry-title">{entry.data.link ? <a href={entry.data.link}>{entry.data.title}</a> : entry.data.title}</h2>
+              <p class="meta">
+                {[entry.data.author, entry.data.status, entry.data.date ? formatYear(entry.data.date) : undefined].filter(Boolean).join(" / ")}
+              </p>
+              <div class="prose">
+                <Content />
+              </div>
+              {entry.data.tags.length > 0 && (
+                <ul class="tag-list">
+                  {entry.data.tags.map((tag) => <li>{tag}</li>)}
+                </ul>
+              )}
+            </li>
+          );
+        })
+      )
+    }
+  </ul>
+</BaseLayout>

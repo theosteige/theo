@@ -1,0 +1,50 @@
+---
+import { getCollection, render } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { formatYear } from "../../lib/site";
+
+const roles = (await getCollection("experience")).sort((a, b) => {
+  return b.data.startDate.valueOf() - a.data.startDate.valueOf();
+});
+---
+
+<BaseLayout title="Experience" description="Experience and background.">
+  <section class="intro">
+    <h1>Experience</h1>
+    <p>Roles, education, collaborations, and relevant background.</p>
+  </section>
+
+  <ul class="entry-list">
+    {
+      await Promise.all(
+        roles.map(async (role) => {
+          const { Content } = await render(role);
+          const start = formatYear(role.data.startDate);
+          const dateRange = role.data.current
+            ? `${start} - Present`
+            : role.data.endDate
+              ? `${start} - ${formatYear(role.data.endDate)}`
+              : `${start}`;
+          return (
+            <li class="entry">
+              <h2 class="entry-title">{role.data.role}</h2>
+              <p class="meta">
+                {[role.data.organization, role.data.location].filter(Boolean).join(" / ")}
+                {" "}
+                ({dateRange})
+              </p>
+              <div class="prose">
+                <Content />
+              </div>
+              {role.data.tags.length > 0 && (
+                <ul class="tag-list">
+                  {role.data.tags.map((tag) => <li>{tag}</li>)}
+                </ul>
+              )}
+            </li>
+          );
+        })
+      )
+    }
+  </ul>
+</BaseLayout>

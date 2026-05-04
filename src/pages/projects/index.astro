@@ -1,0 +1,51 @@
+---
+import { getCollection, render } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const projects = (await getCollection("projects")).sort((a, b) => {
+  const aDate = a.data.startDate?.valueOf() ?? 0;
+  const bDate = b.data.startDate?.valueOf() ?? 0;
+  return bDate - aDate;
+});
+---
+
+<BaseLayout title="Projects" description="Current and past projects.">
+  <section class="intro">
+    <h1>Projects</h1>
+    <p>Current and past work.</p>
+  </section>
+
+  <ul class="entry-list">
+    {
+      await Promise.all(
+        projects.map(async (project) => {
+          const { Content } = await render(project);
+          return (
+            <li class="entry">
+              <h2 class="entry-title">{project.data.title}</h2>
+              <p class="meta">{project.data.status}</p>
+              <p>{project.data.summary}</p>
+              <div class="prose">
+                <Content />
+              </div>
+              {project.data.links.length > 0 && (
+                <ul class="link-list">
+                  {project.data.links.map((link) => (
+                    <li>
+                      <a href={link.url}>{link.label}</a>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {project.data.tags.length > 0 && (
+                <ul class="tag-list">
+                  {project.data.tags.map((tag) => <li>{tag}</li>)}
+                </ul>
+              )}
+            </li>
+          );
+        })
+      )
+    }
+  </ul>
+</BaseLayout>
