@@ -160,6 +160,14 @@ p {
   max-width: 720px;
 }
 
+.prose img {
+    display: block;
+    width: min(100%, 320px);
+    height: auto;
+    margin: 24px auto;
+    border-radius: 6px;
+}
+
 .prose h2,
 .prose h3 {
   margin-top: 32px;

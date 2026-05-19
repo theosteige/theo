@@ -10,10 +10,10 @@ interface Props {
 const { title, description = site.description } = Astro.props;
 const pageTitle = title ? `${title} | ${site.name}` : site.name;
 const navItems = [
-  { label: "Blog", href: pathWithBase("blog/") },
-  { label: "Reading", href: pathWithBase("reading/") },
+  { label: "Experience", href: pathWithBase("experience/") },
   { label: "Projects", href: pathWithBase("projects/") },
-  { label: "Experience", href: pathWithBase("experience/") }
+  { label: "Blog", href: pathWithBase("blog/") },
+  { label: "Reading", href: pathWithBase("reading/") }
 ];
 ---
 

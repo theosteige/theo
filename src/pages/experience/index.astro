@@ -3,7 +3,21 @@ import { getCollection, render } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { formatYear } from "../../lib/site";
 
+const getSortEndDate = (role: Awaited<ReturnType<typeof getCollection<"experience">>>[number]) => {
+  if (role.data.current) {
+    return Number.POSITIVE_INFINITY;
+  }
+
+  return (role.data.endDate ?? role.data.startDate).valueOf();
+};
+
 const roles = (await getCollection("experience")).sort((a, b) => {
+  const endDateDelta = getSortEndDate(b) - getSortEndDate(a);
+
+  if (endDateDelta !== 0) {
+    return endDateDelta;
+  }
+
   return b.data.startDate.valueOf() - a.data.startDate.valueOf();
 });
 ---
