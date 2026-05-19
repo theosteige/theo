@@ -41,7 +41,15 @@ const navItems = [
         {
           site.contacts.map((contact) => (
             <li>
-              <a href={contact.href}>{contact.label}</a>
+              {
+                contact.label === "Email" ? (
+                  <button class="contact-button" type="button" data-reveal={contact.href}>
+                    {contact.label}
+                  </button>
+                ) : (
+                  <a href={contact.href}>{contact.label}</a>
+                )
+              }
             </li>
           ))
         }
@@ -50,5 +58,14 @@ const navItems = [
     <main>
       <slot />
     </main>
+    <script>
+      document.querySelectorAll("[data-reveal]").forEach((button) => {
+        button.addEventListener("click", () => {
+          if (button instanceof HTMLButtonElement) {
+            button.textContent = button.dataset.reveal ?? "";
+          }
+        });
+      });
+    </script>
   </body>
 </html>

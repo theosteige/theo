@@ -4,7 +4,7 @@ export const site = {
   contacts: [
     {
       label: "Email",
-      href: "mailto:hello@example.com"
+      href: "theohsteiger@gmail.com"
     },
     {
       label: "GitHub",
@@ -12,7 +12,7 @@ export const site = {
     },
     {
       label: "LinkedIn",
-      href: "https://www.linkedin.com/in/your-profile"
+      href: "https://www.linkedin.com/in/theodore-steiger/"
     }
   ]
 };
