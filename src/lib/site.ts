@@ -1,5 +1,6 @@
 export const site = {
   name: "Theo Steiger",
+  url: "https://theosteiger.com",
   description: "Personal website, writing, reading, projects, and experience.",
   contacts: [
     {

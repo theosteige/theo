@@ -36,7 +36,7 @@ const prefixMarkdownImagePaths = () => {
 };
 
 export default defineConfig({
-  site: "https://theosteige.github.io",
+  site: "https://theosteiger.com",
   base,
   trailingSlash: "always",
   markdown: {
