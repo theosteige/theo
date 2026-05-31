@@ -99,6 +99,33 @@ main {
   margin-bottom: 42px;
 }
 
+.intro-with-action {
+  display: flex;
+  max-width: none;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.intro-with-action > div {
+  max-width: 720px;
+}
+
+.button-link {
+  color: var(--accent);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.button-link:hover {
+  text-decoration-thickness: 2px;
+}
+
+.button-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
 h1,
 h2,
 h3 {
@@ -241,6 +268,14 @@ p {
 
   .section-list {
     grid-template-columns: 1fr;
+  }
+
+  .intro-with-action {
+    display: block;
+  }
+
+  .button-link {
+    margin-top: 6px;
   }
 
   .media-grid {

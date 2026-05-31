@@ -1,7 +1,7 @@
 ---
 import { getCollection, render } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { formatYear } from "../../lib/site";
+import { formatYear, pathWithBase } from "../../lib/site";
 
 const getSortEndDate = (role: Awaited<ReturnType<typeof getCollection<"experience">>>[number]) => {
   if (role.data.current) {
@@ -20,12 +20,24 @@ const roles = (await getCollection("experience")).sort((a, b) => {
 
   return b.data.startDate.valueOf() - a.data.startDate.valueOf();
 });
+
+const resumePdfHref = pathWithBase("resume/theo-steiger-resume.pdf");
 ---
 
 <BaseLayout title="Experience" description="Experience and background.">
-  <section class="intro">
-    <h1>Experience</h1>
-    <p>Roles, education, collaborations, and relevant background.</p>
+  <section class="intro intro-with-action">
+    <div>
+      <h1>Experience</h1>
+      <p>Roles, education, collaborations, and relevant background.</p>
+    </div>
+    <a
+      class="button-link"
+      href={resumePdfHref}
+      download="Theo-Steiger-Resume.pdf"
+      aria-label="Download Theo Steiger resume as a PDF"
+    >
+      Export to PDF
+    </a>
   </section>
 
   <ul class="entry-list">
