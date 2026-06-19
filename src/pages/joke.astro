@@ -1,10 +1,30 @@
----
-import BaseLayout from "../layouts/BaseLayout.astro";
----
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="A secret joke." />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Joke</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
 
-<BaseLayout title="Joke" description="A secret joke." noindex>
-  <article class="prose secret-page">
-    <h1>Joke</h1>
+      body {
+        width: min(720px, calc(100% - 32px));
+        margin: 42px auto 64px;
+        color: #1d1d1d;
+        line-height: 1.6;
+      }
+
+      p {
+        margin: 0 0 16px;
+      }
+    </style>
+  </head>
+  <body>
     <p>
       A man walks into a bar, sits down, and pulls a tiny, one-foot-tall man and a
       miniature grand piano out of his bag. The tiny man sits down and begins
@@ -32,5 +52,5 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     <p>
       "Do you really think I wished for a 12-inch pianist?"
     </p>
-  </article>
-</BaseLayout>
+  </body>
+</html>
