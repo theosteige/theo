@@ -173,6 +173,16 @@ import { pathWithBase } from "../lib/site";
       </button>
       <button
         type="button"
+        data-kind="video"
+        data-src={pathWithBase("videos/mood/dance-or-die.mp4")}
+        aria-label="Open Dance or Die video"
+      >
+        <video autoplay muted loop playsinline preload="metadata">
+          <source src={pathWithBase("videos/mood/dance-or-die.mp4")} type="video/mp4" />
+        </video>
+      </button>
+      <button
+        type="button"
         data-kind="image"
         data-src={pathWithBase("images/mood/emirshiro-collage-4.jpg")}
         aria-label="Open fish and eye collage"
