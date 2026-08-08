@@ -3,6 +3,13 @@ import { getCollection, render } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
 const projects = (await getCollection("projects")).sort((a, b) => {
+  const aIsClawdBot = a.data.title.toLowerCase() === "clawdbot";
+  const bIsClawdBot = b.data.title.toLowerCase() === "clawdbot";
+
+  if (aIsClawdBot !== bIsClawdBot) {
+    return aIsClawdBot ? 1 : -1;
+  }
+
   const aDate = a.data.startDate?.valueOf() ?? 0;
   const bDate = b.data.startDate?.valueOf() ?? 0;
   return bDate - aDate;

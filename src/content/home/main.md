@@ -44,29 +44,29 @@ I could write about my hobbies and obsessions all day but I'll spare the details
     <video controls preload="metadata" playsinline poster="images/home/card-trick-poster.jpg">
       <source src="videos/home/card-trick.mp4" type="video/mp4" />
     </video>
-    <figcaption>Breaking in a fresh deck.</figcaption>
+    <figcaption>Breaking in a fresh deck</figcaption>
   </figure>
   <figure>
     <img src="images/home/baseball.jpg" alt="Theo in a baseball uniform with family and coach" />
-    <figcaption>Senior day.</figcaption>
+    <figcaption>Senior day</figcaption>
   </figure>
   <figure>
     <video controls preload="metadata" playsinline poster="images/home/computer-poster.jpg">
       <source src="videos/home/computer.mp4" type="video/mp4" />
     </video>
-    <figcaption>The computer obsession begins.</figcaption>
+    <figcaption>My first real computer</figcaption>
   </figure>
   <figure>
     <img src="images/home/fish-pond.jpg" alt="Theo holding two fish by a pond" />
-    <figcaption>Our secret spot (definetely not private)</figcaption>
+    <figcaption>My secret spot (definetely not private)</figcaption>
   </figure>
   <figure>
     <img src="images/home/fish-boat.jpg" alt="Theo holding a striped bass on a fishing boat" />
-    <figcaption>A slightly more official fishing moment.</figcaption>
+    <figcaption>Sunrise deep sea fishing (the best)</figcaption>
   </figure>
   <figure>
     <img src="images/home/fish-sunset.jpg" alt="Theo fishing at sunset from a boat" />
-    <figcaption>The topwater bite report.</figcaption>
+    <figcaption>Striper!</figcaption>
   </figure>
 </div>
 
@@ -79,19 +79,19 @@ Along with this, I have started to care more about health and wellness as well a
 <div class="media-grid">
   <figure>
     <img src="images/home/body-before.jpg" alt="Theo taking a mirror photo before a fitness transformation" />
-    <figcaption>The starting point.</figcaption>
+    <figcaption>starting point</figcaption>
   </figure>
   <figure>
     <img src="images/home/body-after.jpg" alt="Theo taking a mirror photo after consistent training" />
-    <figcaption>The boring habits starting to work.</figcaption>
+    <figcaption>WIP</figcaption>
   </figure>
   <figure>
     <img src="images/home/friends-dinner.jpg" alt="Theo with friends at dinner" />
-    <figcaption>Friends outside the work loop.</figcaption>
+    <figcaption>Friends</figcaption>
   </figure>
   <figure>
     <img src="images/home/friends-formal.jpg" alt="Theo with friends in formalwear outside" />
-    <figcaption>Friends, plus the occasional tux situation.</figcaption>
+    <figcaption>More friends</figcaption>
   </figure>
 </div>
 
