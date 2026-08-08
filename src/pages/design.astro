@@ -113,6 +113,20 @@ import { pathWithBase } from "../lib/site";
       </button>
       <button
         type="button"
+        data-kind="audio"
+        data-loop
+        data-src={pathWithBase("audio/mood/girlfriends-untitled-3.mp3")}
+        aria-label="Open looping Girlfriends Untitled 3 audio player"
+      >
+        <audio controls loop preload="metadata" tabindex="-1" aria-hidden="true">
+          <source
+            src={pathWithBase("audio/mood/girlfriends-untitled-3.mp3")}
+            type="audio/mpeg"
+          />
+        </audio>
+      </button>
+      <button
+        type="button"
         data-kind="video"
         data-src={pathWithBase("videos/mood/cannes-oxygen-tanks.mp4")}
         aria-label="Open Cannes film video"
