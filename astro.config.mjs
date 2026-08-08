@@ -39,6 +39,9 @@ export default defineConfig({
   site: "https://theosteiger.com",
   base,
   trailingSlash: "always",
+  redirects: {
+    "/mood": "/design"
+  },
   markdown: {
     rehypePlugins: [prefixMarkdownImagePaths]
   }
