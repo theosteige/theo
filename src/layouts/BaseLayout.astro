@@ -6,15 +6,21 @@ interface Props {
   title?: string;
   description?: string;
   noindex?: boolean;
+  fillViewport?: boolean;
 }
 
-const { title, description = site.description, noindex = false } = Astro.props;
+const {
+  title,
+  description = site.description,
+  noindex = false,
+  fillViewport = false
+} = Astro.props;
 const pageTitle = title ? `${title} | ${site.name}` : site.name;
 const canonicalUrl = new URL(Astro.url.pathname, site.url);
 const navItems = [
   { label: "Experience", href: pathWithBase("experience/") },
   { label: "Projects", href: pathWithBase("projects/") },
-  { label: "Blog", href: pathWithBase("blog/") },
+  { label: "Mood", href: pathWithBase("mood/") },
   { label: "Reading", href: pathWithBase("reading/") }
 ];
 ---
@@ -29,7 +35,7 @@ const navItems = [
     <link rel="canonical" href={canonicalUrl.toString()} />
     <title>{pageTitle}</title>
   </head>
-  <body>
+  <body class:list={{ "viewport-layout": fillViewport }}>
     <header class="site-header">
       <div>
         <a class="site-title" href={pathWithBase()}>{site.name}</a>
