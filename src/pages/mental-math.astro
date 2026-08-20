@@ -75,10 +75,27 @@ const scoreApiUrl = (import.meta.env.PUBLIC_SCORE_API_URL ?? "").replace(/\/$/, 
         color: #900;
       }
 
-      .game-introduction {
+      .progress-section {
         clear: both;
         padding-top: 12px;
-        line-height: 1.5;
+      }
+
+      .game-introduction {
+        display: none;
+        width: min(720px, calc(100% - 32px));
+        margin: 32px auto 64px;
+        color: var(--text);
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        font-size: 16px;
+        line-height: 1.6;
+      }
+
+      .mental-math-page[data-state="settings"] .game-introduction {
+        display: block;
+      }
+
+      .game-introduction p {
+        margin: 0 0 16px;
       }
 
       #history-summary {
@@ -287,14 +304,7 @@ const scoreApiUrl = (import.meta.env.PUBLIC_SCORE_API_URL ?? "").replace(/\/$/, 
         <p id="settings-error" role="alert" hidden></p>
       </form>
 
-      <div class="game-introduction">
-        <p>
-          Here's a fun game. I realized a week or two ago that I take pride in my mental math skills, and yet over time they have degraded. I think this is because I don't use them in my day to day work. With this game I hope to keep them sharp, and if I'm lucky, I will have some good scores to show off.
-        </p>
-        <p>Quick note: I only play this on the default settings</p>
-      </div>
-
-      <section aria-labelledby="progress-heading">
+      <section class="progress-section" aria-labelledby="progress-heading">
         <h2 id="progress-heading">Progress</h2>
         <p id="progress-status" aria-live="polite"></p>
         <p id="empty-progress">No completed games yet.</p>
@@ -312,6 +322,13 @@ const scoreApiUrl = (import.meta.env.PUBLIC_SCORE_API_URL ?? "").replace(/\/$/, 
         </div>
       </section>
     </section>
+
+    <div class="game-introduction">
+      <p>
+        Here's a fun game. I realized a week or two ago that I take pride in my mental math skills, and yet over time they have degraded. I think this is because I don't use them in my day to day work. With this game I hope to keep them sharp, and if I'm lucky, I will have some good scores to show off.
+      </p>
+      <p>Quick note: I only play this on the default settings</p>
+    </div>
 
     <section id="history" aria-labelledby="history-heading">
       <h1 id="history-heading">Past Scores</h1>
