@@ -1,6 +1,8 @@
 const FILE = "scores.json";
+const PRACTICE_FILE = "practice.json";
 const MAX_SCORES = 100;
 const DURATIONS = new Set([30, 60, 120, 300, 600]);
+const MAX_PRACTICE_SESSION_SECONDS = 7 * 24 * 60 * 60;
 
 function headers(origin) {
   return {
@@ -61,6 +63,19 @@ async function readScores(env, fetcher) {
   return Array.isArray(scores) ? scores.filter(validScore).slice(-MAX_SCORES) : [];
 }
 
+function practiceSecondsFromGist(gist) {
+  const file = gist.files?.[PRACTICE_FILE];
+  if (!file || file.truncated || typeof file.content !== "string") return 0;
+  const value = JSON.parse(file.content);
+  return Number.isSafeInteger(value.totalSeconds) && value.totalSeconds >= 0
+    ? value.totalSeconds
+    : 0;
+}
+
+async function readPracticeSeconds(env, fetcher) {
+  return practiceSecondsFromGist(await gistRequest(env, fetcher));
+}
+
 async function sameSecret(left, right) {
   const encode = (value) => crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
   const [leftHash, rightHash] = await Promise.all([encode(left), encode(right)]);
@@ -74,11 +89,15 @@ export function createHandler(fetcher = fetch, now = () => new Date()) {
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: headers(origin) });
 
     const path = new URL(request.url).pathname.replace(/\/$/, "");
-    if (!path.endsWith("/scores")) return json({ error: "Not found." }, 404, origin);
+    const isScoresPath = path.endsWith("/scores");
+    const isPracticeTimePath = path.endsWith("/practice-time");
+    if (!isScoresPath && !isPracticeTimePath) return json({ error: "Not found." }, 404, origin);
 
     try {
       if (request.method === "GET") {
-        return json({ scores: await readScores(env, fetcher) }, 200, origin);
+        return isScoresPath
+          ? json({ scores: await readScores(env, fetcher) }, 200, origin)
+          : json({ totalSeconds: await readPracticeSeconds(env, fetcher) }, 200, origin);
       }
 
       if (request.method === "POST") {
@@ -88,6 +107,22 @@ export function createHandler(fetcher = fetch, now = () => new Date()) {
         }
 
         const input = await request.json();
+        if (isPracticeTimePath) {
+          if (
+            !Number.isSafeInteger(input.seconds) ||
+            input.seconds < 1 ||
+            input.seconds > MAX_PRACTICE_SESSION_SECONDS
+          ) {
+            return json({ error: "Invalid practice time." }, 400, origin);
+          }
+
+          const totalSeconds = practiceSecondsFromGist(await gistRequest(env, fetcher)) + input.seconds;
+          await gistRequest(env, fetcher, "PATCH", {
+            files: { [PRACTICE_FILE]: { content: `${JSON.stringify({ totalSeconds }, null, 2)}\n` } }
+          });
+          return json({ totalSeconds }, 201, origin);
+        }
+
         if (!Number.isInteger(input.score) || input.score < 0 || input.score > 10000 || !DURATIONS.has(input.duration)) {
           return json({ error: "Invalid score." }, 400, origin);
         }

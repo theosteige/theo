@@ -15,13 +15,19 @@ const priorScore = {
   duration: 120
 };
 
-function gist(scores = [priorScore]) {
+function gist(scores = [priorScore], practiceSeconds) {
   return Response.json({
     files: {
       "scores.json": {
         content: JSON.stringify(scores),
         truncated: false
-      }
+      },
+      ...(practiceSeconds === undefined ? {} : {
+        "practice.json": {
+          content: JSON.stringify({ totalSeconds: practiceSeconds }),
+          truncated: false
+        }
+      })
     }
   });
 }
@@ -99,4 +105,43 @@ test("rejects incorrect keys without contacting GitHub", async () => {
 
   assert.equal(response.status, 401);
   assert.equal(calls, 0);
+});
+
+test("reads zero practice time when the Gist file does not exist", async () => {
+  const handler = createHandler(async () => gist());
+  const response = await handler(
+    new Request("https://scores.example/practice-time", {
+      headers: { Origin: "https://theosteiger.com" }
+    }),
+    env
+  );
+
+  assert.equal(response.status, 200);
+  assert.deepEqual(await response.json(), { totalSeconds: 0 });
+});
+
+test("adds authenticated practice time to the Gist total", async () => {
+  const requests = [];
+  const handler = createHandler(async (input, init) => {
+    const request = new Request(input, init);
+    requests.push(request.clone());
+    return request.method === "GET" ? gist([], 125) : Response.json({ ok: true });
+  });
+  const response = await handler(
+    new Request("https://scores.example/practice-time", {
+      method: "POST",
+      headers: {
+        Authorization: "Bearer journal-key",
+        "Content-Type": "application/json",
+        Origin: "https://theosteiger.com"
+      },
+      body: JSON.stringify({ seconds: 35 })
+    }),
+    env
+  );
+
+  assert.equal(response.status, 201);
+  assert.deepEqual(await response.json(), { totalSeconds: 160 });
+  const update = await requests[1].json();
+  assert.deepEqual(JSON.parse(update.files["practice.json"].content), { totalSeconds: 160 });
 });

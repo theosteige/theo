@@ -27,6 +27,16 @@ const scoreApiUrl = (import.meta.env.PUBLIC_SCORE_API_URL ?? "").replace(/\/$/, 
         background: #ddd;
       }
 
+      #practice-time-summary {
+        display: none;
+        width: 480px;
+        margin: 0 auto 8px;
+      }
+
+      .mental-math-page[data-state="settings"] #practice-time-summary {
+        display: block;
+      }
+
       #welcome {
         overflow: auto;
       }
@@ -228,7 +238,8 @@ const scoreApiUrl = (import.meta.env.PUBLIC_SCORE_API_URL ?? "").replace(/\/$/, 
 
       @media (max-width: 480px) {
         #welcome,
-        #history {
+        #history,
+        #practice-time-summary {
           width: 100%;
         }
 
@@ -249,6 +260,9 @@ const scoreApiUrl = (import.meta.env.PUBLIC_SCORE_API_URL ?? "").replace(/\/$/, 
   fillViewport
 >
   <div class="mental-math-page" data-state="settings" data-score-api={scoreApiUrl}>
+    <p id="practice-time-summary">
+      <strong>Total time played:</strong> <span id="practice-time-value">Loading…</span>
+    </p>
     <section id="welcome" aria-labelledby="game-heading">
       <h1 id="game-heading">Arithmetic Game</h1>
       <p>
@@ -411,6 +425,7 @@ const scoreApiUrl = (import.meta.env.PUBLIC_SCORE_API_URL ?? "").replace(/\/$/, 
 
       const root = document.querySelector<HTMLElement>(".mental-math-page")!;
       const scoreApi = root.dataset.scoreApi ?? "";
+      const practiceTimeValue = document.querySelector<HTMLElement>("#practice-time-value")!;
       const optionsForm = document.querySelector<HTMLFormElement>("#game-options")!;
       const settingsError = document.querySelector<HTMLParagraphElement>("#settings-error")!;
       const durationSelect = document.querySelector<HTMLSelectElement>("#duration")!;
@@ -443,7 +458,63 @@ const scoreApiUrl = (import.meta.env.PUBLIC_SCORE_API_URL ?? "").replace(/\/$/, 
       let deadline = 0;
       let timerId: number | undefined;
       let isPlaying = false;
+      let practiceStartedAt: number | undefined;
+      let totalPracticeSeconds = 0;
       let scores: ScoreEntry[] = [];
+
+      function formatPracticeTime(seconds: number) {
+        if (seconds < 60) return `${seconds} ${seconds === 1 ? "second" : "seconds"}`;
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        if (hours === 0) return `${minutes} ${minutes === 1 ? "minute" : "minutes"}`;
+        if (minutes === 0) return `${hours} ${hours === 1 ? "hour" : "hours"}`;
+        return `${hours} ${hours === 1 ? "hour" : "hours"} ${minutes} ${minutes === 1 ? "minute" : "minutes"}`;
+      }
+
+      function renderPracticeTime() {
+        practiceTimeValue.textContent = formatPracticeTime(totalPracticeSeconds);
+      }
+
+      async function loadPracticeTime() {
+        if (!scoreApi) {
+          practiceTimeValue.textContent = "Unavailable";
+          return;
+        }
+        try {
+          const response = await fetch(`${scoreApi}/practice-time`);
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.error);
+          totalPracticeSeconds = data.totalSeconds;
+          renderPracticeTime();
+        } catch {
+          practiceTimeValue.textContent = "Unavailable";
+        }
+      }
+
+      async function savePracticeTime(seconds: number) {
+        if (!scoreApi || !journalKey.value) {
+          saveStatus.textContent = "Enter the journal key to save practice time. Practice scores are not saved.";
+          return;
+        }
+        saveStatus.textContent = "Saving practice time…";
+        try {
+          const response = await fetch(`${scoreApi}/practice-time`, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${journalKey.value}`,
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ seconds })
+          });
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.error);
+          totalPracticeSeconds = data.totalSeconds;
+          renderPracticeTime();
+          saveStatus.textContent = "Practice time saved. Practice scores are not saved.";
+        } catch {
+          saveStatus.textContent = "Practice time could not be saved. Practice scores are not saved.";
+        }
+      }
 
       function setScoreStatus(message: string) {
         progressStatus.textContent = message;
@@ -567,6 +638,7 @@ const scoreApiUrl = (import.meta.env.PUBLIC_SCORE_API_URL ?? "").replace(/\/$/, 
 
       function startGame() {
         const isPractice = gameDuration === null;
+        practiceStartedAt = isPractice ? performance.now() : undefined;
         score = 0;
         currentScore.value = "0";
         timeLabel.textContent = isPractice ? "Practice mode" : "Seconds left:";
@@ -591,11 +663,14 @@ const scoreApiUrl = (import.meta.env.PUBLIC_SCORE_API_URL ?? "").replace(/\/$/, 
         exitPractice.hidden = true;
         if (gameDuration === null) {
           timeLabel.textContent = "Practice complete";
+          const practiceSeconds = Math.max(1, Math.round((performance.now() - practiceStartedAt!) / 1000));
+          practiceStartedAt = undefined;
+          void savePracticeTime(practiceSeconds);
         } else {
           timeLeft.value = "0";
+          void saveScore();
         }
         finalScore.textContent = String(score);
-        void saveScore();
         renderHistory();
         setState("finished");
       }
@@ -736,6 +811,7 @@ const scoreApiUrl = (import.meta.env.PUBLIC_SCORE_API_URL ?? "").replace(/\/$/, 
 
       renderHistory();
       void loadScores();
+      void loadPracticeTime();
     </script>
   </div>
 </BaseLayout>
