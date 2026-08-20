@@ -1,5 +1,5 @@
 ---
-title: "A 3-Minute Introduction to Theo"
+title: "A 5-Minute Introduction to Theo"
 description: "A short introduction to Theo Steiger."
 ---
 
@@ -11,7 +11,7 @@ I'm a 21 year old new graduate from Union College Studying Physics and Computer 
 
 ## Early Life
 
-Growing up, I was always a curious and deeply obsessive kid. In school, that obsessoin turned into a deep love for math (shoutout rockership math). Outside of school, that curiousity turned into card trick tutorial videos, and yoyoing. Growing up I also spent lots of time outside on my skateboard around Littlebrook elementary school. Some would even say I spent a little too much time. 
+Growing up, I was always a curious and deeply obsessive kid. In school, that obsession turned into a deep love for math (shoutout rockership math). Outside of school, that curiousity turned into card trick tutorial videos, and yoyoing. Growing up I also spent lots of time outside on my skateboard around Littlebrook elementary school. Some would even say I spent a little too much time.
 
 ![Theo skateboarding as a kid](/images/home/skateboard.jpg)
 
@@ -41,31 +41,31 @@ I could write about my hobbies and obsessions all day but I'll spare the details
 
 <div class="media-grid">
   <figure>
-    <video controls preload="metadata" playsinline poster="images/home/card-trick-poster.jpg">
-      <source src="videos/home/card-trick.mp4" type="video/mp4" />
+    <video controls preload="metadata" playsinline poster="/images/home/card-trick-poster.jpg">
+      <source src="/videos/home/card-trick.mp4" type="video/mp4" />
     </video>
     <figcaption>Breaking in a fresh deck</figcaption>
   </figure>
   <figure>
-    <img src="images/home/baseball.jpg" alt="Theo in a baseball uniform with family and coach" />
+    <img src="/images/home/baseball.jpg" alt="Theo in a baseball uniform with family and coach" />
     <figcaption>Senior day</figcaption>
   </figure>
   <figure>
-    <video controls preload="metadata" playsinline poster="images/home/computer-poster.jpg">
-      <source src="videos/home/computer.mp4" type="video/mp4" />
+    <video controls preload="metadata" playsinline poster="/images/home/computer-poster.jpg">
+      <source src="/videos/home/computer.mp4" type="video/mp4" />
     </video>
     <figcaption>My first real computer</figcaption>
   </figure>
   <figure>
-    <img src="images/home/fish-pond.jpg" alt="Theo holding two fish by a pond" />
+    <img src="/images/home/fish-pond.jpg" alt="Theo holding two fish by a pond" />
     <figcaption>My secret spot (definetely not private)</figcaption>
   </figure>
   <figure>
-    <img src="images/home/fish-boat.jpg" alt="Theo holding a striped bass on a fishing boat" />
+    <img src="/images/home/fish-boat.jpg" alt="Theo holding a striped bass on a fishing boat" />
     <figcaption>Sunrise deep sea fishing (the best)</figcaption>
   </figure>
   <figure>
-    <img src="images/home/fish-sunset.jpg" alt="Theo fishing at sunset from a boat" />
+    <img src="/images/home/fish-sunset.jpg" alt="Theo fishing at sunset from a boat" />
     <figcaption>Striper!</figcaption>
   </figure>
 </div>
@@ -78,19 +78,19 @@ Along with this, I have started to care more about health and wellness as well a
 
 <div class="media-grid">
   <figure>
-    <img src="images/home/body-before.jpg" alt="Theo taking a mirror photo before a fitness transformation" />
+    <img src="/images/home/body-before.jpg" alt="Theo taking a mirror photo before a fitness transformation" />
     <figcaption>starting point</figcaption>
   </figure>
   <figure>
-    <img src="images/home/body-after.jpg" alt="Theo taking a mirror photo after consistent training" />
+    <img src="/images/home/body-after.jpg" alt="Theo taking a mirror photo after consistent training" />
     <figcaption>WIP</figcaption>
   </figure>
   <figure>
-    <img src="images/home/friends-dinner.jpg" alt="Theo with friends at dinner" />
+    <img src="/images/home/friends-dinner.jpg" alt="Theo with friends at dinner" />
     <figcaption>Friends</figcaption>
   </figure>
   <figure>
-    <img src="images/home/friends-formal.jpg" alt="Theo with friends in formalwear outside" />
+    <img src="/images/home/friends-formal.jpg" alt="Theo with friends in formalwear outside" />
     <figcaption>More friends</figcaption>
   </figure>
 </div>

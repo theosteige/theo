@@ -1,12 +1,73 @@
 ---
+import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
-import * as home from "../content/home/main.md";
+import { pathWithBase } from "../lib/site";
 
-const { Content, frontmatter } = home;
+const posts = (await getCollection("blog"))
+  .filter((post) => !post.data.draft)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const pages = [
+  {
+    title: "5-Minute Intro",
+    description: "A short introduction to who I am outside of work.",
+    href: pathWithBase("five-minute-intro/")
+  },
+  {
+    title: "Experience",
+    description: "Roles, education, collaborations, and relevant background.",
+    href: pathWithBase("experience/")
+  },
+  {
+    title: "Projects",
+    description: "Current and past work.",
+    href: pathWithBase("projects/")
+  },
+  {
+    title: "Reading",
+    description: "Books, papers, articles, and references.",
+    href: pathWithBase("reading/")
+  },
+  {
+    title: "Blog",
+    description: "Posts and notes.",
+    href: pathWithBase("blog/"),
+    children: posts.map((post) => ({
+      title: post.data.title,
+      href: pathWithBase(`blog/${post.id}/`)
+    }))
+  },
+  {
+    title: "Design",
+    description: "A collection of images, videos, and audio.",
+    href: pathWithBase("design/")
+  }
+];
 ---
 
-<BaseLayout title={frontmatter.title} description={frontmatter.description}>
-  <article class="prose home-content">
-    <Content />
-  </article>
+<BaseLayout title="Table of Contents" description="Explore Theo Steiger's website.">
+  <section class="intro" aria-labelledby="contents-title">
+    <h1 id="contents-title">Table of Contents</h1>
+    <p>Everything on this site, in one place.</p>
+  </section>
+
+  <ol class="contents-list">
+    {
+      pages.map((page) => (
+        <li>
+          <div class="contents-entry">
+            <h2><a href={page.href}>{page.title}</a></h2>
+            <p>{page.description}</p>
+          </div>
+          {page.children && page.children.length > 0 && (
+            <ol class="contents-sublist">
+              {page.children.map((child) => (
+                <li><a href={child.href}>{child.title}</a></li>
+              ))}
+            </ol>
+          )}
+        </li>
+      ))
+    }
+  </ol>
 </BaseLayout>
