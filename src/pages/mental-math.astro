@@ -144,6 +144,12 @@ const scoreApiUrl = (import.meta.env.PUBLIC_SCORE_API_URL ?? "").replace(/\/$/, 
         right: 20px;
       }
 
+      #exit-practice {
+        position: absolute;
+        top: 52px;
+        left: 20px;
+      }
+
       .banner {
         padding: 10px 0;
         margin-top: 240px;
@@ -294,6 +300,7 @@ const scoreApiUrl = (import.meta.env.PUBLIC_SCORE_API_URL ?? "").replace(/\/$/, 
             <option value="120" selected>120 seconds</option>
             <option value="300">300 seconds</option>
             <option value="600">600 seconds</option>
+            <option value="practice">Practice (no time limit)</option>
           </select>
         </p>
         <p>
@@ -352,7 +359,10 @@ const scoreApiUrl = (import.meta.env.PUBLIC_SCORE_API_URL ?? "").replace(/\/$/, 
     </section>
 
     <section id="game" aria-label="Arithmetic game in progress">
-      <span class="game-status left">Seconds left: <output id="time-left">120</output></span>
+      <span class="game-status left">
+        <span id="time-label">Seconds left:</span>
+        <output id="time-left">120</output>
+      </span>
       <span class="game-status right">Score: <output id="current-score">0</output></span>
 
       <div class="banner">
@@ -378,6 +388,7 @@ const scoreApiUrl = (import.meta.env.PUBLIC_SCORE_API_URL ?? "").replace(/\/$/, 
           <p><a href="#history" data-show-history>View past scores</a>.</p>
         </div>
       </div>
+      <button id="exit-practice" type="button" hidden>Exit practice</button>
     </section>
 
     <script>
@@ -407,7 +418,9 @@ const scoreApiUrl = (import.meta.env.PUBLIC_SCORE_API_URL ?? "").replace(/\/$/, 
       const answerForm = document.querySelector<HTMLFormElement>("#answer-form")!;
       const answerInput = document.querySelector<HTMLInputElement>("#answer")!;
       const equation = document.querySelector<HTMLElement>("#equation")!;
+      const timeLabel = document.querySelector<HTMLElement>("#time-label")!;
       const timeLeft = document.querySelector<HTMLOutputElement>("#time-left")!;
+      const exitPractice = document.querySelector<HTMLButtonElement>("#exit-practice")!;
       const currentScore = document.querySelector<HTMLOutputElement>("#current-score")!;
       const finalScore = document.querySelector<HTMLElement>("#final-score")!;
       const saveStatus = document.querySelector<HTMLElement>("#save-status")!;
@@ -426,7 +439,7 @@ const scoreApiUrl = (import.meta.env.PUBLIC_SCORE_API_URL ?? "").replace(/\/$/, 
       let problem: MentalMathProblem | undefined;
       let gameOptions: MentalMathOptions;
       let score = 0;
-      let gameDuration = 120;
+      let gameDuration: number | null = 120;
       let deadline = 0;
       let timerId: number | undefined;
       let isPlaying = false;
@@ -456,6 +469,10 @@ const scoreApiUrl = (import.meta.env.PUBLIC_SCORE_API_URL ?? "").replace(/\/$/, 
       }
 
       async function saveScore() {
+        if (gameDuration === null) {
+          saveStatus.textContent = "Practice scores are not saved.";
+          return;
+        }
         if (!scoreApi || !journalKey.value) {
           saveStatus.textContent = "Enter the journal key to save this score.";
           return;
@@ -549,17 +566,21 @@ const scoreApiUrl = (import.meta.env.PUBLIC_SCORE_API_URL ?? "").replace(/\/$/, 
       }
 
       function startGame() {
+        const isPractice = gameDuration === null;
         score = 0;
         currentScore.value = "0";
-        timeLeft.value = String(gameDuration);
+        timeLabel.textContent = isPractice ? "Practice mode" : "Seconds left:";
+        timeLeft.hidden = isPractice;
+        timeLeft.value = isPractice ? "" : String(gameDuration);
+        exitPractice.hidden = !isPractice;
         isPlaying = true;
-        deadline = performance.now() + gameDuration * 1000;
+        deadline = isPractice ? Number.POSITIVE_INFINITY : performance.now() + gameDuration * 1000;
         answerInput.value = "";
         saveStatus.textContent = "";
         setState("playing");
         showNextProblem();
         answerInput.focus();
-        timerId = window.setInterval(updateTimer, 100);
+        timerId = isPractice ? undefined : window.setInterval(updateTimer, 100);
       }
 
       function finishGame() {
@@ -567,7 +588,12 @@ const scoreApiUrl = (import.meta.env.PUBLIC_SCORE_API_URL ?? "").replace(/\/$/, 
         isPlaying = false;
         if (timerId !== undefined) window.clearInterval(timerId);
         timerId = undefined;
-        timeLeft.value = "0";
+        exitPractice.hidden = true;
+        if (gameDuration === null) {
+          timeLabel.textContent = "Practice complete";
+        } else {
+          timeLeft.value = "0";
+        }
         finalScore.textContent = String(score);
         void saveScore();
         renderHistory();
@@ -666,7 +692,7 @@ const scoreApiUrl = (import.meta.env.PUBLIC_SCORE_API_URL ?? "").replace(/\/$/, 
         const selectedOptions = readGameOptions();
         if (!selectedOptions) return;
         gameOptions = selectedOptions;
-        gameDuration = Number(durationSelect.value);
+        gameDuration = durationSelect.value === "practice" ? null : Number(durationSelect.value);
         startGame();
       });
 
@@ -690,6 +716,8 @@ const scoreApiUrl = (import.meta.env.PUBLIC_SCORE_API_URL ?? "").replace(/\/$/, 
         event.preventDefault();
         startGame();
       });
+
+      exitPractice.addEventListener("click", finishGame);
 
       document.querySelectorAll("[data-show-settings]").forEach((link) => {
         link.addEventListener("click", (event) => {
