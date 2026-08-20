@@ -1,17 +1,17 @@
 ---
-import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { pathWithBase } from "../lib/site";
-
-const posts = (await getCollection("blog"))
-  .filter((post) => !post.data.draft)
-  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
 const pages = [
   {
     title: "5-Minute Intro",
     description: "A short introduction to who I am outside of work.",
     href: pathWithBase("five-minute-intro/")
+  },
+  {
+    title: "Mental Math",
+    description: "A two-minute arithmetic game with personal score tracking.",
+    href: pathWithBase("mental-math/")
   },
   {
     title: "Experience",
@@ -27,15 +27,6 @@ const pages = [
     title: "Reading",
     description: "Books, papers, articles, and references.",
     href: pathWithBase("reading/")
-  },
-  {
-    title: "Blog",
-    description: "Posts and notes.",
-    href: pathWithBase("blog/"),
-    children: posts.map((post) => ({
-      title: post.data.title,
-      href: pathWithBase(`blog/${post.id}/`)
-    }))
   },
   {
     title: "Design",
@@ -59,13 +50,6 @@ const pages = [
             <h2><a href={page.href}>{page.title}</a></h2>
             <p>{page.description}</p>
           </div>
-          {page.children && page.children.length > 0 && (
-            <ol class="contents-sublist">
-              {page.children.map((child) => (
-                <li><a href={child.href}>{child.title}</a></li>
-              ))}
-            </ol>
-          )}
         </li>
       ))
     }

@@ -1,0 +1,643 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const scoreApiUrl = (import.meta.env.PUBLIC_SCORE_API_URL ?? "").replace(/\/$/, "");
+---
+
+<style>
+      .mental-math-page {
+        position: relative;
+        min-height: 100%;
+        overflow: auto;
+        font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+        font-size: 14px;
+        color: #000;
+      }
+
+      a {
+        color: #04c;
+      }
+
+      #welcome,
+      #history {
+        display: none;
+        width: 480px;
+        padding: 20px;
+        margin: 0 auto;
+        background: #ddd;
+      }
+
+      #welcome {
+        overflow: auto;
+      }
+
+      .mental-math-page[data-state="settings"] #welcome,
+      .mental-math-page[data-state="history"] #history,
+      .mental-math-page[data-state="playing"] #game,
+      .mental-math-page[data-state="finished"] #game {
+        display: block;
+      }
+
+      h1 {
+        margin: 0.67em 0;
+        font-size: 28px;
+      }
+
+      h2 {
+        margin: 1em 0 0.5em;
+        font-size: 18px;
+      }
+
+      p,
+      dl {
+        margin: 1em 0;
+      }
+
+      dt {
+        display: block;
+      }
+
+      dd {
+        margin: 0 0 7px 40px;
+      }
+
+      .range-input {
+        width: 42px;
+        margin: 0 2px;
+      }
+
+      #start-game {
+        float: right;
+      }
+
+      #settings-error {
+        clear: both;
+        color: #900;
+      }
+
+      #history-summary {
+        line-height: 1.5;
+      }
+
+      #history-chart {
+        display: block;
+        width: 100%;
+        height: auto;
+        border: 1px solid #aaa;
+        background: #fff;
+      }
+
+      #history-chart[hidden],
+      #history-data[hidden],
+      #empty-history[hidden] {
+        display: none;
+      }
+
+      #score-history {
+        padding-left: 24px;
+      }
+
+      #score-history li {
+        margin: 4px 0;
+      }
+
+      #game {
+        display: none;
+      }
+
+      .game-status {
+        position: absolute;
+        top: 20px;
+        font-size: 18px;
+      }
+
+      .game-status.left {
+        left: 20px;
+      }
+
+      .game-status.right {
+        right: 20px;
+      }
+
+      .banner {
+        padding: 10px 0;
+        margin-top: 240px;
+        background: #ddd;
+        font-size: 36px;
+        line-height: 54px;
+        text-align: center;
+      }
+
+      #answer-form,
+      #finished-game {
+        display: none;
+      }
+
+      .mental-math-page[data-state="playing"] #answer-form,
+      .mental-math-page[data-state="finished"] #finished-game {
+        display: block;
+      }
+
+      #equation {
+        white-space: nowrap;
+      }
+
+      #answer {
+        width: 188px;
+        padding: 1px 2px;
+        font: 36px "Helvetica Neue", Arial, Helvetica, sans-serif;
+      }
+
+      #finished-game p {
+        padding: 0;
+        margin: 0;
+        font-size: 14px;
+        line-height: 24px;
+      }
+
+      #finished-game .final-score {
+        font-size: 36px;
+        line-height: 56px;
+      }
+
+      .chart-grid {
+        stroke: #ccc;
+        stroke-width: 1;
+      }
+
+      .chart-label {
+        fill: #444;
+        font: 11px "Helvetica Neue", Arial, Helvetica, sans-serif;
+      }
+
+      .chart-line {
+        fill: none;
+        stroke: #04c;
+        stroke-width: 2;
+      }
+
+      .chart-point {
+        fill: #fff;
+        stroke: #04c;
+        stroke-width: 2;
+      }
+
+      .visually-hidden {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        border: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        clip-path: inset(50%);
+        white-space: nowrap;
+      }
+
+      @media (max-width: 480px) {
+        #welcome,
+        #history {
+          width: 100%;
+        }
+
+        .banner {
+          font-size: 30px;
+        }
+
+        #answer {
+          width: 140px;
+          font-size: 30px;
+        }
+      }
+    </style>
+
+<BaseLayout
+  title="Mental Math"
+  description="A fast-paced mental arithmetic game with personal score tracking."
+  fillViewport
+>
+  <div class="mental-math-page" data-state="settings" data-score-api={scoreApiUrl}>
+    <section id="welcome" aria-labelledby="game-heading">
+      <h1 id="game-heading">Arithmetic Game</h1>
+      <p>
+        The Arithmetic Game is a fast-paced speed drill where you are given two
+        minutes to solve as many arithmetic problems as you can.
+      </p>
+      <p>
+        Scores are synced after each game. <a href="#history" data-show-history>View past scores</a>.
+      </p>
+
+      <form id="game-options">
+        <dl>
+          <dt>
+            <label><input id="addition" type="checkbox" checked /> Addition</label>
+          </dt>
+          <dd>
+            Range: (<input class="range-input" id="add-left-min" value="2" inputmode="numeric" aria-label="Addition left minimum" />
+            to <input class="range-input" id="add-left-max" value="100" inputmode="numeric" aria-label="Addition left maximum" />)
+            + (<input class="range-input" id="add-right-min" value="2" inputmode="numeric" aria-label="Addition right minimum" />
+            to <input class="range-input" id="add-right-max" value="100" inputmode="numeric" aria-label="Addition right maximum" />)
+          </dd>
+
+          <dt>
+            <label><input id="subtraction" type="checkbox" checked /> Subtraction</label>
+          </dt>
+          <dd>Addition problems in reverse.</dd>
+
+          <dt>
+            <label><input id="multiplication" type="checkbox" checked /> Multiplication</label>
+          </dt>
+          <dd>
+            Range: (<input class="range-input" id="mul-left-min" value="2" inputmode="numeric" aria-label="Multiplication left minimum" />
+            to <input class="range-input" id="mul-left-max" value="12" inputmode="numeric" aria-label="Multiplication left maximum" />)
+            × (<input class="range-input" id="mul-right-min" value="2" inputmode="numeric" aria-label="Multiplication right minimum" />
+            to <input class="range-input" id="mul-right-max" value="100" inputmode="numeric" aria-label="Multiplication right maximum" />)
+          </dd>
+
+          <dt>
+            <label><input id="division" type="checkbox" checked /> Division</label>
+          </dt>
+          <dd>Multiplication problems in reverse.</dd>
+        </dl>
+
+        <p class="form-actions">
+          <label for="duration">Duration:</label>
+          <select id="duration">
+            <option value="30">30 seconds</option>
+            <option value="60">60 seconds</option>
+            <option value="120" selected>120 seconds</option>
+            <option value="300">300 seconds</option>
+            <option value="600">600 seconds</option>
+          </select>
+        </p>
+        <p>
+          <label for="journal-key">Journal key:</label>
+          <input id="journal-key" type="password" autocomplete="off" />
+        </p>
+        <input id="start-game" type="submit" value="Start" />
+        <p id="settings-error" role="alert" hidden></p>
+      </form>
+    </section>
+
+    <section id="history" aria-labelledby="history-heading">
+      <h1 id="history-heading">Past Scores</h1>
+      <p id="history-status" aria-live="polite"></p>
+      <p id="empty-history">No completed games yet.</p>
+      <div id="history-data" hidden>
+        <p id="history-summary"></p>
+        <svg
+          id="history-chart"
+          viewBox="0 0 440 160"
+          role="img"
+          aria-labelledby="chart-title"
+          aria-describedby="chart-description"
+          hidden
+        ></svg>
+        <h2>Recent games</h2>
+        <ol id="score-history"></ol>
+      </div>
+      <p><a href="#settings" data-show-settings>Back to settings</a>.</p>
+    </section>
+
+    <section id="game" aria-label="Arithmetic game in progress">
+      <span class="game-status left">Seconds left: <output id="time-left">120</output></span>
+      <span class="game-status right">Score: <output id="current-score">0</output></span>
+
+      <div class="banner">
+        <form id="answer-form" autocomplete="off">
+          <span id="equation">Ready?</span>
+          <label class="visually-hidden" for="answer">Answer</label>
+          <input
+            id="answer"
+            type="text"
+            inputmode="numeric"
+            pattern="-?[0-9]*"
+            maxlength="8"
+          />
+        </form>
+
+        <div id="finished-game">
+          <p class="final-score">Score: <span id="final-score">0</span></p>
+          <p id="save-status" aria-live="polite"></p>
+          <p>
+            <a href="#again" id="try-again">Try again</a> or
+            <a href="#settings" data-show-settings>change settings</a>.
+          </p>
+          <p><a href="#history" data-show-history>View past scores</a>.</p>
+        </div>
+      </div>
+    </section>
+
+    <script>
+      import {
+        createProblem,
+        isCorrectAnswer,
+        type MentalMathOperation,
+        type MentalMathOptions,
+        type MentalMathProblem,
+        type NumberRange
+      } from "../lib/mentalMath";
+      interface ScoreEntry {
+        score: number;
+        playedAt: string;
+        duration?: number;
+      }
+
+      const MAX_STORED_GAMES = 100;
+      const MAX_CHART_GAMES = 20;
+
+      const root = document.querySelector<HTMLElement>(".mental-math-page")!;
+      const scoreApi = root.dataset.scoreApi ?? "";
+      const optionsForm = document.querySelector<HTMLFormElement>("#game-options")!;
+      const settingsError = document.querySelector<HTMLParagraphElement>("#settings-error")!;
+      const durationSelect = document.querySelector<HTMLSelectElement>("#duration")!;
+      const journalKey = document.querySelector<HTMLInputElement>("#journal-key")!;
+      const answerForm = document.querySelector<HTMLFormElement>("#answer-form")!;
+      const answerInput = document.querySelector<HTMLInputElement>("#answer")!;
+      const equation = document.querySelector<HTMLElement>("#equation")!;
+      const timeLeft = document.querySelector<HTMLOutputElement>("#time-left")!;
+      const currentScore = document.querySelector<HTMLOutputElement>("#current-score")!;
+      const finalScore = document.querySelector<HTMLElement>("#final-score")!;
+      const saveStatus = document.querySelector<HTMLElement>("#save-status")!;
+      const emptyHistory = document.querySelector<HTMLElement>("#empty-history")!;
+      const historyStatus = document.querySelector<HTMLElement>("#history-status")!;
+      const historyData = document.querySelector<HTMLElement>("#history-data")!;
+      const historySummary = document.querySelector<HTMLElement>("#history-summary")!;
+      const historyChart = document.querySelector<SVGSVGElement>("#history-chart")!;
+      const scoreHistory = document.querySelector<HTMLOListElement>("#score-history")!;
+
+      let problem: MentalMathProblem | undefined;
+      let gameOptions: MentalMathOptions;
+      let score = 0;
+      let gameDuration = 120;
+      let deadline = 0;
+      let timerId: number | undefined;
+      let isPlaying = false;
+      let scores: ScoreEntry[] = [];
+
+      async function loadScores() {
+        if (!scoreApi) {
+          historyStatus.textContent = "Score syncing is not configured.";
+          return;
+        }
+        historyStatus.textContent = "Loading…";
+        try {
+          const response = await fetch(`${scoreApi}/scores`);
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.error);
+          scores = data.scores;
+          historyStatus.textContent = "";
+        } catch {
+          historyStatus.textContent = "Scores could not be loaded.";
+        }
+        renderHistory();
+      }
+
+      async function saveScore() {
+        if (!scoreApi || !journalKey.value) {
+          saveStatus.textContent = "Enter the journal key to save this score.";
+          return;
+        }
+        saveStatus.textContent = "Saving…";
+        try {
+          const response = await fetch(`${scoreApi}/scores`, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${journalKey.value}`,
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ score, duration: gameDuration })
+          });
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.error);
+          scores = [...scores, data.score].slice(-MAX_STORED_GAMES);
+          saveStatus.textContent = "Saved.";
+          renderHistory();
+        } catch {
+          saveStatus.textContent = "Score could not be saved.";
+        }
+      }
+
+      function readRange(minimumId: string, maximumId: string): NumberRange | undefined {
+        const minimum = Number(document.querySelector<HTMLInputElement>(`#${minimumId}`)!.value);
+        const maximum = Number(document.querySelector<HTMLInputElement>(`#${maximumId}`)!.value);
+
+        if (
+          !Number.isSafeInteger(minimum) ||
+          !Number.isSafeInteger(maximum) ||
+          minimum < 0 ||
+          maximum < minimum ||
+          maximum > 10000
+        ) {
+          return undefined;
+        }
+
+        return { min: minimum, max: maximum };
+      }
+
+      function readGameOptions(): MentalMathOptions | undefined {
+        const operations: MentalMathOperation[] = [];
+        if (document.querySelector<HTMLInputElement>("#addition")!.checked) operations.push("addition");
+        if (document.querySelector<HTMLInputElement>("#subtraction")!.checked) operations.push("subtraction");
+        if (document.querySelector<HTMLInputElement>("#multiplication")!.checked) operations.push("multiplication");
+        if (document.querySelector<HTMLInputElement>("#division")!.checked) operations.push("division");
+
+        const additionLeft = readRange("add-left-min", "add-left-max");
+        const additionRight = readRange("add-right-min", "add-right-max");
+        const multiplicationLeft = readRange("mul-left-min", "mul-left-max");
+        const multiplicationRight = readRange("mul-right-min", "mul-right-max");
+
+        if (
+          operations.length === 0 ||
+          !additionLeft ||
+          !additionRight ||
+          !multiplicationLeft ||
+          !multiplicationRight
+        ) {
+          settingsError.hidden = false;
+          settingsError.textContent = operations.length === 0
+            ? "Select at least one operation."
+            : "Use whole-number ranges from 0 to 10,000, with the minimum no greater than the maximum.";
+          return undefined;
+        }
+
+        settingsError.hidden = true;
+        return {
+          operations,
+          additionLeft,
+          additionRight,
+          multiplicationLeft,
+          multiplicationRight
+        };
+      }
+
+      function setState(state: "settings" | "playing" | "finished" | "history") {
+        root.dataset.state = state;
+      }
+
+      function showNextProblem() {
+        problem = createProblem(Math.random, gameOptions);
+        equation.textContent = `${problem.left} ${problem.operator} ${problem.right} =`;
+      }
+
+      function updateTimer() {
+        const millisecondsLeft = Math.max(0, deadline - performance.now());
+        timeLeft.value = String(Math.ceil(millisecondsLeft / 1000));
+        if (millisecondsLeft <= 0) finishGame();
+      }
+
+      function startGame() {
+        score = 0;
+        currentScore.value = "0";
+        timeLeft.value = String(gameDuration);
+        isPlaying = true;
+        deadline = performance.now() + gameDuration * 1000;
+        answerInput.value = "";
+        saveStatus.textContent = "";
+        setState("playing");
+        showNextProblem();
+        answerInput.focus();
+        timerId = window.setInterval(updateTimer, 100);
+      }
+
+      function finishGame() {
+        if (!isPlaying) return;
+        isPlaying = false;
+        if (timerId !== undefined) window.clearInterval(timerId);
+        timerId = undefined;
+        timeLeft.value = "0";
+        finalScore.textContent = String(score);
+        void saveScore();
+        renderHistory();
+        setState("finished");
+      }
+
+      function renderHistory() {
+        if (scores.length === 0) {
+          emptyHistory.hidden = false;
+          historyData.hidden = true;
+          historyChart.setAttribute("hidden", "");
+          return;
+        }
+
+        const values = scores.map((entry) => entry.score);
+        const latest = values.at(-1)!;
+        const best = Math.max(...values);
+        const average = values.reduce((sum, value) => sum + value, 0) / values.length;
+        emptyHistory.hidden = true;
+        historyData.hidden = false;
+        historySummary.textContent = `Latest: ${latest} · Best: ${best} · Average: ${average.toFixed(1)} · Games: ${scores.length}`;
+        historyChart.removeAttribute("hidden");
+        renderChart();
+        renderRecentGames();
+      }
+
+      function renderChart() {
+        const chartScores = scores.slice(-MAX_CHART_GAMES);
+        const width = 440;
+        const height = 160;
+        const padding = { top: 14, right: 14, bottom: 28, left: 34 };
+        const plotWidth = width - padding.left - padding.right;
+        const plotHeight = height - padding.top - padding.bottom;
+        const highestScore = Math.max(...chartScores.map((entry) => entry.score));
+        const yMaximum = Math.max(10, Math.ceil(highestScore / 10) * 10);
+        const xForIndex = (index: number) =>
+          chartScores.length === 1
+            ? padding.left + plotWidth / 2
+            : padding.left + (index / (chartScores.length - 1)) * plotWidth;
+        const yForScore = (value: number) =>
+          padding.top + plotHeight - (value / yMaximum) * plotHeight;
+        const points = chartScores.map((entry, index) => ({
+          x: xForIndex(index),
+          y: yForScore(entry.score),
+          score: entry.score
+        }));
+        const path = points
+          .map((point, index) => `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`)
+          .join(" ");
+        const gridValues = [yMaximum, Math.round(yMaximum / 2), 0];
+
+        historyChart.innerHTML = `
+          <title id="chart-title">Mental math scores over time</title>
+          <desc id="chart-description">The latest ${chartScores.length} game scores, from oldest to newest.</desc>
+          ${gridValues.map((value) => {
+            const y = yForScore(value);
+            return `<line class="chart-grid" x1="${padding.left}" y1="${y}" x2="${width - padding.right}" y2="${y}"></line>
+              <text class="chart-label" x="${padding.left - 6}" y="${y + 4}" text-anchor="end">${value}</text>`;
+          }).join("")}
+          <path class="chart-line" d="${path}"></path>
+          ${points.map((point) => `<circle class="chart-point" cx="${point.x}" cy="${point.y}" r="4"><title>Score: ${point.score}</title></circle>`).join("")}
+          <text class="chart-label" x="${padding.left}" y="${height - 7}">Older</text>
+          <text class="chart-label" x="${width - padding.right}" y="${height - 7}" text-anchor="end">Latest</text>
+        `;
+      }
+
+      function renderRecentGames() {
+        const dateFormatter = new Intl.DateTimeFormat(undefined, {
+          month: "short",
+          day: "numeric",
+          hour: "numeric",
+          minute: "2-digit"
+        });
+
+        scoreHistory.replaceChildren(
+          ...scores.slice(-10).reverse().map((entry) => {
+            const item = document.createElement("li");
+            const duration = entry.duration ? ` in ${entry.duration}s` : "";
+            item.textContent = `${entry.score} correct${duration} — ${dateFormatter.format(new Date(entry.playedAt))}`;
+            return item;
+          })
+        );
+      }
+
+      optionsForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const selectedOptions = readGameOptions();
+        if (!selectedOptions) return;
+        gameOptions = selectedOptions;
+        gameDuration = Number(durationSelect.value);
+        startGame();
+      });
+
+      answerForm.addEventListener("submit", (event) => event.preventDefault());
+      answerInput.addEventListener("input", () => {
+        if (!isPlaying || !problem) return;
+        if (performance.now() >= deadline) {
+          finishGame();
+          return;
+        }
+
+        if (isCorrectAnswer(problem, answerInput.value)) {
+          score += 1;
+          currentScore.value = String(score);
+          answerInput.value = "";
+          showNextProblem();
+        }
+      });
+
+      document.querySelector("#try-again")!.addEventListener("click", (event) => {
+        event.preventDefault();
+        startGame();
+      });
+
+      document.querySelectorAll("[data-show-settings]").forEach((link) => {
+        link.addEventListener("click", (event) => {
+          event.preventDefault();
+          setState("settings");
+        });
+      });
+
+      document.querySelectorAll("[data-show-history]").forEach((link) => {
+        link.addEventListener("click", (event) => {
+          event.preventDefault();
+          setState("history");
+          void loadScores();
+        });
+      });
+
+      renderHistory();
+      void loadScores();
+    </script>
+  </div>
+</BaseLayout>

@@ -1,0 +1,10 @@
+{
+  "name": "mental-math-scores",
+  "main": "workers/score-gist.js",
+  "compatibility_date": "2026-08-20",
+  "workers_dev": true,
+  // Set GIST_ID, GITHUB_TOKEN, and WRITE_KEY with `wrangler secret put`.
+  "vars": {
+    "ALLOWED_ORIGINS": "https://theosteiger.com,http://127.0.0.1:4321,http://localhost:4321"
+  }
+}

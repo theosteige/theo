@@ -34,6 +34,7 @@ jobs:
         env:
           GITHUB_PAGES: true
           CUSTOM_DOMAIN: true
+          PUBLIC_SCORE_API_URL: ${{ vars.SCORE_API_URL }}
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
