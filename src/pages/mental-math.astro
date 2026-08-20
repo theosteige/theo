@@ -75,11 +75,17 @@ const scoreApiUrl = (import.meta.env.PUBLIC_SCORE_API_URL ?? "").replace(/\/$/, 
         color: #900;
       }
 
+      .game-introduction {
+        clear: both;
+        padding-top: 12px;
+        line-height: 1.5;
+      }
+
       #history-summary {
         line-height: 1.5;
       }
 
-      #history-chart {
+      .score-chart {
         display: block;
         width: 100%;
         height: auto;
@@ -87,8 +93,10 @@ const scoreApiUrl = (import.meta.env.PUBLIC_SCORE_API_URL ?? "").replace(/\/$/, 
         background: #fff;
       }
 
-      #history-chart[hidden],
+      .score-chart[hidden],
+      #progress-data[hidden],
       #history-data[hidden],
+      #empty-progress[hidden],
       #empty-history[hidden] {
         display: none;
       }
@@ -278,6 +286,31 @@ const scoreApiUrl = (import.meta.env.PUBLIC_SCORE_API_URL ?? "").replace(/\/$/, 
         <input id="start-game" type="submit" value="Start" />
         <p id="settings-error" role="alert" hidden></p>
       </form>
+
+      <div class="game-introduction">
+        <p>
+          Here's a fun game. I realized a week or two ago that I take pride in my mental math skills, and yet over time they have degraded. I think this is because I don't use them in my day to day work. With this game I hope to keep them sharp, and if I'm lucky, I will have some good scores to show off.
+        </p>
+        <p>Quick note: I only play this on the default settings</p>
+      </div>
+
+      <section aria-labelledby="progress-heading">
+        <h2 id="progress-heading">Progress</h2>
+        <p id="progress-status" aria-live="polite"></p>
+        <p id="empty-progress">No completed games yet.</p>
+        <div id="progress-data" hidden>
+          <p id="progress-summary"></p>
+          <svg
+            id="progress-chart"
+            class="score-chart"
+            viewBox="0 0 440 160"
+            role="img"
+            aria-labelledby="progress-chart-title"
+            aria-describedby="progress-chart-description"
+            hidden
+          ></svg>
+        </div>
+      </section>
     </section>
 
     <section id="history" aria-labelledby="history-heading">
@@ -288,10 +321,11 @@ const scoreApiUrl = (import.meta.env.PUBLIC_SCORE_API_URL ?? "").replace(/\/$/, 
         <p id="history-summary"></p>
         <svg
           id="history-chart"
+          class="score-chart"
           viewBox="0 0 440 160"
           role="img"
-          aria-labelledby="chart-title"
-          aria-describedby="chart-description"
+          aria-labelledby="history-chart-title"
+          aria-describedby="history-chart-description"
           hidden
         ></svg>
         <h2>Recent games</h2>
@@ -360,6 +394,11 @@ const scoreApiUrl = (import.meta.env.PUBLIC_SCORE_API_URL ?? "").replace(/\/$/, 
       const currentScore = document.querySelector<HTMLOutputElement>("#current-score")!;
       const finalScore = document.querySelector<HTMLElement>("#final-score")!;
       const saveStatus = document.querySelector<HTMLElement>("#save-status")!;
+      const emptyProgress = document.querySelector<HTMLElement>("#empty-progress")!;
+      const progressStatus = document.querySelector<HTMLElement>("#progress-status")!;
+      const progressData = document.querySelector<HTMLElement>("#progress-data")!;
+      const progressSummary = document.querySelector<HTMLElement>("#progress-summary")!;
+      const progressChart = document.querySelector<SVGSVGElement>("#progress-chart")!;
       const emptyHistory = document.querySelector<HTMLElement>("#empty-history")!;
       const historyStatus = document.querySelector<HTMLElement>("#history-status")!;
       const historyData = document.querySelector<HTMLElement>("#history-data")!;
@@ -376,20 +415,25 @@ const scoreApiUrl = (import.meta.env.PUBLIC_SCORE_API_URL ?? "").replace(/\/$/, 
       let isPlaying = false;
       let scores: ScoreEntry[] = [];
 
+      function setScoreStatus(message: string) {
+        progressStatus.textContent = message;
+        historyStatus.textContent = message;
+      }
+
       async function loadScores() {
         if (!scoreApi) {
-          historyStatus.textContent = "Score syncing is not configured.";
+          setScoreStatus("Score syncing is not configured.");
           return;
         }
-        historyStatus.textContent = "Loading…";
+        setScoreStatus("Loading…");
         try {
           const response = await fetch(`${scoreApi}/scores`);
           const data = await response.json();
           if (!response.ok) throw new Error(data.error);
           scores = data.scores;
-          historyStatus.textContent = "";
+          setScoreStatus("");
         } catch {
-          historyStatus.textContent = "Scores could not be loaded.";
+          setScoreStatus("Scores could not be loaded.");
         }
         renderHistory();
       }
@@ -515,8 +559,11 @@ const scoreApiUrl = (import.meta.env.PUBLIC_SCORE_API_URL ?? "").replace(/\/$/, 
 
       function renderHistory() {
         if (scores.length === 0) {
+          emptyProgress.hidden = false;
           emptyHistory.hidden = false;
+          progressData.hidden = true;
           historyData.hidden = true;
+          progressChart.setAttribute("hidden", "");
           historyChart.setAttribute("hidden", "");
           return;
         }
@@ -525,15 +572,21 @@ const scoreApiUrl = (import.meta.env.PUBLIC_SCORE_API_URL ?? "").replace(/\/$/, 
         const latest = values.at(-1)!;
         const best = Math.max(...values);
         const average = values.reduce((sum, value) => sum + value, 0) / values.length;
+        const summary = `Latest: ${latest} · Best: ${best} · Average: ${average.toFixed(1)} · Games: ${scores.length}`;
+        emptyProgress.hidden = true;
         emptyHistory.hidden = true;
+        progressData.hidden = false;
         historyData.hidden = false;
-        historySummary.textContent = `Latest: ${latest} · Best: ${best} · Average: ${average.toFixed(1)} · Games: ${scores.length}`;
+        progressSummary.textContent = summary;
+        historySummary.textContent = summary;
+        progressChart.removeAttribute("hidden");
         historyChart.removeAttribute("hidden");
-        renderChart();
+        renderChart(progressChart);
+        renderChart(historyChart);
         renderRecentGames();
       }
 
-      function renderChart() {
+      function renderChart(chart: SVGSVGElement) {
         const chartScores = scores.slice(-MAX_CHART_GAMES);
         const width = 440;
         const height = 160;
@@ -558,9 +611,9 @@ const scoreApiUrl = (import.meta.env.PUBLIC_SCORE_API_URL ?? "").replace(/\/$/, 
           .join(" ");
         const gridValues = [yMaximum, Math.round(yMaximum / 2), 0];
 
-        historyChart.innerHTML = `
-          <title id="chart-title">Mental math scores over time</title>
-          <desc id="chart-description">The latest ${chartScores.length} game scores, from oldest to newest.</desc>
+        chart.innerHTML = `
+          <title id="${chart.id}-title">Mental math scores over time</title>
+          <desc id="${chart.id}-description">The latest ${chartScores.length} game scores, from oldest to newest.</desc>
           ${gridValues.map((value) => {
             const y = yForScore(value);
             return `<line class="chart-grid" x1="${padding.left}" y1="${y}" x2="${width - padding.right}" y2="${y}"></line>

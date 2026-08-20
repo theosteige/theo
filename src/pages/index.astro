@@ -39,10 +39,10 @@ const pages = [
 <BaseLayout title="Table of Contents" description="Explore Theo Steiger's website.">
   <section class="intro" aria-labelledby="contents-title">
     <h1 id="contents-title">Table of Contents</h1>
-    <p>Everything on this site, in one place.</p>
+    <p>Everything currently on this site</p>
   </section>
 
-  <ol class="contents-list">
+  <ul class="contents-list">
     {
       pages.map((page) => (
         <li>
@@ -53,5 +53,5 @@ const pages = [
         </li>
       ))
     }
-  </ol>
+  </ul>
 </BaseLayout>

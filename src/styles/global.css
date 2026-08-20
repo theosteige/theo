@@ -161,24 +161,11 @@ p {
 .contents-list {
   padding: 0;
   margin: 0;
-  border-top: 1px solid var(--line);
   list-style: none;
-  counter-reset: contents;
 }
 
 .contents-list > li {
-  display: grid;
-  grid-template-columns: 2.5rem minmax(0, 1fr);
-  gap: 12px;
-  padding: 22px 0;
-  border-bottom: 1px solid var(--line);
-  counter-increment: contents;
-}
-
-.contents-list > li::before {
-  color: var(--muted);
-  font-variant-numeric: tabular-nums;
-  content: counter(contents, decimal-leading-zero);
+  margin-bottom: 24px;
 }
 
 .contents-entry h2 {
