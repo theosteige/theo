@@ -1,7 +1,3 @@
-node_modules/
-dist/
-.astro/
 .DS_Store
-npm-debug.log*
 .dev.vars
 .wrangler/
