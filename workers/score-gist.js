@@ -1,7 +1,14 @@
 const FILE = "scores.json";
 const PRACTICE_FILE = "practice.json";
-const MAX_SCORES = 100;
 const DURATIONS = new Set([30, 60, 120, 300, 600]);
+const OPERATIONS = new Set(["addition", "subtraction", "multiplication", "division"]);
+const DEFAULT_SETTINGS = {
+  operations: [...OPERATIONS],
+  additionLeft: { min: 2, max: 100 },
+  additionRight: { min: 2, max: 100 },
+  multiplicationLeft: { min: 2, max: 12 },
+  multiplicationRight: { min: 2, max: 100 }
+};
 const MAX_PRACTICE_SESSION_SECONDS = 7 * 24 * 60 * 60;
 
 function headers(origin) {
@@ -27,6 +34,24 @@ function requestOrigin(request, env) {
     : false;
 }
 
+function validSettings(value) {
+  const validRange = (range) =>
+    Number.isSafeInteger(range?.min) &&
+    Number.isSafeInteger(range.max) &&
+    range.min >= 0 &&
+    range.max >= range.min &&
+    range.max <= 10000;
+  return value &&
+    Array.isArray(value.operations) &&
+    value.operations.length > 0 &&
+    new Set(value.operations).size === value.operations.length &&
+    value.operations.every((operation) => OPERATIONS.has(operation)) &&
+    validRange(value.additionLeft) &&
+    validRange(value.additionRight) &&
+    validRange(value.multiplicationLeft) &&
+    validRange(value.multiplicationRight);
+}
+
 function validScore(value) {
   return value &&
     Number.isInteger(value.score) &&
@@ -34,7 +59,8 @@ function validScore(value) {
     value.score <= 10000 &&
     typeof value.playedAt === "string" &&
     Number.isFinite(Date.parse(value.playedAt)) &&
-    DURATIONS.has(value.duration);
+    DURATIONS.has(value.duration) &&
+    (value.settings === undefined || validSettings(value.settings));
 }
 
 async function gistRequest(env, fetcher, method = "GET", body) {
@@ -60,7 +86,10 @@ async function readScores(env, fetcher) {
     throw new Error(`${FILE} is missing or too large.`);
   }
   const scores = JSON.parse(file.content);
-  return Array.isArray(scores) ? scores.filter(validScore).slice(-MAX_SCORES) : [];
+  return Array.isArray(scores)
+    ? scores.filter(validScore).map((score) =>
+      score.settings ? score : { ...score, settings: DEFAULT_SETTINGS })
+    : [];
 }
 
 function practiceSecondsFromGist(gist) {
@@ -123,12 +152,24 @@ export function createHandler(fetcher = fetch, now = () => new Date()) {
           return json({ totalSeconds }, 201, origin);
         }
 
-        if (!Number.isInteger(input.score) || input.score < 0 || input.score > 10000 || !DURATIONS.has(input.duration)) {
+        const settings = input.settings ?? DEFAULT_SETTINGS;
+        if (
+          !Number.isInteger(input.score) ||
+          input.score < 0 ||
+          input.score > 10000 ||
+          !DURATIONS.has(input.duration) ||
+          !validSettings(settings)
+        ) {
           return json({ error: "Invalid score." }, 400, origin);
         }
 
-        const entry = { score: input.score, playedAt: now().toISOString(), duration: input.duration };
-        const scores = [...await readScores(env, fetcher), entry].slice(-MAX_SCORES);
+        const entry = {
+          score: input.score,
+          playedAt: now().toISOString(),
+          duration: input.duration,
+          settings
+        };
+        const scores = [...await readScores(env, fetcher), entry];
         await gistRequest(env, fetcher, "PATCH", {
           files: { [FILE]: { content: `${JSON.stringify(scores, null, 2)}\n` } }
         });
