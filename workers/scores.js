@@ -1,5 +1,3 @@
-const FILE = "scores.json";
-const PRACTICE_FILE = "practice.json";
 const DURATIONS = new Set([30, 60, 120, 300, 600]);
 const OPERATIONS = new Set(["addition", "subtraction", "multiplication", "division"]);
 const DEFAULT_SETTINGS = {
@@ -53,56 +51,25 @@ function validSettings(value) {
 }
 
 function validScore(value) {
-  return value &&
-    Number.isInteger(value.score) &&
+  return Number.isInteger(value.score) &&
     value.score >= 0 &&
     value.score <= 10000 &&
     typeof value.playedAt === "string" &&
     Number.isFinite(Date.parse(value.playedAt)) &&
     DURATIONS.has(value.duration) &&
-    (value.settings === undefined || validSettings(value.settings));
+    validSettings(value.settings);
 }
 
-async function gistRequest(env, fetcher, method = "GET", body) {
-  const response = await fetcher(`https://api.github.com/gists/${env.GIST_ID}`, {
-    method,
-    headers: {
-      Accept: "application/vnd.github+json",
-      Authorization: `Bearer ${env.GITHUB_TOKEN}`,
-      "Content-Type": "application/json",
-      "User-Agent": "theosteiger-mental-math",
-      "X-GitHub-Api-Version": "2022-11-28"
-    },
-    ...(body ? { body: JSON.stringify(body) } : {})
-  });
-  if (!response.ok) throw new Error(`GitHub returned ${response.status}.`);
-  return response.json();
-}
-
-async function readScores(env, fetcher) {
-  const gist = await gistRequest(env, fetcher);
-  const file = gist.files?.[FILE];
-  if (!file || file.truncated || typeof file.content !== "string") {
-    throw new Error(`${FILE} is missing or too large.`);
-  }
-  const scores = JSON.parse(file.content);
-  return Array.isArray(scores)
-    ? scores.filter(validScore).map((score) =>
-      score.settings ? score : { ...score, settings: DEFAULT_SETTINGS })
-    : [];
-}
-
-function practiceSecondsFromGist(gist) {
-  const file = gist.files?.[PRACTICE_FILE];
-  if (!file || file.truncated || typeof file.content !== "string") return 0;
-  const value = JSON.parse(file.content);
-  return Number.isSafeInteger(value.totalSeconds) && value.totalSeconds >= 0
-    ? value.totalSeconds
-    : 0;
-}
-
-async function readPracticeSeconds(env, fetcher) {
-  return practiceSecondsFromGist(await gistRequest(env, fetcher));
+async function readScores(db) {
+  const { results } = await db
+    .prepare("SELECT score, played_at, duration, settings FROM scores ORDER BY id")
+    .all();
+  return results.map((row) => ({
+    score: row.score,
+    playedAt: row.played_at,
+    duration: row.duration,
+    settings: JSON.parse(row.settings)
+  })).filter(validScore);
 }
 
 async function sameSecret(left, right) {
@@ -111,7 +78,7 @@ async function sameSecret(left, right) {
   return new Uint8Array(leftHash).every((byte, index) => byte === new Uint8Array(rightHash)[index]);
 }
 
-export function createHandler(fetcher = fetch, now = () => new Date()) {
+export function createHandler(now = () => new Date()) {
   return async (request, env) => {
     const origin = requestOrigin(request, env);
     if (origin === false) return json({ error: "Origin not allowed." }, 403, null);
@@ -124,9 +91,11 @@ export function createHandler(fetcher = fetch, now = () => new Date()) {
 
     try {
       if (request.method === "GET") {
-        return isScoresPath
-          ? json({ scores: await readScores(env, fetcher) }, 200, origin)
-          : json({ totalSeconds: await readPracticeSeconds(env, fetcher) }, 200, origin);
+        if (isScoresPath) return json({ scores: await readScores(env.DB) }, 200, origin);
+        const totalSeconds = await env.DB
+          .prepare("SELECT total_seconds FROM practice WHERE id=1")
+          .first("total_seconds");
+        return json({ totalSeconds: totalSeconds ?? 0 }, 200, origin);
       }
 
       if (request.method === "POST") {
@@ -144,12 +113,11 @@ export function createHandler(fetcher = fetch, now = () => new Date()) {
           ) {
             return json({ error: "Invalid practice time." }, 400, origin);
           }
-
-          const totalSeconds = practiceSecondsFromGist(await gistRequest(env, fetcher)) + input.seconds;
-          await gistRequest(env, fetcher, "PATCH", {
-            files: { [PRACTICE_FILE]: { content: `${JSON.stringify({ totalSeconds }, null, 2)}\n` } }
-          });
-          return json({ totalSeconds }, 201, origin);
+          const [, result] = await env.DB.batch([
+            env.DB.prepare("UPDATE practice SET total_seconds=total_seconds+? WHERE id=1").bind(input.seconds),
+            env.DB.prepare("SELECT total_seconds FROM practice WHERE id=1")
+          ]);
+          return json({ totalSeconds: result.results[0].total_seconds }, 201, origin);
         }
 
         const settings = input.settings ?? DEFAULT_SETTINGS;
@@ -169,17 +137,17 @@ export function createHandler(fetcher = fetch, now = () => new Date()) {
           duration: input.duration,
           settings
         };
-        const scores = [...await readScores(env, fetcher), entry];
-        await gistRequest(env, fetcher, "PATCH", {
-          files: { [FILE]: { content: `${JSON.stringify(scores, null, 2)}\n` } }
-        });
+        await env.DB
+          .prepare("INSERT INTO scores(score,played_at,duration,settings) VALUES(?,?,?,?)")
+          .bind(entry.score, entry.playedAt, entry.duration, JSON.stringify(entry.settings))
+          .run();
         return json({ score: entry }, 201, origin);
       }
 
       return json({ error: "Method not allowed." }, 405, origin);
     } catch (error) {
       console.error(error);
-      return json({ error: "Score history is temporarily unavailable." }, 502, origin);
+      return json({ error: "Game history is temporarily unavailable." }, 502, origin);
     }
   };
 }
