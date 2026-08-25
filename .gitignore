@@ -1,3 +1,6 @@
 .DS_Store
 .dev.vars
 .wrangler/
+.astro/
+dist/
+node_modules/

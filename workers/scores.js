@@ -8,6 +8,7 @@ const DEFAULT_SETTINGS = {
   multiplicationRight: { min: 2, max: 100 }
 };
 const MAX_PRACTICE_SESSION_SECONDS = 7 * 24 * 60 * 60;
+const ATTEMPT_OPERATIONS = new Set(["+", "−", "×", "÷"]);
 
 function headers(origin) {
   return {
@@ -58,6 +59,28 @@ function validScore(value) {
     Number.isFinite(Date.parse(value.playedAt)) &&
     DURATIONS.has(value.duration) &&
     validSettings(value.settings);
+}
+
+function canonicalAttempt(value, duration) {
+  if (
+    !Array.isArray(value) ||
+    value.length !== 4 ||
+    !ATTEMPT_OPERATIONS.has(value[0]) ||
+    !Number.isSafeInteger(value[1]) ||
+    value[1] < 0 ||
+    value[1] > 100000000 ||
+    !Number.isSafeInteger(value[2]) ||
+    value[2] < 0 ||
+    value[2] > 100000000 ||
+    !Number.isSafeInteger(value[3]) ||
+    value[3] < 1 ||
+    value[3] > duration * 1000
+  ) return;
+  const [operation, first, second, responseMs] = value;
+  const [left, right] = (operation === "+" || operation === "×") && first > second
+    ? [second, first]
+    : [first, second];
+  return [operation, left, right, responseMs];
 }
 
 async function readScores(db) {
@@ -131,16 +154,34 @@ export function createHandler(now = () => new Date()) {
           return json({ error: "Invalid score." }, 400, origin);
         }
 
+        let attempts = [];
+        if (input.attempts !== undefined) {
+          if (
+            !Array.isArray(input.attempts) ||
+            input.attempts.length !== input.score
+          ) return json({ error: "Invalid attempts." }, 400, origin);
+          attempts = input.attempts.map((attempt) => canonicalAttempt(attempt, input.duration));
+          if (attempts.some((attempt) => !attempt)) {
+            return json({ error: "Invalid attempts." }, 400, origin);
+          }
+        }
+
         const entry = {
           score: input.score,
           playedAt: now().toISOString(),
           duration: input.duration,
           settings
         };
-        await env.DB
+        const statements = [env.DB
           .prepare("INSERT INTO scores(score,played_at,duration,settings) VALUES(?,?,?,?)")
-          .bind(entry.score, entry.playedAt, entry.duration, JSON.stringify(entry.settings))
-          .run();
+          .bind(entry.score, entry.playedAt, entry.duration, JSON.stringify(entry.settings))];
+        if (attempts.length) statements.push(env.DB.prepare(`
+          INSERT INTO attempts(game_at,operation,left_operand,right_operand,response_ms)
+          SELECT ?,json_extract(value,'$[0]'),json_extract(value,'$[1]'),
+            json_extract(value,'$[2]'),json_extract(value,'$[3]')
+          FROM json_each(?)
+        `).bind(entry.playedAt, JSON.stringify(attempts)));
+        await env.DB.batch(statements);
         return json({ score: entry }, 201, origin);
       }
 
