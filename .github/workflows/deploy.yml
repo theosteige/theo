@@ -22,6 +22,10 @@ jobs:
         run: sed -i "s|data-score-api|data-score-api=\"$SCORE_API_URL\"|" public/mental-math/index.html
         env:
           SCORE_API_URL: ${{ vars.SCORE_API_URL }}
+      - name: Configure Spotify
+        run: sed -i "s|data-spotify-api|data-spotify-api=\"$SPOTIFY_API_URL\"|" public/music/index.html public/podcasts/index.html
+        env:
+          SPOTIFY_API_URL: ${{ vars.SPOTIFY_API_URL }}
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

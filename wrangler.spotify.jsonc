@@ -1,0 +1,15 @@
+{
+  "name": "theo-spotify-now-playing",
+  "main": "workers/spotify.js",
+  "compatibility_date": "2026-08-20",
+  "workers_dev": false,
+  "routes": [{
+    "pattern": "spotify-api.theosteiger.com",
+    "custom_domain": true
+  }],
+  // Add SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET, and SPOTIFY_REFRESH_TOKEN
+  // with `wrangler secret put --config wrangler.spotify.jsonc`.
+  "vars": {
+    "ALLOWED_ORIGINS": "https://theosteiger.com,http://127.0.0.1:4321,http://localhost:4321"
+  }
+}

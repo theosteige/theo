@@ -2,7 +2,11 @@
   "name": "mental-math-scores",
   "main": "workers/scores.js",
   "compatibility_date": "2026-08-20",
-  "workers_dev": true,
+  "workers_dev": false,
+  "routes": [{
+    "pattern": "api.theosteiger.com",
+    "custom_domain": true
+  }],
   // Set WRITE_KEY with `wrangler secret put`.
   "vars": {
     "ALLOWED_ORIGINS": "https://theosteiger.com,http://127.0.0.1:4321,http://localhost:4321"
