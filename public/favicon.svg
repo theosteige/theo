@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
+  <title id="title">Blue underlined letter T</title>
+  <path fill="#fff" d="M0 0h512v512H0z"/>
+  <path fill="#0645ad" d="M133 95h246v40H276v236h-40V135H133zM133 399h246v18H133z"/>
+</svg>

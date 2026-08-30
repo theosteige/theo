@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="description" content="What Theo is currently listening to and notes about podcasts.">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="canonical" href="https://theosteiger.com/podcasts/">
-  <title>Podcasts | Theo Steiger</title>
+  <meta name="description" content="What Theo is currently listening to and notes about podcasts."><meta property="og:description" content="What Theo is currently listening to and notes about podcasts.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" href="/favicon.svg"><link rel="apple-touch-icon" href="/favicon-512.png"><meta property="og:type" content="website"><meta property="og:image" content="https://theosteiger.com/favicon-512.png"><meta property="og:image:alt" content="Blue underlined letter T on white"><meta name="twitter:card" content="summary"><meta name="twitter:image" content="https://theosteiger.com/favicon-512.png">
+  <meta property="og:url" content="https://theosteiger.com/podcasts/"><link rel="canonical" href="https://theosteiger.com/podcasts/">
+  <meta property="og:title" content="Podcasts | Theo Steiger"><title>Podcasts | Theo Steiger</title>
   <link rel="stylesheet" href="/style.css">
 </head>
 <body data-spotify-api>
@@ -22,6 +22,26 @@
       <h1>Podcasts</h1>
       <p>What I am listening to, with more to come.</p>
     </section>
+    <section class="playlist-section" aria-labelledby="favorite-podcasts-heading">
+      <h2 id="favorite-podcasts-heading">My Favorite Podcasts of All Time</h2>
+      <p class="meta">Last updated <time datetime="2026-08-30">August 30, 2026</time></p>
+      <iframe class="spotify-embed" title="Theo's favorite podcasts on Spotify" src="https://open.spotify.com/embed/playlist/1jJlIqMWgKvjuzVkxUTkd5" loading="lazy" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" allowfullscreen></iframe>
+    </section>
+    <section class="podcast-notes" aria-labelledby="podcast-notes-heading">
+      <h2 id="podcast-notes-heading">Thoughts</h2>
+      <ol>
+        <li id="podcast-1"><h3><a href="https://open.spotify.com/episode/40mBOeQLJvVra5yocENS8W">How to Take Over the World — Steve Jobs (Part 1)</a></h3><p>...</p></li>
+        <li id="podcast-2"><h3><a href="https://open.spotify.com/episode/2GPkApesrhUpPJwsgvbOwM">How to Take Over the World — Thomas Edison (Part 1)</a></h3><p>...</p></li>
+        <li id="podcast-3"><h3><a href="https://open.spotify.com/episode/0SEzOejAtZ55rrVLwvWNmO">The Rest Is History — The Fall of the Aztecs: The Adventure Begins (Part 1)</a></h3><p>...</p></li>
+        <li id="podcast-4"><h3><a href="https://open.spotify.com/episode/7DZ7GCtxjotNjrZNkem6Sj">The Rest Is History — The Fall of the Incas: Empire of Gold (Part 1)</a></h3><p>...</p></li>
+        <li id="podcast-5"><h3><a href="https://open.spotify.com/episode/6G85ReuFsSkqIuwwwEhJeG">Acquired — Nvidia Part I: The GPU Company (1993–2006)</a></h3><p>...</p></li>
+        <li id="podcast-6"><h3><a href="https://open.spotify.com/episode/6NK5LxOp6alyDtAFiS9REw">David Senra — Tobi Lütke, Shopify</a></h3><p>...</p></li>
+        <li id="podcast-7"><h3><a href="https://open.spotify.com/episode/3H7h33piLg6LrxGeQqlfUE">How to Take Over the World — How to Raise a Genius: Laszlo Polgar</a></h3><p>...</p></li>
+        <li id="podcast-8"><h3><a href="https://open.spotify.com/episode/0TA2uCZUQDF8AdF5dUofAi">Lex Fridman Podcast — George Hotz: Tiny Corp, Twitter, AI Safety, Self-Driving, GPT, AGI &amp; God</a></h3><p>...</p></li>
+        <li id="podcast-9"><h3><a href="https://open.spotify.com/episode/36MWYn1m1f5pv73RFfGbWo">My First Million — 5 Internet Goldmines to Spot the Next $1B Trend | Steph Smith</a></h3><p>...</p></li>
+        <li id="podcast-10"><h3><a href="https://open.spotify.com/episode/546RNrr3L0DYULYFnPmHf8">TBPN — Hit the Dom Button, Unicorn Growth Continues, Sequoia's Lasting Success, Crypto Dawgs</a></h3><p>...</p></li>
+      </ol>
+    </section>
     <section class="listening-section" data-now-playing aria-labelledby="now-playing-heading">
       <h2 id="now-playing-heading">Currently listening</h2>
       <p class="listening-message" data-message role="status">Checking Spotify…</p>
@@ -29,12 +49,10 @@
         <img class="listening-artwork" data-artwork alt="" width="120" height="120">
         <span class="listening-details">
           <span class="listening-topline">
-            <span class="listening-state"><span class="listening-dot" aria-hidden="true"></span><span data-state>Playing</span></span>
-            <img class="spotify-logo" src="/spotify-logo-white.svg" alt="" width="88" height="24">
+            <span class="spotify-link">Spotify</span><span aria-hidden="true">·</span><span class="listening-state" data-state>Playing</span>
           </span>
           <strong class="listening-title" data-title></strong>
           <span class="listening-creator" data-creator></span>
-          <span class="spotify-link">Open Spotify <span aria-hidden="true">↗</span></span>
           <span class="listening-progress" data-progress-wrap hidden>
             <progress data-progress max="1" value="0"></progress>
             <span class="listening-times"><span data-elapsed>0:00</span><span data-duration>0:00</span></span>

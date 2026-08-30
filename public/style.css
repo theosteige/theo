@@ -31,37 +31,32 @@ p{margin:0 0 16px}
 .viewport-layout header{width:min(920px,calc(100% - 32px));height:115px;margin:auto;padding-top:28px}
 .viewport-layout main{position:relative;height:calc(100dvh - 115px);padding:0}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-.listening-section{max-width:720px}
+.listening-section,.playlist-section,.artists-section,.podcast-notes{max-width:720px}
+.playlist-section,.artists-section,.podcast-notes{margin-bottom:42px}
+.podcast-notes li{margin-bottom:24px}
+.podcast-notes h3{font-size:1rem;margin-bottom:4px}
 .listening-section h2{margin-bottom:16px}
 .listening-message{padding:20px 0;border-top:1px solid #ddd;border-bottom:1px solid #ddd;color:#666}
 .listening-card[hidden],.listening-artwork[hidden],.listening-progress[hidden]{display:none!important}
-.listening-card{display:grid;width:100%;min-width:0;min-height:152px;grid-template-columns:120px minmax(0,1fr);gap:16px;overflow:hidden;padding:16px;border-radius:12px;background:#191414;color:#fff;font-family:system-ui,"Helvetica Neue",Helvetica,Arial,sans-serif;text-decoration:none;box-shadow:0 8px 24px rgb(0 0 0/.16)}
+.listening-card{display:grid;width:100%;min-width:0;grid-template-columns:96px minmax(0,1fr);gap:16px;overflow:hidden;padding:16px 0;border-top:1px solid #ddd;border-bottom:1px solid #ddd;color:inherit;text-decoration:none}
 .listening-card.without-artwork{grid-template-columns:1fr}
-.listening-card:hover{background:#242424;box-shadow:0 10px 30px rgb(0 0 0/.22)}
-.listening-card:hover .spotify-link{text-decoration:underline;text-underline-position:from-font;text-decoration-thickness:from-font}
-.listening-card:focus-visible{outline:3px solid #191414;outline-offset:3px;box-shadow:0 0 0 6px #1ed760}
-.listening-artwork{display:block;width:120px;height:120px;border-radius:4px;object-fit:cover;outline:1px solid oklch(1 0 0/.1)}
+.listening-card:hover .spotify-link{text-decoration-thickness:2px}
+.listening-card:focus-visible{outline:2px solid #0645ad;outline-offset:4px}
+.listening-artwork{display:block;width:96px;height:96px;object-fit:cover;outline:1px solid oklch(0 0 0/.1)}
 .listening-details{display:flex;min-width:0;flex-direction:column;justify-content:center}
-.listening-topline{display:flex;min-width:0;align-items:center;justify-content:space-between;gap:12px;margin-bottom:5px}
-.listening-state{display:flex;min-width:0;align-items:center;gap:7px;color:#1ed760;font-size:.75rem;font-weight:700;letter-spacing:.02em;white-space:nowrap}
-.listening-dot{width:8px;height:8px;flex:0 0 auto;border-radius:50%;background:#1ed760;box-shadow:0 0 0 3px rgb(30 215 96/.14)}
-.spotify-logo{display:block;width:88px;height:auto;flex:0 0 auto}
-[data-playback-state="paused"] .listening-state{color:#b3b3b3}
-[data-playback-state="paused"] .listening-dot{background:#b3b3b3;box-shadow:0 0 0 3px rgb(179 179 179/.12)}
-.listening-title{display:block;overflow:hidden;margin-bottom:1px;color:#fff;font-size:1.05rem;font-weight:700;line-height:1.25;text-overflow:ellipsis;white-space:nowrap}
+.listening-topline{display:flex;min-width:0;align-items:center;gap:6px;margin-bottom:4px;color:#666;font-size:.875rem;white-space:nowrap}
+.listening-state{color:#666}
+.listening-title{display:block;overflow:hidden;margin-bottom:1px;color:#1d1d1d;font-size:1.05rem;font-weight:600;line-height:1.25;text-overflow:ellipsis;white-space:nowrap}
 [data-content-type="episode"] .listening-title{display:-webkit-box;white-space:normal;-webkit-box-orient:vertical;-webkit-line-clamp:2}
-.listening-creator{display:block;overflow:hidden;color:#b3b3b3;font-size:.875rem;line-height:1.4;text-overflow:ellipsis;white-space:nowrap}
-.spotify-link{margin-top:3px;color:#1ed760;font-size:.75rem;font-weight:700;line-height:1.4}
+.listening-creator{display:block;overflow:hidden;color:#666;font-size:.875rem;line-height:1.4;text-overflow:ellipsis;white-space:nowrap}
+.spotify-link{color:#0645ad;text-decoration:underline}
+.spotify-embed{display:block;width:100%;height:730px;border:0;border-radius:12px}
 .listening-progress{display:block;min-width:0;margin-top:7px}
-.listening-progress progress{display:block;width:100%;height:4px;border:0;border-radius:999px;overflow:hidden;background:#4d4d4d;pointer-events:none;appearance:none}
-.listening-progress progress::-webkit-progress-bar{background:#4d4d4d}
-.listening-progress progress::-webkit-progress-value{border-radius:999px;background:#fff}
-.listening-progress progress::-moz-progress-bar{border-radius:999px;background:#fff}
-.listening-times{display:flex;justify-content:space-between;margin-top:2px;color:#b3b3b3;font-size:.6875rem;font-variant-numeric:tabular-nums;line-height:1.3}
-@media(prefers-reduced-motion:no-preference){
-  .listening-card{transition-property:background-color,box-shadow,transform;transition-duration:150ms;transition-timing-function:ease-out}
-  .listening-card:active{transform:scale(.96)}
-}
+.listening-progress progress{display:block;width:100%;height:3px;border:0;overflow:hidden;background:#ddd;pointer-events:none;appearance:none}
+.listening-progress progress::-webkit-progress-bar{background:#ddd}
+.listening-progress progress::-webkit-progress-value{background:#0645ad}
+.listening-progress progress::-moz-progress-bar{background:#0645ad}
+.listening-times{display:flex;justify-content:space-between;margin-top:2px;color:#666;font-size:.6875rem;font-variant-numeric:tabular-nums;line-height:1.3}
 @media(max-width:680px){
   header{display:block}
   .contact-list{gap:8px 12px;margin-top:12px}
@@ -70,12 +65,8 @@ p{margin:0 0 16px}
   .viewport-layout main{height:calc(100dvh - 160px)}
 }
 @media(max-width:560px){
-  .listening-card{min-height:116px;grid-template-columns:92px minmax(0,1fr);gap:12px;padding:12px}
-  .listening-artwork{width:92px;height:92px}
-  .listening-topline{gap:8px;margin-bottom:3px}
-  .spotify-logo{width:70px}
-  .listening-state{font-size:.6875rem}
+  .listening-card{grid-template-columns:80px minmax(0,1fr);gap:12px}
+  .listening-artwork{width:80px;height:80px}
   .listening-title{font-size:1rem}
-  .spotify-link{margin-top:2px}
   .listening-progress{margin-top:5px}
 }
