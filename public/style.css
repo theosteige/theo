@@ -1,10 +1,13 @@
 *{box-sizing:border-box}
 body{max-width:920px;margin:auto;padding:28px 16px 64px;color:#1d1d1d;font:16px/1.6 system-ui,sans-serif}
 a{color:#0645ad}
-header{display:flex;justify-content:space-between;gap:24px;padding-bottom:18px;border-bottom:1px solid #ddd}
+header{display:flex;align-items:center;justify-content:space-between;gap:24px;padding-bottom:18px;border-bottom:1px solid #ddd}
 .contact-list,.tag-list,.link-list{display:flex;flex-wrap:wrap;gap:8px 16px}
 .contact-list,.tag-list,.link-list,.contents-list,.entry-list{padding:0;margin:0;list-style:none}
 .contact-button{padding:0;border:0;background:none;color:#0645ad;font:inherit;text-decoration:underline;cursor:pointer}
+.header-listening-item[hidden],.header-listening-artwork[hidden]{display:none!important}
+.header-listening{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.header-listening-artwork{display:block;width:20px;height:20px;flex:0 0 auto;object-fit:cover;outline:1px solid oklch(0 0 0/.1)}
 main{padding-top:42px}
 h1,h2,h3{line-height:1.25;margin:0 0 12px}
 h1{font-size:2rem}
@@ -27,46 +30,52 @@ p{margin:0 0 16px}
 .viewport-layout{max-width:none;height:100dvh;padding:0;overflow:hidden}
 .viewport-layout header{width:min(920px,calc(100% - 32px));height:115px;margin:auto;padding-top:28px}
 .viewport-layout main{position:relative;height:calc(100dvh - 115px);padding:0}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .listening-section{max-width:720px}
-.listening-heading{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:16px}
-.listening-heading h2{margin:0}
-.eyebrow{margin:0 0 3px;color:#666;font-size:.78rem;font-weight:650;letter-spacing:.09em;text-transform:uppercase}
-.listening-updated{margin:0;color:#666;font-size:.88rem}
+.listening-section h2{margin-bottom:16px}
 .listening-message{padding:20px 0;border-top:1px solid #ddd;border-bottom:1px solid #ddd;color:#666}
 .listening-card[hidden],.listening-artwork[hidden],.listening-progress[hidden]{display:none!important}
-.listening-card{display:grid;width:100%;max-width:100%;min-width:0;grid-template-columns:160px minmax(0,1fr);gap:22px;overflow:hidden;padding:18px;border:1px solid #ddd;border-radius:14px;color:inherit;text-decoration:none;box-shadow:0 1px 2px rgb(0 0 0/.04),0 8px 24px rgb(0 0 0/.04);transition-property:border-color,box-shadow,transform;transition-duration:150ms;transition-timing-function:ease-out}
+.listening-card{display:grid;width:100%;min-width:0;min-height:152px;grid-template-columns:120px minmax(0,1fr);gap:16px;overflow:hidden;padding:16px;border-radius:12px;background:#191414;color:#fff;font-family:system-ui,"Helvetica Neue",Helvetica,Arial,sans-serif;text-decoration:none;box-shadow:0 8px 24px rgb(0 0 0/.16)}
 .listening-card.without-artwork{grid-template-columns:1fr}
-.listening-card:hover{border-color:#aaa;box-shadow:0 2px 4px rgb(0 0 0/.05),0 12px 32px rgb(0 0 0/.08);transform:translateY(-1px)}
-.listening-card:focus-visible{outline:3px solid rgb(6 69 173/.25);outline-offset:3px}
-.listening-artwork{display:block;width:160px;height:160px;border-radius:8px;object-fit:cover;outline:1px solid oklch(0 0 0/.1)}
+.listening-card:hover{background:#242424;box-shadow:0 10px 30px rgb(0 0 0/.22)}
+.listening-card:hover .spotify-link{text-decoration:underline;text-underline-position:from-font;text-decoration-thickness:from-font}
+.listening-card:focus-visible{outline:3px solid #191414;outline-offset:3px;box-shadow:0 0 0 6px #1ed760}
+.listening-artwork{display:block;width:120px;height:120px;border-radius:4px;object-fit:cover;outline:1px solid oklch(1 0 0/.1)}
 .listening-details{display:flex;min-width:0;flex-direction:column;justify-content:center}
-.listening-state{display:flex;align-items:center;gap:8px;margin-bottom:8px;color:#137333;font-size:.84rem;font-weight:650}
-.listening-dot{width:8px;height:8px;border-radius:50%;background:#1db954;box-shadow:0 0 0 4px rgb(29 185 84/.12)}
-[data-playback-state="paused"] .listening-state{color:#666}
-[data-playback-state="paused"] .listening-dot{background:#999;box-shadow:0 0 0 4px rgb(0 0 0/.07)}
-.listening-title{overflow:hidden;margin-bottom:2px;font-size:1.25rem;line-height:1.25;text-overflow:ellipsis;white-space:nowrap}
-.listening-creator{overflow:hidden;color:#666;text-overflow:ellipsis;white-space:nowrap}
-.listening-progress{display:block;min-width:0;margin-top:16px}
-.listening-progress progress{display:block;width:100%;height:4px;border:0;border-radius:999px;overflow:hidden;background:#e5e5e5;appearance:none}
-.listening-progress progress::-webkit-progress-bar{background:#e5e5e5}
-.listening-progress progress::-webkit-progress-value{background:#1d1d1d}
-.listening-progress progress::-moz-progress-bar{background:#1d1d1d}
-.listening-times{display:flex;justify-content:space-between;margin-top:4px;color:#777;font-size:.74rem;font-variant-numeric:tabular-nums}
-.spotify-link{margin-top:14px;color:#0645ad;font-size:.88rem;text-decoration:underline}
-.spotify-attribution{margin-top:12px;color:#777;font-size:.78rem}
+.listening-topline{display:flex;min-width:0;align-items:center;justify-content:space-between;gap:12px;margin-bottom:5px}
+.listening-state{display:flex;min-width:0;align-items:center;gap:7px;color:#1ed760;font-size:.75rem;font-weight:700;letter-spacing:.02em;white-space:nowrap}
+.listening-dot{width:8px;height:8px;flex:0 0 auto;border-radius:50%;background:#1ed760;box-shadow:0 0 0 3px rgb(30 215 96/.14)}
+.spotify-logo{display:block;width:88px;height:auto;flex:0 0 auto}
+[data-playback-state="paused"] .listening-state{color:#b3b3b3}
+[data-playback-state="paused"] .listening-dot{background:#b3b3b3;box-shadow:0 0 0 3px rgb(179 179 179/.12)}
+.listening-title{display:block;overflow:hidden;margin-bottom:1px;color:#fff;font-size:1.05rem;font-weight:700;line-height:1.25;text-overflow:ellipsis;white-space:nowrap}
+[data-content-type="episode"] .listening-title{display:-webkit-box;white-space:normal;-webkit-box-orient:vertical;-webkit-line-clamp:2}
+.listening-creator{display:block;overflow:hidden;color:#b3b3b3;font-size:.875rem;line-height:1.4;text-overflow:ellipsis;white-space:nowrap}
+.spotify-link{margin-top:3px;color:#1ed760;font-size:.75rem;font-weight:700;line-height:1.4}
+.listening-progress{display:block;min-width:0;margin-top:7px}
+.listening-progress progress{display:block;width:100%;height:4px;border:0;border-radius:999px;overflow:hidden;background:#4d4d4d;pointer-events:none;appearance:none}
+.listening-progress progress::-webkit-progress-bar{background:#4d4d4d}
+.listening-progress progress::-webkit-progress-value{border-radius:999px;background:#fff}
+.listening-progress progress::-moz-progress-bar{border-radius:999px;background:#fff}
+.listening-times{display:flex;justify-content:space-between;margin-top:2px;color:#b3b3b3;font-size:.6875rem;font-variant-numeric:tabular-nums;line-height:1.3}
+@media(prefers-reduced-motion:no-preference){
+  .listening-card{transition-property:background-color,box-shadow,transform;transition-duration:150ms;transition-timing-function:ease-out}
+  .listening-card:active{transform:scale(.96)}
+}
 @media(max-width:680px){
   header{display:block}
-  .contact-list{margin-top:12px}
+  .contact-list{gap:8px 12px;margin-top:12px}
   .media-grid{grid-template-columns:1fr}
   .viewport-layout header{height:160px}
   .viewport-layout main{height:calc(100dvh - 160px)}
 }
 @media(max-width:560px){
-  .listening-heading{display:block}
-  .listening-updated{margin-top:4px}
-  .listening-card{grid-template-columns:92px minmax(0,1fr);gap:14px;padding:14px;border-radius:12px}
-  .listening-artwork{width:92px;height:92px;border-radius:6px}
-  .listening-title{font-size:1.05rem}
-  .listening-progress{margin-top:11px}
-  .spotify-link{margin-top:10px}
+  .listening-card{min-height:116px;grid-template-columns:92px minmax(0,1fr);gap:12px;padding:12px}
+  .listening-artwork{width:92px;height:92px}
+  .listening-topline{gap:8px;margin-bottom:3px}
+  .spotify-logo{width:70px}
+  .listening-state{font-size:.6875rem}
+  .listening-title{font-size:1rem}
+  .spotify-link{margin-top:2px}
+  .listening-progress{margin-top:5px}
 }

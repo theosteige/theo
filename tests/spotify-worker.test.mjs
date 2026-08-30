@@ -107,7 +107,7 @@ test("refreshes the token and returns sanitized playback with CORS", async () =>
 
   assert.equal(response.status, 200);
   assert.equal(response.headers.get("Access-Control-Allow-Origin"), "https://theosteiger.com");
-  assert.match(response.headers.get("Cache-Control"), /max-age=10/);
+  assert.match(response.headers.get("Cache-Control"), /max-age=5/);
   assert.equal(body.title, "Worker song");
   assert.equal(calls.length, 2);
   assert.equal(calls[1].options.headers.Authorization, "Bearer access-token");
@@ -130,6 +130,58 @@ test("returns idle when Spotify has no active playback", async () => {
     status: "idle",
     fetchedAt: "2026-08-30T12:00:00.000Z"
   });
+});
+
+test("shares a recent playback result instead of repeating Spotify requests", async () => {
+  let clock = 1_000;
+  let playbackRequests = 0;
+  const fetchImpl = async (url) => {
+    if (url.includes("/api/token")) {
+      return Response.json({ access_token: "access-token", expires_in: 3600 });
+    }
+    playbackRequests += 1;
+    return Response.json({
+      is_playing: true,
+      progress_ms: 10_000,
+      device: { is_private_session: false },
+      item: {
+        type: "track",
+        name: "Cached song",
+        duration_ms: 180_000,
+        artists: [{ name: "Cached artist" }],
+        album: { images: [] },
+        external_urls: { spotify: "https://open.spotify.com/track/cached" }
+      }
+    });
+  };
+  const handler = worker.createHandler({
+    fetchImpl,
+    now: () => clock,
+    nowDate: () => new Date("2026-08-30T12:00:00.000Z")
+  });
+
+  await handler(new Request("https://worker.example/currently-playing"), env);
+  clock += 8_999;
+  await handler(new Request("https://worker.example/currently-playing"), env);
+  assert.equal(playbackRequests, 1);
+
+  clock += 2;
+  await handler(new Request("https://worker.example/currently-playing"), env);
+  assert.equal(playbackRequests, 2);
+});
+
+test("exposes Spotify retry timing to approved browser origins", async () => {
+  const fetchImpl = async (url) => url.includes("/api/token")
+    ? Response.json({ access_token: "access-token", expires_in: 3600 })
+    : new Response(null, { status: 429, headers: { "Retry-After": "17" } });
+  const handler = worker.createHandler({ fetchImpl, now: () => 1_000 });
+  const response = await handler(new Request("https://worker.example/currently-playing", {
+    headers: { Origin: "https://theosteiger.com" }
+  }), env);
+
+  assert.equal(response.status, 503);
+  assert.equal(response.headers.get("Retry-After"), "17");
+  assert.match(response.headers.get("Access-Control-Expose-Headers"), /Retry-After/);
 });
 
 test("rejects unapproved browser origins before contacting Spotify", async () => {

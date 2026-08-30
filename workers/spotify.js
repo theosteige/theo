@@ -1,6 +1,7 @@
 const TOKEN_URL = "https://accounts.spotify.com/api/token";
 const PLAYBACK_URL = "https://api.spotify.com/v1/me/player/currently-playing?additional_types=track%2Cepisode";
 const ACCESS_TOKEN_EXPIRY_BUFFER_MS = 30_000;
+const PLAYBACK_CACHE_MS = 9_000;
 
 class SpotifyRequestError extends Error {
   constructor(message, status = 502, retryAfter = null) {
@@ -25,6 +26,7 @@ function responseHeaders(origin, cacheControl = "no-store") {
   const headers = {
     "Access-Control-Allow-Headers": "Content-Type",
     "Access-Control-Allow-Methods": "GET, OPTIONS",
+    "Access-Control-Expose-Headers": "Retry-After",
     "Cache-Control": cacheControl,
     "Content-Type": "application/json; charset=utf-8",
     "Vary": "Origin",
@@ -176,8 +178,32 @@ export function createSpotifyClient({ fetchImpl = fetch, now = Date.now } = {}) 
 }
 
 export function createHandler(options = {}) {
+  const now = options.now ?? Date.now;
   const nowDate = options.nowDate ?? (() => new Date());
-  const spotify = createSpotifyClient(options);
+  const spotify = createSpotifyClient({ ...options, now });
+  let cachedPlayback = null;
+  let cacheExpiresAt = 0;
+  let playbackInFlight = null;
+
+  async function currentPlayback(env) {
+    if (cachedPlayback && now() < cacheExpiresAt) return cachedPlayback;
+    if (playbackInFlight) return playbackInFlight;
+
+    playbackInFlight = (async () => {
+      const playback = await spotify.requestPlayback(env);
+      const fetchedAt = nowDate().toISOString();
+      const body = playback ? normalizePlayback(playback, fetchedAt) : { status: "idle", fetchedAt };
+      cachedPlayback = body;
+      cacheExpiresAt = now() + PLAYBACK_CACHE_MS;
+      return body;
+    })();
+
+    try {
+      return await playbackInFlight;
+    } finally {
+      playbackInFlight = null;
+    }
+  }
 
   return async (request, env) => {
     const origin = allowedOrigin(request, env);
@@ -201,18 +227,16 @@ export function createHandler(options = {}) {
     }
 
     try {
-      const playback = await spotify.requestPlayback(env);
-      const fetchedAt = nowDate().toISOString();
-      const body = playback ? normalizePlayback(playback, fetchedAt) : { status: "idle", fetchedAt };
+      const body = await currentPlayback(env);
       return json(
         body,
         200,
         origin,
-        "public, max-age=10, s-maxage=10, stale-while-revalidate=20"
+        "public, max-age=5, s-maxage=9, stale-while-revalidate=5"
       );
     } catch (error) {
-      console.error(error);
       const known = error instanceof SpotifyRequestError;
+      if (!known) console.error(error);
       const retryAfter = known ? error.retryAfter : null;
       return json(
         { error: known ? error.message : "Spotify playback is temporarily unavailable." },
