@@ -8,6 +8,7 @@ const DEFAULT_SETTINGS = {
   multiplicationRight: { min: 2, max: 100 }
 };
 const MAX_PRACTICE_SESSION_SECONDS = 7 * 24 * 60 * 60;
+const LEGACY_PRACTICE_YEAR = 2026;
 const ATTEMPT_OPERATIONS = new Set(["+", "−", "×", "÷"]);
 
 function headers(origin) {
@@ -95,6 +96,24 @@ async function readScores(db) {
   })).filter(validScore);
 }
 
+async function readPractice(db) {
+  const [practice, sessions] = await db.batch([
+    db.prepare("SELECT total_seconds FROM practice WHERE id=1"),
+    db.prepare("SELECT played_at,seconds FROM practice_sessions ORDER BY id")
+  ]);
+  const entries = sessions.results.map((row) => ({
+    playedAt: row.played_at,
+    seconds: row.seconds
+  }));
+  const totalSeconds = practice.results[0]?.total_seconds ?? 0;
+  return {
+    totalSeconds,
+    legacySeconds: Math.max(0, totalSeconds - entries.reduce((sum, entry) => sum + entry.seconds, 0)),
+    legacyYear: LEGACY_PRACTICE_YEAR,
+    sessions: entries
+  };
+}
+
 async function sameSecret(left, right) {
   const encode = (value) => crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
   const [leftHash, rightHash] = await Promise.all([encode(left), encode(right)]);
@@ -115,10 +134,7 @@ export function createHandler(now = () => new Date()) {
     try {
       if (request.method === "GET") {
         if (isScoresPath) return json({ scores: await readScores(env.DB) }, 200, origin);
-        const totalSeconds = await env.DB
-          .prepare("SELECT total_seconds FROM practice WHERE id=1")
-          .first("total_seconds");
-        return json({ totalSeconds: totalSeconds ?? 0 }, 200, origin);
+        return json(await readPractice(env.DB), 200, origin);
       }
 
       if (request.method === "POST") {
@@ -136,11 +152,17 @@ export function createHandler(now = () => new Date()) {
           ) {
             return json({ error: "Invalid practice time." }, 400, origin);
           }
-          const [, result] = await env.DB.batch([
+          const playedAt = now().toISOString();
+          const [, , result] = await env.DB.batch([
             env.DB.prepare("UPDATE practice SET total_seconds=total_seconds+? WHERE id=1").bind(input.seconds),
+            env.DB.prepare("INSERT INTO practice_sessions(played_at,seconds) VALUES(?,?)")
+              .bind(playedAt, input.seconds),
             env.DB.prepare("SELECT total_seconds FROM practice WHERE id=1")
           ]);
-          return json({ totalSeconds: result.results[0].total_seconds }, 201, origin);
+          return json({
+            totalSeconds: result.results[0].total_seconds,
+            session: { playedAt, seconds: input.seconds }
+          }, 201, origin);
         }
 
         const settings = input.settings ?? DEFAULT_SETTINGS;
