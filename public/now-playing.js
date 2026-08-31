@@ -4,23 +4,26 @@
 
   const section = document.querySelector("[data-now-playing]");
   const apiBase = (document.body.dataset.spotifyApi || "https://spotify-api.theosteiger.com").replace(/\/$/, "");
+  const spotifyProfileUrl = "https://open.spotify.com/user/tmoneysteiger?si=07e15516b3f4432c";
   const contacts = header.querySelector(".contact-list");
   if (!contacts) return;
   const miniItem = document.createElement("li");
   miniItem.className = "header-listening-item";
-  miniItem.hidden = true;
   const mini = document.createElement("a");
   mini.className = "header-listening";
+  mini.href = spotifyProfileUrl;
   mini.target = "_blank";
   mini.rel = "noopener noreferrer";
   mini.innerHTML = `
-    <img class="header-listening-artwork" alt="" width="20" height="20">
-    <span>Spotify</span>
+    <span class="header-listening-label">Spotify</span>
+    <img class="header-listening-artwork" alt="" width="20" height="20" hidden>
   `;
   miniItem.append(mini);
   contacts.prepend(miniItem);
 
+  const miniLabel = mini.querySelector(".header-listening-label");
   const miniArtwork = mini.querySelector(".header-listening-artwork");
+  miniArtwork.hidden = true;
   const card = section?.querySelector("[data-card]");
   const message = section?.querySelector("[data-message]");
   const announcement = section?.querySelector("[data-announcement]");
@@ -58,7 +61,13 @@
 
   function hidePlayback(text) {
     current = null;
-    miniItem.hidden = true;
+    mini.href = spotifyProfileUrl;
+    mini.removeAttribute("aria-label");
+    mini.removeAttribute("title");
+    miniLabel.textContent = "Spotify";
+    miniArtwork.hidden = true;
+    miniArtwork.removeAttribute("src");
+    miniItem.hidden = false;
     if (section) {
       card.hidden = true;
       message.hidden = false;
@@ -92,10 +101,11 @@
   function showPlayback(playback) {
     current = playback;
     const playing = playback.status === "playing";
-    const action = `${playing ? "Currently playing" : "Spotify is paused on"} ${playback.title} by ${playback.creator}. Open in Spotify in a new tab.`;
+    const details = `Theo is listening to ${playback.title} by ${playback.creator}`;
     mini.href = playback.spotifyUrl;
-    mini.setAttribute("aria-label", action);
-    mini.title = action;
+    mini.setAttribute("aria-label", `Listening to Spotify: ${details}`);
+    mini.title = details;
+    miniLabel.textContent = "Listening to Spotify";
     miniItem.hidden = false;
     if (playback.imageUrl) {
       miniArtwork.src = playback.imageUrl;
