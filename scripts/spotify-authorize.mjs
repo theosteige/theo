@@ -21,7 +21,8 @@ async function ask(prompt) {
 }
 
 async function askHidden(prompt) {
-  if (!stdin.isTTY || typeof stdin.setRawMode !== "function") return ask(prompt);
+  if (!stdin.isTTY || typeof stdin.setRawMode !== "function")
+    return ask(prompt);
   stdout.write(prompt);
   stdin.setRawMode(true);
   stdin.resume();
@@ -66,12 +67,16 @@ async function askHidden(prompt) {
 }
 
 function openBrowser(url) {
-  const command = process.platform === "darwin"
-    ? ["open", [url]]
-    : process.platform === "win32"
-      ? ["cmd", ["/c", "start", "", url]]
-      : ["xdg-open", [url]];
-  const child = spawn(command[0], command[1], { detached: true, stdio: "ignore" });
+  const command =
+    process.platform === "darwin"
+      ? ["open", [url]]
+      : process.platform === "win32"
+        ? ["cmd", ["/c", "start", "", url]]
+        : ["xdg-open", [url]];
+  const child = spawn(command[0], command[1], {
+    detached: true,
+    stdio: "ignore",
+  });
   child.on("error", () => {});
   child.unref();
 }
@@ -79,9 +84,11 @@ function openBrowser(url) {
 function browserMessage(response, title, message, status = 200) {
   response.writeHead(status, {
     "Content-Type": "text/html; charset=utf-8",
-    "X-Content-Type-Options": "nosniff"
+    "X-Content-Type-Options": "nosniff",
   });
-  response.end(`<!doctype html><html lang="en"><meta charset="utf-8"><title>${title}</title><body><h1>${title}</h1><p>${message}</p></body></html>`);
+  response.end(
+    `<!doctype html><html lang="en"><meta charset="utf-8"><title>${title}</title><body><h1>${title}</h1><p>${message}</p></body></html>`,
+  );
 }
 
 function putSecret(name, value) {
@@ -89,7 +96,7 @@ function putSecret(name, value) {
     const child = spawn(
       "npx",
       ["wrangler", "secret", "put", name, "--config", "wrangler.spotify.jsonc"],
-      { stdio: ["pipe", "inherit", "inherit"] }
+      { stdio: ["pipe", "inherit", "inherit"] },
     );
     child.on("error", reject);
     child.on("exit", (code) => {
@@ -101,10 +108,13 @@ function putSecret(name, value) {
 }
 
 async function main() {
-  stdout.write(`Spotify authorization helper\n\nBefore continuing, add this exact redirect URI to your Spotify app:\n${REDIRECT_URI}\n\n`);
+  stdout.write(
+    `Spotify authorization helper\n\nBefore continuing, add this exact redirect URI to your Spotify app:\n${REDIRECT_URI}\n\n`,
+  );
   const clientId = await ask("Spotify client ID: ");
   const clientSecret = await askHidden("Spotify client secret: ");
-  if (!clientId || !clientSecret) throw new Error("Both the client ID and client secret are required.");
+  if (!clientId || !clientSecret)
+    throw new Error("Both the client ID and client secret are required.");
 
   const state = randomBytes(24).toString("hex");
   const authorization = new URL("https://accounts.spotify.com/authorize");
@@ -114,14 +124,19 @@ async function main() {
     redirect_uri: REDIRECT_URI,
     state,
     scope: SCOPES,
-    show_dialog: "true"
+    show_dialog: "true",
   }).toString();
 
   const refreshToken = await new Promise((resolve, reject) => {
     const server = createServer(async (request, response) => {
       const url = new URL(request.url, REDIRECT_URI);
       if (url.pathname !== "/callback") {
-        browserMessage(response, "Not found", "This authorization helper only accepts Spotify's callback.", 404);
+        browserMessage(
+          response,
+          "Not found",
+          "This authorization helper only accepts Spotify's callback.",
+          404,
+        );
         return;
       }
 
@@ -129,34 +144,61 @@ async function main() {
       const returnedState = url.searchParams.get("state");
       const code = url.searchParams.get("code");
       if (error || returnedState !== state || !code) {
-        browserMessage(response, "Spotify was not connected", "Return to the terminal and try again.", 400);
+        browserMessage(
+          response,
+          "Spotify was not connected",
+          "Return to the terminal and try again.",
+          400,
+        );
         server.close();
-        reject(new Error(error ? `Spotify returned: ${error}` : "The OAuth state or authorization code was invalid."));
+        reject(
+          new Error(
+            error
+              ? `Spotify returned: ${error}`
+              : "The OAuth state or authorization code was invalid.",
+          ),
+        );
         return;
       }
 
       try {
-        const tokenResponse = await fetch("https://accounts.spotify.com/api/token", {
-          method: "POST",
-          headers: {
-            "Authorization": `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString("base64")}`,
-            "Content-Type": "application/x-www-form-urlencoded"
+        const tokenResponse = await fetch(
+          "https://accounts.spotify.com/api/token",
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString("base64")}`,
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: new URLSearchParams({
+              grant_type: "authorization_code",
+              code,
+              redirect_uri: REDIRECT_URI,
+            }),
           },
-          body: new URLSearchParams({
-            grant_type: "authorization_code",
-            code,
-            redirect_uri: REDIRECT_URI
-          })
-        });
+        );
         const token = await tokenResponse.json();
         if (!tokenResponse.ok || !token.refresh_token) {
-          throw new Error(token.error_description || token.error || "Spotify did not issue a refresh token.");
+          throw new Error(
+            token.error_description ||
+              token.error ||
+              "Spotify did not issue a refresh token.",
+          );
         }
-        browserMessage(response, "Spotify connected", "You can close this tab and return to the terminal.");
+        browserMessage(
+          response,
+          "Spotify connected",
+          "You can close this tab and return to the terminal.",
+        );
         server.close();
         resolve(token.refresh_token);
       } catch (tokenError) {
-        browserMessage(response, "Spotify was not connected", "The token exchange failed. Return to the terminal for details.", 500);
+        browserMessage(
+          response,
+          "Spotify was not connected",
+          "The token exchange failed. Return to the terminal for details.",
+          500,
+        );
         server.close();
         reject(tokenError);
       }
@@ -169,11 +211,15 @@ async function main() {
     });
   });
 
-  stdout.write("\nUploading the Spotify credentials directly to Cloudflare...\n");
+  stdout.write(
+    "\nUploading the Spotify credentials directly to Cloudflare...\n",
+  );
   await putSecret("SPOTIFY_CLIENT_ID", clientId);
   await putSecret("SPOTIFY_CLIENT_SECRET", clientSecret);
   await putSecret("SPOTIFY_REFRESH_TOKEN", refreshToken);
-  stdout.write("\nSpotify Worker secrets configured. No credentials were written to disk.\n");
+  stdout.write(
+    "\nSpotify Worker secrets configured. No credentials were written to disk.\n",
+  );
 }
 
 main().catch((error) => {

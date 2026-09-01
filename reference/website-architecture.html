@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Theo's website: architecture reference</title>
+  <link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+  <header>
+    <nav><a href="../lessons/0001-trace-a-mental-math-game.html">Lesson 1</a><a href="../RESOURCES.md">Sources</a></nav>
+    <p class="eyebrow">Living reference · August 2026</p>
+    <h1>Theo's website, end to end</h1>
+    <p class="dek">A field guide to what runs where, which files matter, how mental-math records move, and how to deploy without mixing up the two production systems.</p>
+  </header>
+
+  <section class="callout">
+    <strong>The whole architecture:</strong> GitHub Pages serves the files in <code>public/</code>. Browser JavaScript calls a Cloudflare Worker for mental-math records. The Worker reads and writes Cloudflare D1. There is no framework, application server, package manifest, or static-site build.
+  </section>
+
+  <h2>Two deployables, one database</h2>
+  <div class="flow" aria-label="System architecture">
+    <span>Visitor's browser</span><b>← files →</b><span>GitHub Pages<br><code>theosteiger.com</code></span><b>·</b><span>Browser JS</span><b>← JSON →</b><span>Cloudflare Worker<br>← SQL → D1</span>
+  </div>
+  <table>
+    <thead><tr><th>Part</th><th>Owns</th><th>Source of truth</th><th>Deployment</th></tr></thead>
+    <tbody>
+      <tr><td>Static site</td><td>Pages, styling, media, browser behavior</td><td><code>public/</code></td><td>Push <code>main</code>; GitHub Actions uploads <code>public/</code></td></tr>
+      <tr><td>API Worker</td><td>Routing, validation, authorization, JSON, SQL</td><td><code>workers/scores.js</code> and <code>wrangler.jsonc</code></td><td><code>npx wrangler deploy</code></td></tr>
+      <tr><td>D1 database</td><td>Scores, settings, answer timings, practice time</td><td><code>migrations/*.sql</code> describes schema history</td><td><code>npx wrangler d1 migrations apply mental-math --remote</code></td></tr>
+    </tbody>
+  </table>
+
+  <h2>Repository map</h2>
+  <table>
+    <thead><tr><th>Path</th><th>Responsibility</th></tr></thead>
+    <tbody>
+      <tr><td><code>public/index.html</code></td><td>The Table of Contents and top-level navigation.</td></tr>
+      <tr><td><code>public/&lt;route&gt;/index.html</code></td><td>A URL such as <code>/piano/</code>, <code>/reading/</code>, or <code>/side-quests/</code>. The directory is the route.</td></tr>
+      <tr><td><code>public/style.css</code></td><td>The shared page, header, typography, list, prose, and media-grid rules.</td></tr>
+      <tr><td><code>public/site.js</code></td><td>Exactly one shared behavior: clicking “Email” reveals <code>me@theosteiger.com</code>.</td></tr>
+      <tr><td><code>public/design.*</code></td><td>The extensible media mosaic and modal viewer.</td></tr>
+      <tr><td><code>public/mental-math.*</code></td><td>The game, progress graph, activity calendar, history UI, and API calls.</td></tr>
+      <tr><td><code>workers/scores.js</code></td><td>The complete production API.</td></tr>
+      <tr><td><code>migrations/</code></td><td>Ordered, additive database changes.</td></tr>
+      <tr><td><code>.github/workflows/deploy.yml</code></td><td>The GitHub Pages release recipe.</td></tr>
+      <tr><td><code>wrangler.jsonc</code></td><td>The Worker name, source file, allowed browser origins, and D1 binding.</td></tr>
+      <tr><td><code>public/CNAME</code></td><td>The custom domain: <code>theosteiger.com</code>.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>What “lightweight” means here</h2>
+  <div class="split">
+    <div class="card">
+      <h3>Code is small</h3>
+      <p>No React, Astro, package bundle, client router, component runtime, analytics library, or CSS framework ships to visitors. Shared JavaScript is about 100 bytes; the specialized mental-math script is about 12 KB.</p>
+    </div>
+    <div class="card">
+      <h3>Media is intentionally large</h3>
+      <p>The tracked repository is roughly 87.5 MB, almost all original-quality images, audio, video, and the résumé. The code and HTML together are a tiny fraction of that total.</p>
+    </div>
+  </div>
+  <p>The Piano page is especially economical: three links retarget one lazy-loaded, privacy-enhanced YouTube iframe. The Design page keeps media as ordinary DOM children; a 52-line script recalculates the binary mosaic whenever a child is added and opens the selected original in a native <code>&lt;dialog&gt;</code>.</p>
+
+  <h2>Mental-math browser behavior</h2>
+  <ol class="steps">
+    <li><strong>Settings become a plain object.</strong><p>The checked operations, numeric ranges, and duration are validated in the browser. Practice is represented as a null duration; timed games use 30, 60, 120, 300, or 600 seconds.</p></li>
+    <li><strong>Questions are generated locally.</strong><p>Addition and multiplication choose operands directly. Subtraction starts with two positive values and displays their sum minus one value, guaranteeing a non-negative integer result. Division reverses a multiplication, guaranteeing an integer answer.</p></li>
+    <li><strong>Only correct completions advance.</strong><p>A question's timer starts at generation. Wrong input is not stored separately, but its delay is included because the timer stops only when the correct answer arrives.</p></li>
+    <li><strong>Timed and practice games end differently.</strong><p>A timed game posts its score, settings, duration, and correct-answer attempts when the countdown ends. Practice runs until “Exit practice” and posts only elapsed seconds. Closing or reloading a practice session does not save it.</p></li>
+    <li><strong>The UI renders public records.</strong><p>Anyone can fetch game history and practice totals. The progress line filters to 120-second games with every default operation and range. The history list shows every timed game. The activity calendar includes all timed-game minutes plus dated practice sessions.</p></li>
+  </ol>
+
+  <h3>Activity-calendar rules</h3>
+  <table>
+    <thead><tr><th>Level</th><th>Daily activity</th><th>Color</th></tr></thead>
+    <tbody>
+      <tr><td>0</td><td>None</td><td><code>#eff2f5</code></td></tr>
+      <tr><td>1</td><td>Under 5 minutes</td><td><code>#aceebb</code></td></tr>
+      <tr><td>2</td><td>5–14 minutes</td><td><code>#4ac26b</code></td></tr>
+      <tr><td>3</td><td>15–29 minutes</td><td><code>#2da44e</code></td></tr>
+      <tr><td>4</td><td>30 minutes or more</td><td><code>#116329</code></td></tr>
+    </tbody>
+  </table>
+  <p>The calendar uses the current year in <code>America/Los_Angeles</code>. The pre-session practice total of 1,997 seconds is included in the 2026 cumulative heading but cannot be assigned to a historical day, so it does not color a cell. Future practice exits produce dated rows and therefore appear on their day.</p>
+
+  <h2>API contract and trust boundary</h2>
+  <table>
+    <thead><tr><th>Method</th><th>Route</th><th>Journal key?</th><th>Behavior</th></tr></thead>
+    <tbody>
+      <tr><td><code>GET</code></td><td><code>/scores</code></td><td>No</td><td>Returns every valid timed-game score, timestamp, duration, and settings object.</td></tr>
+      <tr><td><code>POST</code></td><td><code>/scores</code></td><td>Yes</td><td>Validates the payload, saves the score, and batch-inserts canonical answer attempts.</td></tr>
+      <tr><td><code>GET</code></td><td><code>/practice-time</code></td><td>No</td><td>Returns the cumulative total, undated legacy amount/year, and dated sessions.</td></tr>
+      <tr><td><code>POST</code></td><td><code>/practice-time</code></td><td>Yes</td><td>Atomically increments the total and inserts a dated practice session.</td></tr>
+    </tbody>
+  </table>
+  <p>The journal key is sent as an HTTPS <code>Authorization: Bearer …</code> header. Its expected value is the encrypted Cloudflare secret <code>WRITE_KEY</code>, never a repository file. The browser does not put the entered key in cookies or local storage: it remains in the password field for the current page lifetime and disappears on reload or navigation.</p>
+  <div class="callout"><strong>CORS is not the password.</strong> The Worker returns browser-readable responses only to <code>theosteiger.com</code> and configured localhost origins, but non-browser requests can omit <code>Origin</code>. That is intentional because reads are public. Every write is independently protected by the journal key.</div>
+
+  <h2>D1 schema</h2>
+  <table>
+    <thead><tr><th>Table</th><th>Stored data</th><th>Important detail</th></tr></thead>
+    <tbody>
+      <tr><td><code>scores</code></td><td>Score, ISO timestamp, duration, JSON settings</td><td>One row per saved timed game.</td></tr>
+      <tr><td><code>attempts</code></td><td>Game timestamp, operator, canonical operands, response milliseconds</td><td>Addition and multiplication operands are sorted, making <code>5 + 2</code> and <code>2 + 5</code> the same question. Subtraction and division keep their order.</td></tr>
+      <tr><td><code>practice</code></td><td>One cumulative <code>total_seconds</code> value</td><td>Preserves the original total across the dated-session migration.</td></tr>
+      <tr><td><code>practice_sessions</code></td><td>ISO timestamp and elapsed seconds</td><td>New practice exits can be placed on the activity calendar.</td></tr>
+    </tbody>
+  </table>
+  <p>Attempts are collected but are not exposed by a public API or displayed on the site. Analyze them through D1, for example:</p>
+  <pre><code>SELECT operation, left_operand, right_operand,
+       COUNT(*) AS answers,
+       ROUND(AVG(response_ms) / 1000.0, 2) AS average_seconds
+FROM attempts
+GROUP BY operation, left_operand, right_operand
+ORDER BY average_seconds DESC;</code></pre>
+
+  <h2>Why the deployed HTML differs from the repository</h2>
+  <p>The repository intentionally contains a bare <code>data-score-api</code> attribute. During the Pages workflow, one <code>sed</code> command injects the repository's <code>SCORE_API_URL</code> variable into the artifact. This keeps the production URL out of page-maintenance work while avoiding a build system. A plain local static server therefore runs the game but reports that syncing is unconfigured unless the preview injects a local or production API URL.</p>
+
+  <h2>Safe release checklist</h2>
+  <ol class="steps">
+    <li><strong>Preview and validate.</strong><p>Serve <code>public/</code>, exercise the changed page, run JavaScript syntax checks, and inspect <code>git diff --check</code>.</p></li>
+    <li><strong>Apply schema first, if any.</strong><p>Run <code>npx wrangler d1 migrations apply mental-math --remote</code>, then list migrations and perform a read-only schema check.</p></li>
+    <li><strong>Deploy the Worker second, if changed.</strong><p>Run <code>npx wrangler deploy</code>, then call only the public GET routes to verify response shape. Never create a production test score.</p></li>
+    <li><strong>Push the static release last.</strong><p>Commit and push <code>main</code>. The Deploy workflow substitutes the API URL, uploads <code>public/</code>, and publishes the artifact to GitHub Pages.</p></li>
+    <li><strong>Verify the actual public URLs.</strong><p>Check the exact commit's workflow, cache-bust the page and assets, confirm removed text is absent, and confirm the Worker still returns preserved data.</p></li>
+  </ol>
+
+  <h2>Current sharp edges</h2>
+  <ul>
+    <li>The static site and Worker are separate deployments, so a breaking API change must be sequenced carefully.</li>
+    <li>There is no automated test suite in the repository; validation is currently targeted syntax, API, database, and browser QA.</li>
+    <li>Attempt data has no export or analysis interface yet.</li>
+    <li>Practice time is saved only when “Exit practice” runs successfully with the key present.</li>
+    <li>The public GET routes deliberately use <code>Cache-Control: no-store</code>, favoring fresh personal records over caching.</li>
+    <li>The latest Pages run succeeds, but GitHub warns that several pinned action versions still target its deprecated Node 20 action runtime. This is maintenance debt, not a current deployment failure.</li>
+  </ul>
+
+  <footer>
+    <p>Primary references: <a href="https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages">GitHub Pages custom workflows</a>, <a href="https://developers.cloudflare.com/workers/runtime-apis/handlers/fetch/">Workers fetch handlers</a>, <a href="https://developers.cloudflare.com/d1/get-started/">D1 bindings</a>, <a href="https://developers.cloudflare.com/d1/reference/migrations/">D1 migrations</a>, and <a href="https://developers.cloudflare.com/workers/configuration/secrets/">Workers secrets</a>.</p>
+  </footer>
+</body>
+</html>

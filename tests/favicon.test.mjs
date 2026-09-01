@@ -5,16 +5,28 @@ import test from "node:test";
 
 const publicDir = new URL("../public/", import.meta.url);
 const requiredLinks = [
-  `<link rel="icon" type="image/svg+xml" sizes="any" href="/favicon-blue-t.svg">`,
-  `<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#0645ad">`,
-  `<link rel="apple-touch-icon" sizes="512x512" href="/favicon-512.png?v=20260831">`,
+  {
+    rel: "icon",
+    type: "image/svg+xml",
+    sizes: "any",
+    href: "/favicon-blue-t.svg",
+  },
+  { rel: "mask-icon", href: "/safari-pinned-tab.svg", color: "#0645ad" },
+  {
+    rel: "apple-touch-icon",
+    sizes: "512x512",
+    href: "/favicon-512.png?v=20260831",
+  },
 ];
 
 async function findHtmlFiles(directory) {
   const entries = await readdir(directory, { withFileTypes: true });
   const files = await Promise.all(
     entries.map(async (entry) => {
-      const location = new URL(`${entry.name}${entry.isDirectory() ? "/" : ""}`, directory);
+      const location = new URL(
+        `${entry.name}${entry.isDirectory() ? "/" : ""}`,
+        directory,
+      );
       return entry.isDirectory()
         ? findHtmlFiles(location)
         : location.pathname.endsWith(".html")
@@ -33,13 +45,24 @@ test("every page declares one cache-independent blue-T favicon", async () => {
   for (const file of htmlFiles) {
     const html = await readFile(file, "utf8");
     const relativePath = path.relative(publicDir.pathname, file.pathname);
+    const linkTags = [...html.matchAll(/<link\b[^>]*>/gs)].map(
+      (match) => match[0],
+    );
 
-    for (const link of requiredLinks) {
-      assert.ok(html.includes(link), `${relativePath} is missing ${link}`);
+    for (const attributes of requiredLinks) {
+      const matchingLink = linkTags.find((tag) =>
+        Object.entries(attributes).every(([name, value]) =>
+          tag.includes(`${name}="${value}"`),
+        ),
+      );
+      assert.ok(
+        matchingLink,
+        `${relativePath} is missing ${JSON.stringify(attributes)}`,
+      );
     }
 
     assert.equal(
-      html.match(/<link rel="icon"/g)?.length,
+      linkTags.filter((tag) => tag.includes('rel="icon"')).length,
       1,
       `${relativePath} must expose one unambiguous rel=icon candidate`,
     );

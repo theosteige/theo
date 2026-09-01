@@ -3,8 +3,11 @@
   if (!header) return;
 
   const section = document.querySelector("[data-now-playing]");
-  const apiBase = (document.body.dataset.spotifyApi || "https://spotify-api.theosteiger.com").replace(/\/$/, "");
-  const spotifyProfileUrl = "https://open.spotify.com/user/tmoneysteiger?si=07e15516b3f4432c";
+  const apiBase = (
+    document.body.dataset.spotifyApi || "https://spotify-api.theosteiger.com"
+  ).replace(/\/$/, "");
+  const spotifyProfileUrl =
+    "https://open.spotify.com/user/tmoneysteiger?si=07e15516b3f4432c";
   const contacts = header.querySelector(".contact-list");
   if (!contacts) return;
   const miniItem = document.createElement("li");
@@ -44,7 +47,9 @@
   let refreshing = false;
   let lastAnnouncement = "";
 
-  miniArtwork.onerror = () => { miniArtwork.hidden = true; };
+  miniArtwork.onerror = () => {
+    miniArtwork.hidden = true;
+  };
   if (artwork && card) {
     artwork.onerror = () => {
       artwork.hidden = true;
@@ -86,11 +91,18 @@
   }
 
   function updateProgress() {
-    if (!section || !current || current.progressMs === null || current.durationMs === null) return;
+    if (
+      !section ||
+      !current ||
+      current.progressMs === null ||
+      current.durationMs === null
+    )
+      return;
     const fetchedAt = Date.parse(current.fetchedAt);
-    const liveOffset = current.status === "playing" && Number.isFinite(fetchedAt)
-      ? Math.max(0, Date.now() - fetchedAt)
-      : 0;
+    const liveOffset =
+      current.status === "playing" && Number.isFinite(fetchedAt)
+        ? Math.max(0, Date.now() - fetchedAt)
+        : 0;
     const value = Math.min(current.durationMs, current.progressMs + liveOffset);
     progress.max = current.durationMs || 1;
     progress.value = value;
@@ -107,8 +119,9 @@
     mini.title = details;
     miniLabel.textContent = "Listening to Spotify";
     miniItem.hidden = false;
-    if (playback.imageUrl) {
-      miniArtwork.src = playback.imageUrl;
+    const thumbnailUrl = playback.thumbnailUrl || playback.imageUrl;
+    if (thumbnailUrl) {
+      miniArtwork.src = thumbnailUrl;
       miniArtwork.hidden = false;
     } else {
       miniArtwork.removeAttribute("src");
@@ -119,7 +132,10 @@
     message.hidden = true;
     card.hidden = false;
     card.href = playback.spotifyUrl;
-    card.setAttribute("aria-label", `Open ${playback.title} by ${playback.creator} on Spotify in a new tab`);
+    card.setAttribute(
+      "aria-label",
+      `Open ${playback.title} by ${playback.creator} on Spotify in a new tab`,
+    );
     state.textContent = playing ? "Playing" : "Paused";
     section.dataset.playbackState = playback.status;
     section.dataset.contentType = playback.type;
@@ -127,7 +143,9 @@
     title.title = playback.title;
     creator.textContent = playback.creator;
     creator.title = playback.creator;
-    announce(`${playing ? "Now playing" : "Paused"}: ${playback.title} by ${playback.creator}.`);
+    announce(
+      `${playing ? "Now playing" : "Paused"}: ${playback.title} by ${playback.creator}.`,
+    );
 
     if (playback.imageUrl) {
       card.classList.remove("without-artwork");
@@ -139,7 +157,8 @@
       card.classList.add("without-artwork");
     }
 
-    const hasProgress = playback.progressMs !== null && playback.durationMs !== null;
+    const hasProgress =
+      playback.progressMs !== null && playback.durationMs !== null;
     progressWrap.hidden = !hasProgress;
     if (progressTimer) window.clearInterval(progressTimer);
     progressTimer = null;
@@ -151,9 +170,10 @@
 
   function schedule(delay) {
     if (refreshTimer) window.clearTimeout(refreshTimer);
-    refreshTimer = document.visibilityState === "visible"
-      ? window.setTimeout(refresh, delay)
-      : null;
+    refreshTimer =
+      document.visibilityState === "visible"
+        ? window.setTimeout(refresh, delay)
+        : null;
   }
 
   async function refresh() {
@@ -167,13 +187,14 @@
       requestController = controller;
       timeout = window.setTimeout(() => controller.abort(), 8000);
       const response = await fetch(`${apiBase}/currently-playing`, {
-        headers: { "Accept": "application/json" },
-        signal: controller.signal
+        headers: { Accept: "application/json" },
+        signal: controller.signal,
       });
       const playback = await response.json();
       if (!response.ok) {
         const retryAfter = Number(response.headers.get("Retry-After"));
-        if (Number.isFinite(retryAfter)) nextPoll = Math.max(QUIET_POLL_MS, retryAfter * 1000);
+        if (Number.isFinite(retryAfter))
+          nextPoll = Math.max(QUIET_POLL_MS, retryAfter * 1000);
         throw new Error(playback.error || "Playback unavailable");
       }
 
@@ -185,10 +206,12 @@
         hidePlayback("Spotify status is temporarily unavailable.");
       } else {
         showPlayback(playback);
-        nextPoll = playback.status === "playing" ? ACTIVE_POLL_MS : QUIET_POLL_MS;
+        nextPoll =
+          playback.status === "playing" ? ACTIVE_POLL_MS : QUIET_POLL_MS;
       }
     } catch {
-      if (document.visibilityState === "visible") hidePlayback("Spotify status is temporarily unavailable.");
+      if (document.visibilityState === "visible")
+        hidePlayback("Spotify status is temporarily unavailable.");
     } finally {
       if (timeout) window.clearTimeout(timeout);
       if (requestController === controller) requestController = null;

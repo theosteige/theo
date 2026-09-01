@@ -1,5 +1,6 @@
 const TOKEN_URL = "https://accounts.spotify.com/api/token";
-const PLAYBACK_URL = "https://api.spotify.com/v1/me/player/currently-playing?additional_types=track%2Cepisode";
+const PLAYBACK_URL =
+  "https://api.spotify.com/v1/me/player/currently-playing?additional_types=track%2Cepisode";
 const ACCESS_TOKEN_EXPIRY_BUFFER_MS = 30_000;
 const PLAYBACK_CACHE_MS = 9_000;
 
@@ -29,8 +30,8 @@ function responseHeaders(origin, cacheControl = "no-store") {
     "Access-Control-Expose-Headers": "Retry-After",
     "Cache-Control": cacheControl,
     "Content-Type": "application/json; charset=utf-8",
-    "Vary": "Origin",
-    "X-Content-Type-Options": "nosniff"
+    Vary: "Origin",
+    "X-Content-Type-Options": "nosniff",
   };
   if (origin) headers["Access-Control-Allow-Origin"] = origin;
   return headers;
@@ -39,35 +40,52 @@ function responseHeaders(origin, cacheControl = "no-store") {
 function json(body, status, origin, cacheControl, extraHeaders = {}) {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { ...responseHeaders(origin, cacheControl), ...extraHeaders }
+    headers: { ...responseHeaders(origin, cacheControl), ...extraHeaders },
   });
 }
 
 function configured(env) {
   return Boolean(
     env.SPOTIFY_CLIENT_ID &&
-    env.SPOTIFY_CLIENT_SECRET &&
-    env.SPOTIFY_REFRESH_TOKEN
+      env.SPOTIFY_CLIENT_SECRET &&
+      env.SPOTIFY_REFRESH_TOKEN,
   );
 }
 
-function artwork(item) {
-  const images = item.type === "track"
-    ? item.album?.images
-    : item.images?.length
-      ? item.images
-      : item.show?.images;
-  return images?.find((image) => image?.url)?.url ?? null;
+function artwork(item, minimumWidth) {
+  const images =
+    item.type === "track"
+      ? item.album?.images
+      : item.images?.length
+        ? item.images
+        : item.show?.images;
+  const available = images?.filter((image) => image?.url) ?? [];
+  if (!available.length) return null;
+
+  const sized = available
+    .filter((image) => Number.isFinite(image.width))
+    .sort((left, right) => left.width - right.width);
+  if (!sized.length) return available[0].url;
+  return (sized.find((image) => image.width >= minimumWidth) ?? sized.at(-1))
+    .url;
 }
 
 function creator(item) {
   if (item.type === "track") {
-    return item.artists?.map((artist) => artist.name).filter(Boolean).join(", ") || "Unknown artist";
+    return (
+      item.artists
+        ?.map((artist) => artist.name)
+        .filter(Boolean)
+        .join(", ") || "Unknown artist"
+    );
   }
   return item.show?.name || "Unknown podcast";
 }
 
-export function normalizePlayback(playback, fetchedAt = new Date().toISOString()) {
+export function normalizePlayback(
+  playback,
+  fetchedAt = new Date().toISOString(),
+) {
   if (playback?.device?.is_private_session) {
     return { status: "private", fetchedAt };
   }
@@ -77,58 +95,83 @@ export function normalizePlayback(playback, fetchedAt = new Date().toISOString()
     return { status: "idle", fetchedAt };
   }
 
-  const durationMs = Number.isFinite(item.duration_ms) ? Math.max(0, item.duration_ms) : null;
+  const durationMs = Number.isFinite(item.duration_ms)
+    ? Math.max(0, item.duration_ms)
+    : null;
   const progressMs = Number.isFinite(playback.progress_ms)
-    ? Math.max(0, durationMs === null ? playback.progress_ms : Math.min(playback.progress_ms, durationMs))
+    ? Math.max(
+        0,
+        durationMs === null
+          ? playback.progress_ms
+          : Math.min(playback.progress_ms, durationMs),
+      )
     : null;
 
   return {
     status: playback.is_playing ? "playing" : "paused",
     type: item.type,
-    title: item.name || (item.type === "track" ? "Untitled track" : "Untitled episode"),
+    title:
+      item.name ||
+      (item.type === "track" ? "Untitled track" : "Untitled episode"),
     creator: creator(item),
-    imageUrl: artwork(item),
+    imageUrl: artwork(item, 192),
+    thumbnailUrl: artwork(item, 40),
     spotifyUrl: item.external_urls?.spotify ?? null,
     progressMs,
     durationMs,
-    fetchedAt
+    fetchedAt,
   };
 }
 
-export function createSpotifyClient({ fetchImpl = fetch, now = Date.now } = {}) {
+export function createSpotifyClient({
+  fetchImpl = fetch,
+  now = Date.now,
+} = {}) {
   let accessToken = null;
   let accessTokenExpiresAt = 0;
   let activeRefreshToken = null;
   let refreshInFlight = null;
 
   async function refreshAccessToken(env, force = false) {
-    if (!force && accessToken && now() < accessTokenExpiresAt - ACCESS_TOKEN_EXPIRY_BUFFER_MS) {
+    if (
+      !force &&
+      accessToken &&
+      now() < accessTokenExpiresAt - ACCESS_TOKEN_EXPIRY_BUFFER_MS
+    ) {
       return accessToken;
     }
     if (!force && refreshInFlight) return refreshInFlight;
 
     refreshInFlight = (async () => {
       const refreshToken = activeRefreshToken ?? env.SPOTIFY_REFRESH_TOKEN;
-      const credentials = btoa(`${env.SPOTIFY_CLIENT_ID}:${env.SPOTIFY_CLIENT_SECRET}`);
+      const credentials = btoa(
+        `${env.SPOTIFY_CLIENT_ID}:${env.SPOTIFY_CLIENT_SECRET}`,
+      );
       const response = await fetchImpl(TOKEN_URL, {
         method: "POST",
         headers: {
-          "Authorization": `Basic ${credentials}`,
-          "Content-Type": "application/x-www-form-urlencoded"
+          Authorization: `Basic ${credentials}`,
+          "Content-Type": "application/x-www-form-urlencoded",
         },
         body: new URLSearchParams({
           grant_type: "refresh_token",
-          refresh_token: refreshToken
-        })
+          refresh_token: refreshToken,
+        }),
       });
 
       if (!response.ok) {
-        throw new SpotifyRequestError("Spotify authorization needs attention.", 502);
+        throw new SpotifyRequestError(
+          "Spotify authorization needs attention.",
+          502,
+        );
       }
 
       const token = await response.json();
       if (!token.access_token || !Number.isFinite(token.expires_in)) {
-        throw new SpotifyRequestError("Spotify returned an invalid authorization response.", 502);
+        throw new SpotifyRequestError(
+          "Spotify returned an invalid authorization response.",
+          502,
+        );
       }
 
       accessToken = token.access_token;
@@ -148,9 +191,9 @@ export function createSpotifyClient({ fetchImpl = fetch, now = Date.now } = {}) 
     const token = await refreshAccessToken(env);
     const response = await fetchImpl(PLAYBACK_URL, {
       headers: {
-        "Accept": "application/json",
-        "Authorization": `Bearer ${token}`
-      }
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     if (response.status === 204) return null;
@@ -164,11 +207,14 @@ export function createSpotifyClient({ fetchImpl = fetch, now = Date.now } = {}) 
       throw new SpotifyRequestError(
         "Spotify is temporarily limiting playback updates.",
         503,
-        response.headers.get("Retry-After")
+        response.headers.get("Retry-After"),
       );
     }
     if (!response.ok) {
-      throw new SpotifyRequestError("Spotify playback is temporarily unavailable.", 502);
+      throw new SpotifyRequestError(
+        "Spotify playback is temporarily unavailable.",
+        502,
+      );
     }
 
     return response.json();
@@ -192,7 +238,9 @@ export function createHandler(options = {}) {
     playbackInFlight = (async () => {
       const playback = await spotify.requestPlayback(env);
       const fetchedAt = nowDate().toISOString();
-      const body = playback ? normalizePlayback(playback, fetchedAt) : { status: "idle", fetchedAt };
+      const body = playback
+        ? normalizePlayback(playback, fetchedAt)
+        : { status: "idle", fetchedAt };
       cachedPlayback = body;
       cacheExpiresAt = now() + PLAYBACK_CACHE_MS;
       return body;
@@ -212,7 +260,10 @@ export function createHandler(options = {}) {
     }
 
     if (request.method === "OPTIONS") {
-      return new Response(null, { status: 204, headers: responseHeaders(origin) });
+      return new Response(null, {
+        status: 204,
+        headers: responseHeaders(origin),
+      });
     }
 
     const path = new URL(request.url).pathname.replace(/\/$/, "") || "/";
@@ -223,7 +274,12 @@ export function createHandler(options = {}) {
       return json({ error: "Method not allowed." }, 405, origin, "no-store");
     }
     if (!configured(env)) {
-      return json({ error: "Spotify playback is not configured." }, 503, origin, "no-store");
+      return json(
+        { error: "Spotify playback is not configured." },
+        503,
+        origin,
+        "no-store",
+      );
     }
 
     try {
@@ -232,18 +288,22 @@ export function createHandler(options = {}) {
         body,
         200,
         origin,
-        "public, max-age=5, s-maxage=9, stale-while-revalidate=5"
+        "public, max-age=5, s-maxage=9, stale-while-revalidate=5",
       );
     } catch (error) {
       const known = error instanceof SpotifyRequestError;
       if (!known) console.error(error);
       const retryAfter = known ? error.retryAfter : null;
       return json(
-        { error: known ? error.message : "Spotify playback is temporarily unavailable." },
+        {
+          error: known
+            ? error.message
+            : "Spotify playback is temporarily unavailable.",
+        },
         known ? error.status : 502,
         origin,
         "no-store",
-        retryAfter ? { "Retry-After": retryAfter } : {}
+        retryAfter ? { "Retry-After": retryAfter } : {},
       );
     }
   };
@@ -254,5 +314,5 @@ const handle = createHandler();
 export default {
   fetch(request, env) {
     return handle(request, env);
-  }
+  },
 };
