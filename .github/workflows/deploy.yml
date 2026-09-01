@@ -19,7 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Configure scores
-        run: sed -i "s|data-score-api|data-score-api=\"$SCORE_API_URL\"|" public/mental-math/index.html
+        run: sed -i "s|data-score-api|data-score-api=\"$SCORE_API_URL\"|" public/mental-math/index.html public/card-memory/index.html
         env:
           SCORE_API_URL: ${{ vars.SCORE_API_URL }}
       - name: Configure Spotify

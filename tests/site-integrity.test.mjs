@@ -6,6 +6,7 @@ import test from "node:test";
 const publicDirectory = new URL("../public/", import.meta.url);
 const expectedPages = [
   "blog/index.html",
+  "card-memory/index.html",
   "design/index.html",
   "experience/index.html",
   "five-minute-intro/index.html",

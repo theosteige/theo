@@ -1,0 +1,42 @@
+.game-status {
+  display: flex;
+  gap: 24px;
+  font-variant-numeric: tabular-nums;
+}
+.playing-card {
+  display: grid;
+  width: 180px;
+  height: 252px;
+  margin: 24px 0;
+  padding: 12px;
+  border: 1px solid #999;
+  border-radius: 12px;
+  background: #fff;
+  box-sizing: border-box;
+  place-content: center;
+  text-align: center;
+}
+.playing-card .card-face {
+  font-size: 3rem;
+  line-height: 1.1;
+}
+.playing-card .card-dots {
+  min-height: 1.2em;
+  color: #444;
+  font-size: 1.1rem;
+  letter-spacing: 4px;
+  word-break: break-all;
+}
+.playing-card.red .card-face {
+  color: #c22;
+}
+.answer-buttons {
+  display: flex;
+  gap: 16px;
+}
+.answer-buttons button {
+  min-width: 96px;
+  padding: 8px 16px;
+  font-size: 1rem;
+  cursor: pointer;
+}

@@ -137,6 +137,13 @@ async function readPractice(db) {
   };
 }
 
+async function readCardMemoryBest(db) {
+  const { results } = await db
+    .prepare("SELECT best FROM card_memory WHERE id=1")
+    .all();
+  return results[0]?.best ?? 0;
+}
+
 async function sameSecret(left, right) {
   const encode = (value) =>
     crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
@@ -160,13 +167,16 @@ export function createHandler(now = () => new Date()) {
     const path = new URL(request.url).pathname.replace(/\/$/, "");
     const isScoresPath = path.endsWith("/scores");
     const isPracticeTimePath = path.endsWith("/practice-time");
-    if (!isScoresPath && !isPracticeTimePath)
+    const isCardMemoryPath = path.endsWith("/card-memory");
+    if (!isScoresPath && !isPracticeTimePath && !isCardMemoryPath)
       return json({ error: "Not found." }, 404, origin);
 
     try {
       if (request.method === "GET") {
         if (isScoresPath)
           return json({ scores: await readScores(env.DB) }, 200, origin);
+        if (isCardMemoryPath)
+          return json({ best: await readCardMemoryBest(env.DB) }, 200, origin);
         return json(await readPractice(env.DB), 200, origin);
       }
 
@@ -178,6 +188,23 @@ export function createHandler(now = () => new Date()) {
         }
 
         const input = await request.json();
+        if (isCardMemoryPath) {
+          if (
+            !Number.isInteger(input.score) ||
+            input.score < 0 ||
+            input.score > 1000000
+          ) {
+            return json({ error: "Invalid score." }, 400, origin);
+          }
+          const [, result] = await env.DB.batch([
+            env.DB.prepare(
+              "UPDATE card_memory SET best=MAX(best,?) WHERE id=1",
+            ).bind(input.score),
+            env.DB.prepare("SELECT best FROM card_memory WHERE id=1"),
+          ]);
+          return json({ best: result.results[0].best }, 201, origin);
+        }
+
         if (isPracticeTimePath) {
           if (
             !Number.isSafeInteger(input.seconds) ||

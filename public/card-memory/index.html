@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="description"
+      content="A memory game: decide whether each playing card has appeared before."
+    />
+    <meta
+      property="og:description"
+      content="A memory game: decide whether each playing card has appeared before."
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      sizes="any"
+      href="/favicon-blue-t.svg"
+    />
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#0645ad" />
+    <link
+      rel="apple-touch-icon"
+      sizes="512x512"
+      href="/favicon-512.png?v=20260831"
+    />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:image"
+      content="https://theosteiger.com/favicon-512.png"
+    />
+    <meta property="og:image:alt" content="Blue underlined letter T on white" />
+    <meta name="twitter:card" content="summary" />
+    <meta
+      name="twitter:image"
+      content="https://theosteiger.com/favicon-512.png"
+    />
+    <meta property="og:url" content="https://theosteiger.com/card-memory/" />
+    <link rel="canonical" href="https://theosteiger.com/card-memory/" />
+    <meta property="og:title" content="Card Memory | Theo Steiger" />
+    <title>Card Memory | Theo Steiger</title>
+    <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" href="/card-memory.css" />
+  </head>
+  <body>
+    <header>
+      <div>
+        <a href="/">Table of Contents</a> ·
+        <a href="/side-quests/">Side Quests</a>
+      </div>
+      <ul class="contact-list" aria-label="Contact links">
+        <li>
+          <button
+            class="contact-button"
+            type="button"
+            data-reveal="me@theosteiger.com"
+          >
+            Email
+          </button>
+        </li>
+        <li><a href="https://github.com/theosteige">GitHub</a></li>
+        <li>
+          <a href="https://www.linkedin.com/in/theodore-steiger/">LinkedIn</a>
+        </li>
+      </ul>
+    </header>
+    <main>
+      <div class="card-memory-page" data-state="welcome" data-score-api>
+        <section id="welcome" aria-labelledby="game-heading">
+          <h1 id="game-heading">Card Memory</h1>
+          <p>
+            A playing card appears. Press SEEN if it has been shown before this
+            run, or NEW if it has not. You have three lives; a wrong answer
+            costs one. Once all 52 cards have appeared, a fresh deck joins the
+            game — its cards carry one extra dot, so a dotted card counts as
+            new even if its undotted twin already appeared.
+          </p>
+          <p id="best-line">Best score: <span id="best-score">–</span></p>
+          <form id="game-options">
+            <p>
+              <label for="journal-key">Journal key:</label
+              ><input id="journal-key" type="password" autocomplete="off" />
+            </p>
+            <p>A correct journal key saves a new best score.</p>
+            <input id="start-game" type="submit" value="Start" />
+          </form>
+        </section>
+        <section id="game" aria-label="Card memory game in progress" hidden>
+          <p class="game-status">
+            <span>Lives: <output id="lives">3</output></span>
+            <span>Score: <output id="score">0</output></span>
+          </p>
+          <div id="card" class="playing-card" aria-live="polite"></div>
+          <p class="answer-buttons">
+            <button id="answer-seen" type="button">Seen</button>
+            <button id="answer-new" type="button">New</button>
+          </p>
+        </section>
+        <section id="finished" aria-label="Game over" hidden>
+          <h2>Game over</h2>
+          <p>Score: <span id="final-score">0</span></p>
+          <p>Best score: <span id="final-best">–</span></p>
+          <p id="save-status" aria-live="polite"></p>
+          <p><button id="play-again" type="button">Play again</button></p>
+        </section>
+        <script type="module" src="/card-memory.js"></script>
+      </div>
+    </main>
+    <script src="/site.js"></script>
+  </body>
+</html>
