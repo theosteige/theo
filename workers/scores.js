@@ -144,6 +144,23 @@ async function readCardMemoryBest(db) {
   return results[0]?.best ?? 0;
 }
 
+async function saveCardMemoryBest(db, score) {
+  const { results } = await db
+    .prepare(
+      `
+        INSERT INTO card_memory(id,best) VALUES(1,?)
+        ON CONFLICT(id) DO UPDATE SET best=excluded.best
+        WHERE excluded.best > card_memory.best
+        RETURNING best
+      `,
+    )
+    .bind(score)
+    .all();
+
+  if (results[0]) return { best: results[0].best, updated: true };
+  return { best: await readCardMemoryBest(db), updated: false };
+}
+
 async function sameSecret(left, right) {
   const encode = (value) =>
     crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
@@ -196,13 +213,11 @@ export function createHandler(now = () => new Date()) {
           ) {
             return json({ error: "Invalid score." }, 400, origin);
           }
-          const [, result] = await env.DB.batch([
-            env.DB.prepare(
-              "UPDATE card_memory SET best=MAX(best,?) WHERE id=1",
-            ).bind(input.score),
-            env.DB.prepare("SELECT best FROM card_memory WHERE id=1"),
-          ]);
-          return json({ best: result.results[0].best }, 201, origin);
+          return json(
+            await saveCardMemoryBest(env.DB, input.score),
+            201,
+            origin,
+          );
         }
 
         if (isPracticeTimePath) {

@@ -24,18 +24,19 @@ function fakeDb(best = 0) {
           return this;
         },
         async all() {
-          return { results: [{ best: db.best }] };
+          if (this.sql.includes("INSERT INTO card_memory")) {
+            const score = this.args[0];
+            if (db.best === null || score > db.best) {
+              db.best = score;
+              return { results: [{ best: db.best }] };
+            }
+            return { results: [] };
+          }
+          return {
+            results: db.best === null ? [] : [{ best: db.best }],
+          };
         },
       };
-    },
-    async batch(statements) {
-      return statements.map((statement) => {
-        if (statement.sql.includes("UPDATE card_memory")) {
-          db.best = Math.max(db.best, statement.args[0]);
-          return { results: [] };
-        }
-        return { results: [{ best: db.best }] };
-      });
     },
   };
   return db;
@@ -95,7 +96,7 @@ test("stores a higher card memory best score", async () => {
     makeEnv(db),
   );
   assert.equal(response.status, 201);
-  assert.deepEqual(await response.json(), { best: 25 });
+  assert.deepEqual(await response.json(), { best: 25, updated: true });
   assert.equal(db.best, 25);
 });
 
@@ -107,5 +108,27 @@ test("keeps the old best when the new score is lower", async () => {
     makeEnv(db),
   );
   assert.equal(response.status, 201);
-  assert.deepEqual(await response.json(), { best: 60 });
+  assert.deepEqual(await response.json(), { best: 60, updated: false });
+});
+
+test("keeps the old best when the new score ties it", async () => {
+  const handle = worker.createHandler();
+  const response = await handle(
+    request("POST", { score: 60 }, "journal-key"),
+    makeEnv(fakeDb(60)),
+  );
+  assert.equal(response.status, 201);
+  assert.deepEqual(await response.json(), { best: 60, updated: false });
+});
+
+test("repairs a missing best-score singleton row", async () => {
+  const handle = worker.createHandler();
+  const db = fakeDb(null);
+  const response = await handle(
+    request("POST", { score: 18 }, "journal-key"),
+    makeEnv(db),
+  );
+  assert.equal(response.status, 201);
+  assert.deepEqual(await response.json(), { best: 18, updated: true });
+  assert.equal(db.best, 18);
 });

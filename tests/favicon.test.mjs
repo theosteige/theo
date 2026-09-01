@@ -9,13 +9,17 @@ const requiredLinks = [
     rel: "icon",
     type: "image/svg+xml",
     sizes: "any",
-    href: "/favicon-blue-t.svg",
+    href: "/favicon-blue-t.svg?v=20260901",
   },
-  { rel: "mask-icon", href: "/safari-pinned-tab.svg", color: "#0645ad" },
+  {
+    rel: "mask-icon",
+    href: "/safari-pinned-tab.svg?v=20260901",
+    color: "#0645ad",
+  },
   {
     rel: "apple-touch-icon",
     sizes: "512x512",
-    href: "/favicon-512.png?v=20260831",
+    href: "/favicon-512.png?v=20260901",
   },
 ];
 

@@ -114,6 +114,13 @@ test("design videos use thumbnails and load only after interaction", async () =>
   assert.equal(html.match(/<audio\b[^>]*preload="none"/gs)?.length, 2);
 });
 
+test("the Design viewer keeps media inside the visible viewport", async () => {
+  const css = await readFile(new URL("design.css", publicDirectory), "utf8");
+  assert.match(css, /max-width: calc\(100vw - 32px\)/);
+  assert.match(css, /max-height: calc\(100dvh - 72px\)/);
+  assert.match(css, /padding: 56px 16px 16px/);
+});
+
 test("initial-load and deployment media stay within performance budgets", async () => {
   const sharedAssets = ["style.css", "site.js", "now-playing.js"];
   const sharedBytes = await Promise.all(

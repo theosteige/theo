@@ -81,7 +81,7 @@ async function saveBest(score) {
     if (!response.ok) throw new Error(body.error || `Status ${response.status}`);
     knownBest = body.best;
     saveStatus.textContent =
-      body.best === score ? "New best score saved." : "Best score unchanged.";
+      body.updated ? "New best score saved." : "Best score unchanged.";
   } catch (error) {
     saveStatus.textContent = `Could not save: ${error.message}`;
   } finally {
@@ -95,8 +95,7 @@ function finishGame() {
   finalBest.textContent = knownBest ?? "–";
   saveStatus.textContent = "";
   setPageState("over");
-  const improved = knownBest === null || game.score > knownBest;
-  if (game.score > 0 && improved) saveBest(game.score);
+  if (game.score > 0) saveBest(game.score);
 }
 
 function answer(choice) {

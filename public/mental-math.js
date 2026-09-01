@@ -1,3 +1,8 @@
+import {
+  GAME_END_REASONS,
+  saveTargetForGameEnd,
+} from "/mental-math-save-policy.js";
+
 (() => {
   const DEFAULT_SETTINGS = {
     operations: ["addition", "subtraction", "multiplication", "division"],
@@ -460,7 +465,7 @@
   function updateCountdown() {
     const remaining = Math.max(0, endTime - performance.now());
     timeLeft.value = String(Math.ceil(remaining / 1000));
-    if (remaining <= 0) finishGame();
+    if (remaining <= 0) finishGame(GAME_END_REASONS.TIMER_EXPIRED);
   }
 
   function startGame() {
@@ -487,15 +492,21 @@
       : window.setInterval(updateCountdown, 100);
   }
 
-  function finishGame() {
+  function finishGame(reason) {
     if (!isPlaying) return;
 
+    const saveTarget = saveTargetForGameEnd(durationSeconds, reason);
     isPlaying = false;
     if (countdownTimer !== undefined) window.clearInterval(countdownTimer);
     countdownTimer = undefined;
     exitPracticeButton.hidden = true;
 
-    if (durationSeconds === null) {
+    if (!saveTarget) {
+      practiceStartedAt = undefined;
+      return;
+    }
+
+    if (saveTarget === "practice") {
       timeLabel.textContent = "Practice complete";
       const seconds = Math.max(
         1,
@@ -667,7 +678,7 @@
   answerInput.addEventListener("input", () => {
     if (!isPlaying || !currentProblem) return;
     if (performance.now() >= endTime) {
-      finishGame();
+      finishGame(GAME_END_REASONS.TIMER_EXPIRED);
       return;
     }
     if (!isCorrectAnswer(currentProblem, answerInput.value)) return;
@@ -690,7 +701,12 @@
     event.preventDefault();
     startGame();
   });
-  exitPracticeButton.addEventListener("click", finishGame);
+  exitPracticeButton.addEventListener("click", () =>
+    finishGame(GAME_END_REASONS.PRACTICE_EXITED),
+  );
+  window.addEventListener("pagehide", () =>
+    finishGame(GAME_END_REASONS.ABANDONED),
+  );
   document.querySelectorAll("[data-show-settings]").forEach((link) => {
     link.addEventListener("click", (event) => {
       event.preventDefault();

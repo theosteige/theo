@@ -67,7 +67,7 @@
     <li><strong>Settings become a plain object.</strong><p>The checked operations, numeric ranges, and duration are validated in the browser. Practice is represented as a null duration; timed games use 30, 60, 120, 300, or 600 seconds.</p></li>
     <li><strong>Questions are generated locally.</strong><p>Addition and multiplication choose operands directly. Subtraction starts with two positive values and displays their sum minus one value, guaranteeing a non-negative integer result. Division reverses a multiplication, guaranteeing an integer answer.</p></li>
     <li><strong>Only correct completions advance.</strong><p>A question's timer starts at generation. Wrong input is not stored separately, but its delay is included because the timer stops only when the correct answer arrives.</p></li>
-    <li><strong>Timed and practice games end differently.</strong><p>A timed game posts its score, settings, duration, and correct-answer attempts when the countdown ends. Practice runs until “Exit practice” and posts only elapsed seconds. Closing or reloading a practice session does not save it.</p></li>
+    <li><strong>Timed and practice games end differently.</strong><p>A timed game posts its score, settings, duration, and correct-answer attempts only when the countdown ends. Practice runs until “Exit practice” and posts only elapsed seconds. Closing, navigating away, or reloading abandons either kind of session without saving it.</p></li>
     <li><strong>The UI renders public records.</strong><p>Anyone can fetch game history and practice totals. The progress line filters to 120-second games with every default operation and range. The history list shows every timed game. The activity calendar includes all timed-game minutes plus dated practice sessions.</p></li>
   </ol>
 
@@ -92,6 +92,8 @@
       <tr><td><code>POST</code></td><td><code>/scores</code></td><td>Yes</td><td>Validates the payload, saves the score, and batch-inserts canonical answer attempts.</td></tr>
       <tr><td><code>GET</code></td><td><code>/practice-time</code></td><td>No</td><td>Returns the cumulative total, undated legacy amount/year, and dated sessions.</td></tr>
       <tr><td><code>POST</code></td><td><code>/practice-time</code></td><td>Yes</td><td>Atomically increments the total and inserts a dated practice session.</td></tr>
+      <tr><td><code>GET</code></td><td><code>/card-memory</code></td><td>No</td><td>Returns the single saved best card-memory score.</td></tr>
+      <tr><td><code>POST</code></td><td><code>/card-memory</code></td><td>Yes</td><td>Atomically replaces the best score only when the submitted score is higher.</td></tr>
     </tbody>
   </table>
   <p>The journal key is sent as an HTTPS <code>Authorization: Bearer …</code> header. Its expected value is the encrypted Cloudflare secret <code>WRITE_KEY</code>, never a repository file. The browser does not put the entered key in cookies or local storage: it remains in the password field for the current page lifetime and disappears on reload or navigation.</p>
@@ -105,6 +107,7 @@
       <tr><td><code>attempts</code></td><td>Game timestamp, operator, canonical operands, response milliseconds</td><td>Addition and multiplication operands are sorted, making <code>5 + 2</code> and <code>2 + 5</code> the same question. Subtraction and division keep their order.</td></tr>
       <tr><td><code>practice</code></td><td>One cumulative <code>total_seconds</code> value</td><td>Preserves the original total across the dated-session migration.</td></tr>
       <tr><td><code>practice_sessions</code></td><td>ISO timestamp and elapsed seconds</td><td>New practice exits can be placed on the activity calendar.</td></tr>
+      <tr><td><code>card_memory</code></td><td>One <code>best</code> value</td><td>An atomic upsert keeps exactly one maximum score and repairs the singleton row if it is ever missing.</td></tr>
     </tbody>
   </table>
   <p>Attempts are collected but are not exposed by a public API or displayed on the site. Analyze them through D1, for example:</p>
@@ -123,14 +126,14 @@ ORDER BY average_seconds DESC;</code></pre>
     <li><strong>Preview and validate.</strong><p>Serve <code>public/</code>, exercise the changed page, run JavaScript syntax checks, and inspect <code>git diff --check</code>.</p></li>
     <li><strong>Apply schema first, if any.</strong><p>Run <code>npx wrangler d1 migrations apply mental-math --remote</code>, then list migrations and perform a read-only schema check.</p></li>
     <li><strong>Deploy the Worker second, if changed.</strong><p>Run <code>npx wrangler deploy</code>, then call only the public GET routes to verify response shape. Never create a production test score.</p></li>
-    <li><strong>Push the static release last.</strong><p>Commit and push <code>main</code>. The Deploy workflow substitutes the API URL, uploads <code>public/</code>, and publishes the artifact to GitHub Pages.</p></li>
+    <li><strong>Push the static release last.</strong><p>Commit and push <code>main</code>. The Deploy workflow verifies all three public API routes, substitutes the API URL, uploads <code>public/</code>, and publishes the artifact to GitHub Pages.</p></li>
     <li><strong>Verify the actual public URLs.</strong><p>Check the exact commit's workflow, cache-bust the page and assets, confirm removed text is absent, and confirm the Worker still returns preserved data.</p></li>
   </ol>
 
   <h2>Current sharp edges</h2>
   <ul>
-    <li>The static site and Worker are separate deployments, so a breaking API change must be sequenced carefully.</li>
-    <li>There is no automated test suite in the repository; validation is currently targeted syntax, API, database, and browser QA.</li>
+    <li>The static site and Worker are separate deployments, so a breaking API change must be sequenced carefully. The Pages workflow now fails before publishing if a required Worker route is unavailable.</li>
+    <li>The automated tests cover game logic, save policy, and Worker endpoints; production migration and deployment verification are still manual.</li>
     <li>Attempt data has no export or analysis interface yet.</li>
     <li>Practice time is saved only when “Exit practice” runs successfully with the key present.</li>
     <li>The public GET routes deliberately use <code>Cache-Control: no-store</code>, favoring fresh personal records over caching.</li>

@@ -18,6 +18,13 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      - name: Verify scores API contract
+        run: |
+          for route in scores practice-time card-memory; do
+            curl --fail --silent --show-error --retry 3 "$SCORE_API_URL/$route" > /dev/null
+          done
+        env:
+          SCORE_API_URL: ${{ vars.SCORE_API_URL }}
       - name: Configure scores
         run: sed -i "s|data-score-api|data-score-api=\"$SCORE_API_URL\"|" public/mental-math/index.html public/card-memory/index.html
         env:
