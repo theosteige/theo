@@ -1,1 +1,314 @@
-.mental-math-page{position:relative;height:100%;overflow:auto;font-family:Helvetica Neue,Arial,Helvetica,sans-serif;font-size:14px;color:#000}a{color:#04c}#welcome,#history{display:none;width:480px;padding:20px;margin:0 auto;background:#ddd}#history{width:min(780px,100%)}#welcome{overflow:auto}.mental-math-page[data-state=settings] #welcome,.mental-math-page[data-state=history] #history,.mental-math-page[data-state=playing] #game,.mental-math-page[data-state=finished] #game{display:block}h1{margin:.67em 0;font-size:28px}h2{margin:1em 0 .5em;font-size:18px}p,dl{margin:1em 0}dt{display:block}dd{margin:0 0 7px 40px}.range-input{width:42px;margin:0 2px}#start-game{float:right}#settings-error{clear:both;color:#900}.progress-section{clear:both;padding-top:12px}.game-introduction{display:none;width:min(720px,calc(100% - 32px));margin:32px auto 64px;color:var(--text);font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;font-size:16px;line-height:1.6}.mental-math-page[data-state=settings] .game-introduction{display:block}.game-introduction p{margin:0 0 16px}.score-chart{display:block;width:100%;height:auto;border:1px solid #aaa;background:#fff}.score-chart[hidden],#progress-data[hidden],#history-data[hidden],#empty-progress[hidden],#empty-history[hidden]{display:none}.activity-section{margin:20px 0}.activity-section h2{font-size:14px;font-weight:400}.activity-scroll{overflow-x:auto;padding-bottom:6px}.activity-calendar{display:grid;grid-template:16px auto/28px max-content;width:max-content;color:#1f2328;font-size:12px}.activity-months{display:grid;grid-area:1/2;grid-template-columns:repeat(var(--activity-weeks),10px);gap:3px}.activity-months span{grid-row:1}.activity-weekdays{display:grid;grid-area:2/1;grid-template-rows:repeat(7,10px);gap:3px}.activity-weekdays span:nth-child(1){grid-row:2}.activity-weekdays span:nth-child(2){grid-row:4}.activity-weekdays span:nth-child(3){grid-row:6}.activity-days{display:grid;grid-area:2/2;grid-auto-flow:column;grid-template-rows:repeat(7,10px);grid-auto-columns:10px;gap:3px}.activity-day,.activity-legend i{width:10px;height:10px;border:.5px solid #1f23280d;border-radius:2px;background:#eff2f5}.activity-day[data-level="1"],.activity-legend i[data-level="1"]{background:#aceebb}.activity-day[data-level="2"],.activity-legend i[data-level="2"]{background:#4ac26b}.activity-day[data-level="3"],.activity-legend i[data-level="3"]{background:#2da44e}.activity-day[data-level="4"],.activity-legend i[data-level="4"]{background:#116329}.activity-day[tabindex="0"]:focus{outline:2px solid #0969da;outline-offset:-1px}.activity-legend{display:flex;align-items:center;justify-content:flex-end;gap:4px;margin-top:6px;font-size:12px}.activity-legend i{display:block}#activity-tooltip{position:fixed;z-index:2;padding:6px 8px;border-radius:6px;background:#25292e;color:#fff;font-size:12px;pointer-events:none;transform:translate(-50%,-100%);white-space:nowrap}#score-history{padding-left:24px}#score-history li{margin:4px 0}#game{display:none}.game-status{position:absolute;top:20px;font-size:18px}.game-status.left{left:20px}.game-status.right{right:20px}#exit-practice{position:absolute;top:52px;left:20px}.banner{padding:10px 0;margin-top:240px;background:#ddd;font-size:36px;line-height:54px;text-align:center}#answer-form,#finished-game{display:none}.mental-math-page[data-state=playing] #answer-form,.mental-math-page[data-state=finished] #finished-game{display:block}#equation{white-space:nowrap}#answer{width:188px;padding:1px 2px;font:36px Helvetica Neue,Arial,Helvetica,sans-serif}#finished-game p{padding:0;margin:0;font-size:14px;line-height:24px}#finished-game .final-score{font-size:36px;line-height:56px}.chart-grid{stroke:#ccc;stroke-width:1}.chart-label{fill:#444;font:11px Helvetica Neue,Arial,Helvetica,sans-serif}.chart-line{fill:none;stroke:#04c;stroke-width:2}.chart-point{fill:#fff;stroke:#04c;stroke-width:2}.visually-hidden{position:absolute;width:1px;height:1px;padding:0;border:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}@media(max-width:480px){#welcome,#history{width:100%}.banner{font-size:30px}#answer{width:140px;font-size:30px}}
+.mental-math-page {
+  position: relative;
+  height: 100%;
+  overflow: auto;
+  font-family:
+    Helvetica Neue,
+    Arial,
+    Helvetica,
+    sans-serif;
+  font-size: 14px;
+  color: #000;
+}
+a {
+  color: #04c;
+}
+#welcome,
+#history {
+  display: none;
+  width: 480px;
+  padding: 20px;
+  margin: 0 auto;
+  background: #ddd;
+}
+#history {
+  width: min(780px, 100%);
+}
+#welcome {
+  overflow: auto;
+}
+.mental-math-page[data-state="settings"] #welcome,
+.mental-math-page[data-state="history"] #history,
+.mental-math-page[data-state="playing"] #game,
+.mental-math-page[data-state="finished"] #game {
+  display: block;
+}
+h1 {
+  margin: 0.67em 0;
+  font-size: 28px;
+}
+h2 {
+  margin: 1em 0 0.5em;
+  font-size: 18px;
+}
+p,
+dl {
+  margin: 1em 0;
+}
+dt {
+  display: block;
+}
+dd {
+  margin: 0 0 7px 40px;
+}
+.range-input {
+  width: 42px;
+  margin: 0 2px;
+}
+#start-game {
+  float: right;
+}
+#settings-error {
+  clear: both;
+  color: #900;
+}
+.progress-section {
+  clear: both;
+  padding-top: 12px;
+}
+.game-introduction {
+  display: none;
+  width: min(720px, calc(100% - 32px));
+  margin: 32px auto 64px;
+  color: var(--text);
+  font-family:
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    Segoe UI,
+    sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+}
+.mental-math-page[data-state="settings"] .game-introduction {
+  display: block;
+}
+.game-introduction p {
+  margin: 0 0 16px;
+}
+.score-chart {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid #aaa;
+  background: #fff;
+}
+.score-chart[hidden],
+#progress-data[hidden],
+#history-data[hidden],
+#empty-progress[hidden],
+#empty-history[hidden] {
+  display: none;
+}
+.activity-section {
+  margin: 20px 0;
+}
+.activity-section h2 {
+  font-size: 14px;
+  font-weight: 400;
+}
+.activity-scroll {
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+.activity-calendar {
+  display: grid;
+  grid-template: 16px auto/28px max-content;
+  width: max-content;
+  color: #1f2328;
+  font-size: 12px;
+}
+.activity-months {
+  display: grid;
+  grid-area: 1/2;
+  grid-template-columns: repeat(var(--activity-weeks), 10px);
+  gap: 3px;
+}
+.activity-months span {
+  grid-row: 1;
+}
+.activity-weekdays {
+  display: grid;
+  grid-area: 2/1;
+  grid-template-rows: repeat(7, 10px);
+  gap: 3px;
+}
+.activity-weekdays span:nth-child(1) {
+  grid-row: 2;
+}
+.activity-weekdays span:nth-child(2) {
+  grid-row: 4;
+}
+.activity-weekdays span:nth-child(3) {
+  grid-row: 6;
+}
+.activity-days {
+  display: grid;
+  grid-area: 2/2;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(7, 10px);
+  grid-auto-columns: 10px;
+  gap: 3px;
+}
+.activity-day,
+.activity-legend i {
+  width: 10px;
+  height: 10px;
+  border: 0.5px solid #1f23280d;
+  border-radius: 2px;
+  background: #eff2f5;
+}
+.activity-day[data-level="1"],
+.activity-legend i[data-level="1"] {
+  background: #aceebb;
+}
+.activity-day[data-level="2"],
+.activity-legend i[data-level="2"] {
+  background: #4ac26b;
+}
+.activity-day[data-level="3"],
+.activity-legend i[data-level="3"] {
+  background: #2da44e;
+}
+.activity-day[data-level="4"],
+.activity-legend i[data-level="4"] {
+  background: #116329;
+}
+.activity-day[tabindex="0"]:focus {
+  outline: 2px solid #0969da;
+  outline-offset: -1px;
+}
+.activity-legend {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  margin-top: 6px;
+  font-size: 12px;
+}
+.activity-legend i {
+  display: block;
+}
+#activity-tooltip {
+  position: fixed;
+  z-index: 2;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: #25292e;
+  color: #fff;
+  font-size: 12px;
+  pointer-events: none;
+  transform: translate(-50%, -100%);
+  white-space: nowrap;
+}
+#score-history {
+  padding-left: 24px;
+}
+#score-history li {
+  margin: 4px 0;
+}
+#game {
+  display: none;
+}
+.game-status {
+  position: absolute;
+  top: 20px;
+  font-size: 18px;
+}
+.game-status.left {
+  left: 20px;
+}
+.game-status.right {
+  right: 20px;
+}
+#exit-practice {
+  position: absolute;
+  top: 52px;
+  left: 20px;
+}
+.banner {
+  padding: 10px 0;
+  margin-top: 240px;
+  background: #ddd;
+  font-size: 36px;
+  line-height: 54px;
+  text-align: center;
+}
+#answer-form,
+#finished-game {
+  display: none;
+}
+.mental-math-page[data-state="playing"] #answer-form,
+.mental-math-page[data-state="finished"] #finished-game {
+  display: block;
+}
+#equation {
+  white-space: nowrap;
+}
+#answer {
+  width: 188px;
+  padding: 1px 2px;
+  font:
+    36px Helvetica Neue,
+    Arial,
+    Helvetica,
+    sans-serif;
+}
+#finished-game p {
+  padding: 0;
+  margin: 0;
+  font-size: 14px;
+  line-height: 24px;
+}
+#finished-game .final-score {
+  font-size: 36px;
+  line-height: 56px;
+}
+.chart-grid {
+  stroke: #ccc;
+  stroke-width: 1;
+}
+.chart-label {
+  fill: #444;
+  font:
+    11px Helvetica Neue,
+    Arial,
+    Helvetica,
+    sans-serif;
+}
+.chart-line {
+  fill: none;
+  stroke: #04c;
+  stroke-width: 2;
+}
+.chart-point {
+  fill: #fff;
+  stroke: #04c;
+  stroke-width: 2;
+}
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  border: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+@media (max-width: 480px) {
+  #welcome,
+  #history {
+    width: 100%;
+  }
+  .banner {
+    font-size: 30px;
+  }
+  #answer {
+    width: 140px;
+    font-size: 30px;
+  }
+}

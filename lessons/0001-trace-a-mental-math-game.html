@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Lesson 1: Trace a mental-math game</title>
+  <link rel="stylesheet" href="../assets/lesson.css">
+  <script src="../assets/quiz.js" defer></script>
+</head>
+<body>
+  <header>
+    <nav><a href="../reference/website-architecture.html">Architecture reference</a><a href="../RESOURCES.md">Sources</a></nav>
+    <p class="eyebrow">Lesson 1 · About five minutes</p>
+    <h1>Trace one game through the whole website</h1>
+    <p class="dek">Your tangible win: after this lesson, you can point to the exact system and file responsible for every stage between clicking “Start” and seeing a saved score in Game History.</p>
+  </header>
+
+  <section class="callout">
+    <strong>Start with one sentence:</strong> the browser plays the game, the Worker decides whether a record may be saved, and D1 remembers it.
+  </section>
+
+  <h2>The three-system mental model</h2>
+  <div class="flow" aria-label="Request flow">
+    <span>GitHub Pages<br><small>delivers files</small></span><b>→</b><span>Browser JavaScript<br><small>runs game</small></span><b>→</b><span>Cloudflare Worker<br><small>guards API</small></span><b>→</b><span>Cloudflare D1<br><small>stores rows</small></span>
+  </div>
+  <p>GitHub Pages is a file host here; it does not execute the game or write records. <code>public/mental-math.js</code> executes in the visitor's browser. Its cross-origin <code>fetch()</code> calls go to the Worker, whose standard entry point is <code>fetch(request, env)</code>. The <code>DB</code> binding on <code>env</code> gives that Worker access to D1.</p>
+  <p class="source">Primary sources: <a href="https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages">GitHub Pages custom workflows</a> · <a href="https://developers.cloudflare.com/workers/runtime-apis/handlers/fetch/">Cloudflare Worker fetch handler</a> · <a href="https://developers.cloudflare.com/d1/get-started/">Cloudflare D1 bindings</a></p>
+
+  <section class="quiz" data-quiz data-correct="Pages serves the static artifact uploaded from public/." data-incorrect="Look for the system whose job is to publish ordinary files.">
+    <h3>Retrieval 1: Who sends the HTML?</h3>
+    <div class="answers">
+      <button type="button" data-correct>GitHub Pages</button>
+      <button type="button">Cloudflare Workers</button>
+      <button type="button">Cloudflare D1</button>
+    </div>
+    <p class="feedback" aria-live="polite"></p>
+  </section>
+
+  <h2>A timed game, step by step</h2>
+  <ol class="steps">
+    <li>
+      <strong>The browser reads settings.</strong>
+      <p><code>public/mental-math.js</code> validates the operation checkboxes, numeric ranges, and selected duration. Nothing has reached Cloudflare yet.</p>
+    </li>
+    <li>
+      <strong>The browser generates and times questions.</strong>
+      <p>Each correct answer increments an in-memory score. The response timer starts when the question appears and stops when the correct value is entered, so time spent making mistakes is naturally included.</p>
+    </li>
+    <li>
+      <strong>The timer ends and the browser posts JSON.</strong>
+      <p>The payload contains <code>score</code>, <code>duration</code>, <code>settings</code>, and compact answer attempts. The password field becomes an HTTPS Bearer authorization header.</p>
+    </li>
+    <li>
+      <strong>The Worker distrusts the browser.</strong>
+      <p><code>workers/scores.js</code> compares the submitted key with the Cloudflare <code>WRITE_KEY</code> secret and independently validates every score, setting, duration, operand, operator, and response time.</p>
+    </li>
+    <li>
+      <strong>D1 stores one game and its attempts.</strong>
+      <p>The Worker batches an insert into <code>scores</code> with an optional insert into <code>attempts</code>. Commutative operands are sorted first, so <code>5 + 2</code> and <code>2 + 5</code> share one analytical identity.</p>
+    </li>
+    <li>
+      <strong>The public UI reads it back.</strong>
+      <p><code>GET /scores</code> requires no key. Game History shows every timed game; Progress filters to the exact 120-second default configuration; the yearly calendar adds each game's duration to its Pacific-time date.</p>
+    </li>
+  </ol>
+
+  <section class="quiz" data-quiz data-correct="The key lives only in the current password input until navigation or reload." data-incorrect="The implementation never writes the key to browser persistence.">
+    <h3>Retrieval 2: Where does the entered key live?</h3>
+    <div class="answers">
+      <button type="button" data-correct>Page memory only</button>
+      <button type="button">Browser storage only</button>
+      <button type="button">Database storage only</button>
+    </div>
+    <p class="feedback" aria-live="polite"></p>
+  </section>
+
+  <h2>Practice mode takes a shorter path</h2>
+  <div class="split">
+    <div class="card">
+      <h3>What is saved</h3>
+      <p>Clicking “Exit practice” measures elapsed seconds and posts them to <code>/practice-time</code>. D1 increments the lifetime counter and creates a dated <code>practice_sessions</code> row for the calendar.</p>
+    </div>
+    <div class="card">
+      <h3>What is not saved</h3>
+      <p>No practice score or per-question attempt is stored. No key means no write. Closing or reloading the tab skips the exit handler, so that session is also not stored.</p>
+    </div>
+  </div>
+
+  <section class="quiz" data-quiz data-correct="The game ends locally, but no production practice record is created." data-incorrect="Saving requires both the exit action and the journal key.">
+    <h3>Retrieval 3: You exit practice without a key. What happens?</h3>
+    <div class="answers">
+      <button type="button" data-correct>Nothing gets stored</button>
+      <button type="button">Session gets queued</button>
+      <button type="button">Timer keeps running</button>
+    </div>
+    <p class="feedback" aria-live="polite"></p>
+  </section>
+
+  <h2>The deployment seam</h2>
+  <p>The source HTML contains only <code>data-score-api</code>. On a push to <code>main</code>, the GitHub Actions workflow substitutes the configured <code>SCORE_API_URL</code> into the uploaded copy and deploys <code>public/</code>. The repository file stays environment-neutral.</p>
+  <p>The Worker is a separate release. If a change needs a new table or column, deploy in dependency order:</p>
+  <div class="flow" aria-label="Deployment order">
+    <span>D1 migration</span><b>→</b><span>Worker code</span><b>→</b><span>Static page</span>
+  </div>
+  <p>That order ensures the new Worker never queries a schema that does not exist, and the new page never calls an API that has not arrived.</p>
+
+  <details class="checkpoint">
+    <summary>Checkpoint: predict where three changes belong before revealing</summary>
+    <div>
+      <p><strong>Change the Piano paragraph:</strong> <code>public/piano/index.html</code>; Pages deployment only.</p>
+      <p><strong>Allow a new timed duration:</strong> mental-math HTML/JS and Worker validation; Worker first, then Pages.</p>
+      <p><strong>Store a new game field:</strong> numbered SQL migration, Worker read/write logic, then browser rendering; D1 → Worker → Pages.</p>
+    </div>
+  </details>
+
+  <h2>Keep this, not every detail</h2>
+  <p>If you remember only one diagnostic question, use: <strong>“Is this a file-delivery problem, a browser-behavior problem, an API-policy problem, or a stored-data problem?”</strong> That usually tells you whether to open <code>public/</code>, <code>public/*.js</code>, <code>workers/scores.js</code>, or <code>migrations/</code>.</p>
+
+  <footer>
+    <p>Next: keep the <a href="../reference/website-architecture.html">full architecture reference</a> open while making a real change. Ask your agent any follow-up question—especially if you want to trace a particular function or run the deployment yourself.</p>
+  </footer>
+</body>
+</html>
