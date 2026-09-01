@@ -51,9 +51,11 @@ function updateLayout() {
   }
 }
 
+const VIEWER_TAGS = { image: "img", file: "iframe", video: "video", audio: "audio" };
+
 function openViewer(item) {
   const { kind, src } = item.dataset;
-  const media = document.createElement(kind === "file" ? "iframe" : kind);
+  const media = document.createElement(VIEWER_TAGS[kind] || kind);
 
   if (kind === "image") {
     media.alt = item.querySelector("img")?.alt || "";
