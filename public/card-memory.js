@@ -2,9 +2,10 @@ import {
   RANKS,
   SUITS,
   answerCard,
+  cardImagePath,
   createGame,
   drawCard,
-} from "/card-memory-logic.js";
+} from "/card-memory-logic.js?v=20260901-goodall";
 
 const page = document.querySelector(".card-memory-page");
 const scoreApi = page.dataset.scoreApi;
@@ -17,7 +18,13 @@ const finalScore = document.querySelector("#final-score");
 const finalBest = document.querySelector("#final-best");
 const saveStatus = document.querySelector("#save-status");
 
-const RED_SUITS = new Set(["♥", "♦"]);
+const CARD_IMAGE_VERSION = "20260901-goodall";
+const SUIT_NAMES = {
+  "♠": "spades",
+  "♥": "hearts",
+  "♦": "diamonds",
+  "♣": "clubs",
+};
 let game = null;
 let knownBest = null;
 
@@ -29,19 +36,24 @@ function setPageState(state) {
 }
 
 function renderCard(card) {
-  cardElement.classList.toggle("red", RED_SUITS.has(card.suit));
   cardElement.setAttribute(
     "aria-label",
-    `${card.rank} of ${card.suit}, ${card.dots} ${card.dots === 1 ? "dot" : "dots"}`,
+    `${card.rank} of ${SUIT_NAMES[card.suit]}, ${card.dots} ${card.dots === 1 ? "dot" : "dots"}`,
   );
-  cardElement.replaceChildren();
-  const face = document.createElement("div");
+  const face = document.createElement("img");
   face.className = "card-face";
-  face.textContent = `${card.rank}${card.suit}`;
+  face.src = `${cardImagePath(card)}?v=${CARD_IMAGE_VERSION}`;
+  face.alt = "";
+  face.width = 180;
+  face.height = 252;
+  face.decoding = "async";
+  face.fetchPriority = "high";
+  face.draggable = false;
   const dots = document.createElement("div");
   dots.className = "card-dots";
+  dots.setAttribute("aria-hidden", "true");
   dots.textContent = "•".repeat(card.dots);
-  cardElement.append(face, dots);
+  cardElement.replaceChildren(face, dots);
 }
 
 function renderGame() {

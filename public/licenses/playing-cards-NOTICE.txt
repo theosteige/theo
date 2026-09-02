@@ -1,0 +1,12 @@
+Traditional playing-card artwork
+
+Original designs: Adrian Kennard
+Original source: https://www.me.uk/cards/
+SVG source: https://github.com/letele/playing-cards
+SVG source revision: 865a78eb940c1232e4b21523577c8fca52f694fe
+License: CC0 1.0 Universal Public Domain Dedication
+
+The 52 playable card faces in public/images/cards were optimized with
+SVGO 4.1.0. Card backs and jokers are not included.
+
+The full CC0 legal text is in playing-cards-CC0.txt in this directory.

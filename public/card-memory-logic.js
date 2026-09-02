@@ -18,6 +18,12 @@ export const RANKS = [
 ];
 
 const SEEN_DRAW_CHANCE = 0.5;
+const CARD_IMAGE_SUITS = {
+  "♠": "S",
+  "♥": "H",
+  "♦": "D",
+  "♣": "C",
+};
 
 export function createDeck(dots) {
   return SUITS.flatMap((suit) => RANKS.map((rank) => ({ rank, suit, dots })));
@@ -25,6 +31,14 @@ export function createDeck(dots) {
 
 export function cardKey(card) {
   return `${card.rank}${card.suit}:${card.dots}`;
+}
+
+export function cardImagePath(card) {
+  const suit = CARD_IMAGE_SUITS[card.suit];
+  if (!suit || !RANKS.includes(card.rank)) {
+    throw new Error("Cannot render an unknown card.");
+  }
+  return `/images/cards/${suit}-${card.rank}.svg`;
 }
 
 export function createGame() {
