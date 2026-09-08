@@ -1,0 +1,186 @@
+.reading-page {
+  max-width: 1240px;
+}
+
+.reading-page .intro {
+  margin-bottom: 36px;
+}
+
+.book-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 40px 36px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.book {
+  min-width: 0;
+}
+
+.book-card {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: #fff;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.book-card:focus-visible {
+  outline: 3px solid #0645ad;
+  outline-offset: 5px;
+}
+
+.book-cover {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+  filter: drop-shadow(0 2px 3px rgb(0 0 0 / 12%));
+}
+
+.book-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 24px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: rgb(15 15 15 / 87%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 160ms ease, visibility 160ms ease;
+}
+
+.book-card[aria-expanded="true"] .book-overlay,
+.book-card:not([data-enhanced]):focus-visible .book-overlay {
+  opacity: 1;
+  visibility: visible;
+}
+
+@media (hover: hover) {
+  .book-card:not([data-enhanced]):hover .book-overlay {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+.book-title {
+  font-size: 1.25rem;
+  line-height: 1.3;
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+
+.book-author {
+  font-size: 0.9375rem;
+  line-height: 1.4;
+}
+
+.book-overlay-status {
+  color: #d8d8d8;
+  font-size: 0.8125rem;
+}
+
+.book-thoughts {
+  margin-top: 8px;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.book-status {
+  margin: 12px 0 0;
+  color: #666;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.physical-bookshelf {
+  max-width: 720px;
+  margin: 0 auto 48px;
+}
+
+.physical-bookshelf figure {
+  margin: 0;
+}
+
+.physical-bookshelf img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.physical-bookshelf figcaption {
+  margin-top: 20px;
+  color: #666;
+}
+
+@media (max-width: 1000px) {
+  .book-grid {
+    gap: 32px 24px;
+  }
+
+  .book-overlay {
+    padding: 18px;
+  }
+
+  .book-title {
+    font-size: 1.0625rem;
+  }
+}
+
+@media (max-width: 760px) {
+  .book-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 30px 20px;
+  }
+
+  .physical-bookshelf {
+    margin-bottom: 36px;
+  }
+}
+
+@media (max-width: 420px) {
+  .book-grid {
+    column-gap: 16px;
+  }
+
+  .book-overlay {
+    gap: 9px;
+    padding: 14px;
+  }
+
+  .book-title {
+    font-size: 1rem;
+  }
+
+  .book-author,
+  .book-thoughts {
+    font-size: 0.8125rem;
+  }
+
+  .book-thoughts {
+    margin-top: 4px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .book-overlay {
+    transition: none;
+  }
+}
