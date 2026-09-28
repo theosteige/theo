@@ -20,13 +20,13 @@ jobs:
       - uses: actions/checkout@v4
       - name: Verify scores API contract
         run: |
-          for route in scores practice-time card-memory; do
+          for route in scores practice-time card-memory typing; do
             curl --fail --silent --show-error --retry 3 "$SCORE_API_URL/$route" > /dev/null
           done
         env:
           SCORE_API_URL: ${{ vars.SCORE_API_URL }}
       - name: Configure scores
-        run: sed -i "s|data-score-api|data-score-api=\"$SCORE_API_URL\"|" public/mental-math/index.html public/card-memory/index.html
+        run: sed -i "s|data-score-api|data-score-api=\"$SCORE_API_URL\"|" public/mental-math/index.html public/card-memory/index.html public/typing/index.html
         env:
           SCORE_API_URL: ${{ vars.SCORE_API_URL }}
       - name: Configure Spotify

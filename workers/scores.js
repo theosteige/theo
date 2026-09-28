@@ -173,6 +173,45 @@ async function sameSecret(left, right) {
   );
 }
 
+function validTypingResult(input) {
+  return (
+    input &&
+    typeof input.id === "string" &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+      input.id,
+    ) &&
+    [15, 30, 60, 120].includes(input.duration) &&
+    typeof input.punctuation === "boolean" &&
+    typeof input.numbers === "boolean" &&
+    Number.isSafeInteger(input.totalKeystrokes) &&
+    input.totalKeystrokes >= 1 &&
+    input.totalKeystrokes <= 100000 &&
+    Number.isSafeInteger(input.correctKeystrokes) &&
+    input.correctKeystrokes >= 0 &&
+    input.correctKeystrokes <= input.totalKeystrokes &&
+    Number.isSafeInteger(input.correctCharacters) &&
+    input.correctCharacters >= 0 &&
+    input.correctCharacters <= input.correctKeystrokes
+  );
+}
+
+function typingResult(row) {
+  return {
+    id: row.id,
+    playedAt: row.played_at,
+    duration: row.duration,
+    punctuation: Boolean(row.punctuation),
+    numbers: Boolean(row.numbers),
+    correctCharacters: row.correct_characters,
+    correctKeystrokes: row.correct_keystrokes,
+    totalKeystrokes: row.total_keystrokes,
+    wpm: Math.round((row.correct_characters * 12) / row.duration),
+    rawWpm: Math.round((row.total_keystrokes * 12) / row.duration),
+    accuracy:
+      Math.round((row.correct_keystrokes / row.total_keystrokes) * 1000) / 10,
+  };
+}
+
 export function createHandler(now = () => new Date()) {
   return async (request, env) => {
     const origin = requestOrigin(request, env);
@@ -185,11 +224,23 @@ export function createHandler(now = () => new Date()) {
     const isScoresPath = path.endsWith("/scores");
     const isPracticeTimePath = path.endsWith("/practice-time");
     const isCardMemoryPath = path.endsWith("/card-memory");
-    if (!isScoresPath && !isPracticeTimePath && !isCardMemoryPath)
+    const isTypingPath = path === "/typing";
+    if (
+      !isScoresPath &&
+      !isPracticeTimePath &&
+      !isCardMemoryPath &&
+      !isTypingPath
+    )
       return json({ error: "Not found." }, 404, origin);
 
     try {
       if (request.method === "GET") {
+        if (isTypingPath) {
+          const { results } = await env.DB.prepare(
+            "SELECT * FROM typing_results ORDER BY played_at DESC, id DESC",
+          ).all();
+          return json({ results: results.map(typingResult) }, 200, origin);
+        }
         if (isScoresPath)
           return json({ scores: await readScores(env.DB) }, 200, origin);
         if (isCardMemoryPath)
@@ -204,7 +255,38 @@ export function createHandler(now = () => new Date()) {
           return json({ error: "Journal key is incorrect." }, 401, origin);
         }
 
-        const input = await request.json();
+        let input;
+        try {
+          input = await request.json();
+        } catch {
+          return json({ error: "Invalid JSON." }, 400, origin);
+        }
+        if (!input || typeof input !== "object")
+          return json({ error: "Invalid result." }, 400, origin);
+        if (isTypingPath) {
+          if (!validTypingResult(input))
+            return json({ error: "Invalid typing result." }, 400, origin);
+          const [, stored] = await env.DB.batch([
+            env.DB.prepare(
+              `INSERT INTO typing_results
+              (id,played_at,duration,punctuation,numbers,correct_characters,total_keystrokes,correct_keystrokes)
+              VALUES(?,?,?,?,?,?,?,?) ON CONFLICT(id) DO NOTHING`,
+            ).bind(
+              input.id,
+              now().toISOString(),
+              input.duration,
+              Number(input.punctuation),
+              Number(input.numbers),
+              input.correctCharacters,
+              input.totalKeystrokes,
+              input.correctKeystrokes,
+            ),
+            env.DB.prepare("SELECT * FROM typing_results WHERE id=?").bind(
+              input.id,
+            ),
+          ]);
+          return json({ result: typingResult(stored.results[0]) }, 201, origin);
+        }
         if (isCardMemoryPath) {
           if (
             !Number.isInteger(input.score) ||

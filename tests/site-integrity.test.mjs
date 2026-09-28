@@ -20,6 +20,7 @@ const expectedPages = [
   "projects/index.html",
   "reading/index.html",
   "side-quests/index.html",
+  "typing/index.html",
 ];
 
 async function findFiles(directory, extension) {

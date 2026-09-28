@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="[Description placeholder]" />
+    <meta property="og:description" content="[Description placeholder]" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      sizes="any"
+      href="/favicon-blue-t.svg?v=20260901"
+    />
+    <link
+      rel="mask-icon"
+      href="/safari-pinned-tab.svg?v=20260901"
+      color="#0645ad"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="512x512"
+      href="/favicon-512.png?v=20260901"
+    />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:image"
+      content="https://theosteiger.com/favicon-512.png"
+    />
+    <meta property="og:image:alt" content="Blue underlined letter T on white" />
+    <meta name="twitter:card" content="summary" />
+    <meta
+      name="twitter:image"
+      content="https://theosteiger.com/favicon-512.png"
+    />
+    <meta property="og:url" content="https://theosteiger.com/typing/" />
+    <link rel="canonical" href="https://theosteiger.com/typing/" />
+    <meta property="og:title" content="Typing Test | Theo Steiger" />
+    <title>Typing Test | Theo Steiger</title>
+    <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" href="/typing.css?v=20260928" />
+  </head>
+  <body>
+    <header>
+      <div>
+        <a href="/">Table of Contents</a> ·
+        <a href="/side-quests/">Side Quests</a>
+      </div>
+      <ul class="contact-list" aria-label="Contact links">
+        <li>
+          <button
+            class="contact-button"
+            type="button"
+            data-reveal="me@theosteiger.com"
+          >
+            Email
+          </button>
+        </li>
+        <li><a href="https://github.com/theosteige">GitHub</a></li>
+        <li>
+          <a href="https://www.linkedin.com/in/theodore-steiger/">LinkedIn</a>
+        </li>
+      </ul>
+    </header>
+    <main>
+      <div class="typing-page" data-state="ready" data-score-api>
+        <section class="intro">
+          <h1>Typing Test</h1>
+          <p class="meta">[Introduction placeholder]</p>
+        </section>
+        <form id="typing-options" aria-label="Typing test settings">
+          <fieldset id="settings">
+            <legend class="sr-only">Test settings</legend>
+            <div class="typing-options">
+              <div class="duration-options" role="group" aria-label="Duration">
+                <label
+                  ><input type="radio" name="duration" value="15" /><span
+                    >15s</span
+                  ></label
+                >
+                <label
+                  ><input
+                    type="radio"
+                    name="duration"
+                    value="30"
+                    checked
+                  /><span>30s</span></label
+                >
+                <label
+                  ><input type="radio" name="duration" value="60" /><span
+                    >1min</span
+                  ></label
+                >
+                <label
+                  ><input type="radio" name="duration" value="120" /><span
+                    >2min</span
+                  ></label
+                >
+              </div>
+              <label class="toggle-option"
+                ><input id="punctuation" type="checkbox" /> punctuation</label
+              >
+              <label class="toggle-option"
+                ><input id="numbers" type="checkbox" /> numbers</label
+              >
+            </div>
+          </fieldset>
+        </form>
+        <section id="test" aria-label="Typing test">
+          <div class="typing-status" aria-live="off">
+            <span><span id="time-left">30</span>s</span>
+            <span><span id="live-wpm">0</span> wpm</span>
+          </div>
+          <div class="typing-surface">
+            <div id="words" aria-hidden="true"></div>
+            <label class="sr-only" for="typing-input"
+              >Type the displayed words</label
+            >
+            <textarea
+              id="typing-input"
+              rows="1"
+              spellcheck="false"
+              autocapitalize="off"
+              autocomplete="off"
+              autocorrect="off"
+              inputmode="text"
+              aria-describedby="typing-help current-word"
+            ></textarea>
+          </div>
+          <p id="current-word" class="sr-only"></p>
+          <p id="typing-help" class="meta">
+            Type to begin. Space for the next word. Esc to restart.
+          </p>
+        </section>
+        <section id="results" aria-labelledby="results-heading" hidden>
+          <h2 id="results-heading" tabindex="-1">Results</h2>
+          <dl class="typing-results">
+            <div>
+              <dt>WPM</dt>
+              <dd id="result-wpm">0</dd>
+            </div>
+            <div>
+              <dt>Accuracy</dt>
+              <dd id="result-accuracy">0%</dd>
+            </div>
+            <div>
+              <dt>Raw WPM</dt>
+              <dd id="result-raw">0</dd>
+            </div>
+            <div>
+              <dt>Time</dt>
+              <dd id="result-duration">30s</dd>
+            </div>
+          </dl>
+          <p id="result-characters" class="meta"></p>
+          <p id="save-status" role="status"></p>
+          <button id="retry-save" type="button" hidden>Retry save</button>
+        </section>
+        <div class="typing-actions">
+          <button id="restart" type="button">Restart test</button>
+          <span id="best-score" class="meta">Best: –</span>
+        </div>
+        <details class="typing-journal">
+          <summary>Journal</summary>
+          <p class="journal-key-field">
+            <label for="journal-key">Journal key</label>
+            <input
+              id="journal-key"
+              type="password"
+              autocomplete="off"
+              aria-describedby="journal-help"
+            />
+          </p>
+          <p id="journal-help" class="meta">
+            [Journal description placeholder]
+          </p>
+          <p id="history-status" role="status"></p>
+          <div class="history-scroll">
+            <table id="history" hidden>
+              <caption class="sr-only">
+                Recent saved typing results
+              </caption>
+              <thead>
+                <tr>
+                  <th scope="col">Date</th>
+                  <th scope="col">Time</th>
+                  <th scope="col">WPM</th>
+                  <th scope="col">Accuracy</th>
+                  <th scope="col">Settings</th>
+                </tr>
+              </thead>
+              <tbody id="history-rows"></tbody>
+            </table>
+          </div>
+        </details>
+        <noscript
+          ><p>JavaScript is required to run the typing test.</p></noscript
+        >
+      </div>
+    </main>
+    <script src="/site.js"></script>
+    <script src="/typing.js?v=20260928" type="module"></script>
+  </body>
+</html>

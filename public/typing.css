@@ -1,0 +1,231 @@
+.typing-page {
+  max-width: 800px;
+}
+.typing-page [hidden] {
+  display: none !important;
+}
+.typing-page .intro {
+  margin-bottom: 28px;
+}
+.typing-page fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.typing-options,
+.duration-options,
+.typing-actions,
+.typing-status {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+}
+.typing-options {
+  margin-bottom: 28px;
+}
+.duration-options {
+  gap: 4px;
+}
+.duration-options label {
+  position: relative;
+  cursor: pointer;
+}
+.duration-options input {
+  position: absolute;
+  opacity: 0;
+}
+.duration-options span {
+  display: block;
+  padding: 8px 12px;
+  color: #666;
+}
+.duration-options input:checked + span {
+  color: #0645ad;
+  text-decoration: underline;
+  text-underline-offset: 5px;
+}
+.duration-options input:focus-visible + span {
+  outline: 2px solid #0645ad;
+  outline-offset: 1px;
+}
+.toggle-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  cursor: pointer;
+}
+.typing-page input {
+  accent-color: #0645ad;
+}
+.typing-page fieldset:disabled {
+  opacity: 0.55;
+}
+.typing-status {
+  margin-bottom: 16px;
+  color: #666;
+  font-variant-numeric: tabular-nums;
+}
+.typing-status > :first-child {
+  color: #0645ad;
+  min-width: 4ch;
+}
+.typing-surface {
+  position: relative;
+  margin-bottom: 16px;
+}
+.typing-surface:focus-within {
+  outline: 2px solid #0645ad;
+  outline-offset: 8px;
+}
+#words {
+  position: relative;
+  height: 5.4em;
+  overflow: hidden;
+  font:
+    1.5rem/1.8 ui-monospace,
+    SFMono-Regular,
+    Consolas,
+    monospace;
+  color: #757575;
+  overflow-wrap: anywhere;
+}
+.typing-word {
+  display: inline-block;
+  margin-inline-end: 0.6em;
+}
+.typing-word.missed {
+  text-decoration: underline;
+  text-decoration-color: #a32121;
+  text-underline-offset: 5px;
+}
+.typing-letter {
+  position: relative;
+}
+.typing-letter.correct {
+  color: #1d1d1d;
+}
+.typing-letter.incorrect {
+  color: #a32121;
+  background: #fff0f0;
+  text-decoration: underline;
+}
+.typing-letter.caret::before {
+  content: "";
+  position: absolute;
+  left: -1px;
+  top: 0;
+  height: 1.2em;
+  border-left: 2px solid #0645ad;
+}
+.typing-letter.end {
+  display: inline-block;
+  width: 0;
+}
+#typing-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  padding: 0;
+  border: 0;
+  resize: none;
+  font-size: 16px;
+  cursor: text;
+}
+#typing-help {
+  font-size: 0.875rem;
+  min-height: 1.6em;
+}
+.typing-actions {
+  margin: 28px 0 42px;
+}
+.typing-page button {
+  font: inherit;
+  color: #0645ad;
+  background: none;
+  border: 0;
+  padding: 8px 0;
+  text-decoration: underline;
+  cursor: pointer;
+  min-height: 40px;
+}
+.typing-page button:focus-visible,
+.typing-page summary:focus-visible {
+  outline: 2px solid #0645ad;
+  outline-offset: 4px;
+}
+.typing-journal {
+  border-top: 1px solid #ddd;
+  padding-top: 20px;
+}
+.typing-journal summary {
+  cursor: pointer;
+  width: fit-content;
+  min-height: 40px;
+}
+.journal-key-field {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: center;
+}
+#journal-key {
+  font: inherit;
+  max-width: 100%;
+}
+.typing-results {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px 48px;
+  margin: 24px 0;
+  font-variant-numeric: tabular-nums;
+}
+.typing-results dt {
+  color: #666;
+  font-size: 0.875rem;
+}
+.typing-results dd {
+  margin: 0;
+  font-size: 2rem;
+}
+#results {
+  min-height: 15rem;
+}
+#results-heading:focus {
+  outline: none;
+}
+.history-scroll {
+  overflow-x: auto;
+}
+#history {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+}
+#history th,
+#history td {
+  text-align: start;
+  padding: 10px 16px 10px 0;
+  border-bottom: 1px solid #eee;
+  white-space: nowrap;
+}
+@media (max-width: 560px) {
+  .typing-options {
+    gap: 8px 20px;
+  }
+  .duration-options {
+    flex-basis: 100%;
+  }
+  #words {
+    font-size: 1.25rem;
+  }
+  .typing-results {
+    gap: 16px 32px;
+  }
+}
