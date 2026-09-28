@@ -3,14 +3,11 @@ const statusOrder = { "in-progress": 0, finished: 1, unfinished: 2 };
 const books = [...grid.querySelectorAll(".book")];
 
 books.sort((a, b) => {
-  const statusDifference =
+  // Preserve the curated completion order within each status group.
+  return (
     (statusOrder[a.dataset.status] ?? 3) -
-    (statusOrder[b.dataset.status] ?? 3);
-  return statusDifference ||
-    a.querySelector(".book-title").textContent.trim().localeCompare(
-      b.querySelector(".book-title").textContent.trim(),
-      "en",
-    );
+    (statusOrder[b.dataset.status] ?? 3)
+  );
 });
 grid.append(...books);
 
