@@ -18,7 +18,7 @@ Monkeytype's accounts, rankings, themes, or social features.
 | Cursor | Transform-based motion coupled to the text track | Independent persistent cursor with optional 85ms position transitions; reduced motion respected |
 | Backspace | Could reopen any previous word | Correct submitted words lock by default; incorrect visible words remain editable; optional backtracking |
 | Word deletion | Browser-dependent | Ctrl/Option/Command + Backspace deletes the current word |
-| Restart and focus | Escape discarded the test | Tab then Enter restarts; Escape opens settings; body typing focuses the test; repeat preserves the word sequence |
+| Restart and focus | Escape discarded the test | Enter restarts and waits for the first typed character (site preference); Escape opens settings; body typing focuses the test; repeat preserves the word sequence |
 | Modes | Time only | 15/30/60/120 seconds, 10/25/50/100 words, or the length of custom text (up to 500 words) |
 | Custom vocabulary | None | Paste a word pool or text; random, shuffled, or as-written order; whole-text test |
 | Random words | Immediate repeats possible | English generation avoids the previous two words; punctuation and numbers are randomized |

@@ -85,13 +85,56 @@ try {
     await page.locator(".typing-page").getAttribute("data-state"),
     "ready",
   );
+  await page.keyboard.type("abc ");
+  await page.clock.runFor(5000);
+  assert.equal(await page.locator("#time-left").textContent(), "25");
+  const previousWord = await page.locator("#active-word").elementHandle();
+  await page.keyboard.press("Enter");
+  assert.equal(await previousWord.evaluate((word) => word.isConnected), false);
+  assert.equal(await page.locator("#typing-input").inputValue(), "");
+  assert.equal(await page.locator("#live-wpm").textContent(), "0");
+  assert.equal(await page.locator("#live-accuracy").textContent(), "100");
+  assert.equal(
+    await page.evaluate(() => document.activeElement.id),
+    "typing-input",
+  );
+  await page.clock.runFor(31000);
+  assert.equal(
+    await page.locator(".typing-page").getAttribute("data-state"),
+    "ready",
+  );
+  assert.equal(await page.locator("#time-left").textContent(), "30");
+  assert.equal(payloads.length, 0);
+  await page.keyboard.type("a");
+  await page.clock.runFor(1200);
+  assert.equal(
+    await page.locator(".typing-page").getAttribute("data-state"),
+    "running",
+  );
+  assert.equal(await page.locator("#time-left").textContent(), "29");
   await page.getByText("Journal", { exact: true }).click();
   await page.locator("#journal-key").fill("browser-test-key");
+  await page.keyboard.press("Enter");
+  assert.equal(await page.locator("#typing-input").inputValue(), "a");
+  assert.equal(
+    await page.locator(".typing-page").getAttribute("data-state"),
+    "running",
+  );
   await page.getByText("Words & settings", { exact: true }).click();
   await page.locator("#word-source").selectOption("custom");
   assert.equal(await page.locator("#typing-input").isDisabled(), true);
   await page.locator("#custom-text").fill("alpha beta gamma delta");
   await page.locator("#word-order").selectOption("ordered");
+  await page.locator("#custom-text").focus();
+  await page.keyboard.press("Enter");
+  assert.equal(
+    await page.locator("#custom-text").inputValue(),
+    "alpha beta gamma delta\n",
+  );
+  assert.equal(
+    await page.evaluate(() => document.activeElement.id),
+    "custom-text",
+  );
   await page.locator("#use-text-length").click();
   assert.equal(await page.locator("#progress-unit").textContent(), " words");
   assert.equal(await page.locator("#active-word").textContent(), "alpha");
@@ -174,7 +217,30 @@ try {
     .waitFor();
   assert.equal(payloads.length, 2);
   assert.equal(await page.locator("#result-duration").textContent(), "15.0s");
-  await page.locator("#restart").click();
+  await page.keyboard.press("Enter");
+  await page.clock.runFor(20000);
+  assert.equal(
+    await page.locator(".typing-page").getAttribute("data-state"),
+    "ready",
+  );
+  assert.equal(await page.locator("#time-left").textContent(), "15");
+  await page.keyboard.type("a");
+  await page.locator("#typing-input").evaluate((element) =>
+    element.dispatchEvent(
+      new InputEvent("beforeinput", {
+        inputType: "insertLineBreak",
+        bubbles: true,
+        cancelable: true,
+      }),
+    ),
+  );
+  assert.equal(await page.locator("#typing-input").inputValue(), "");
+  await page.clock.runFor(16000);
+  assert.equal(
+    await page.locator(".typing-page").getAttribute("data-state"),
+    "ready",
+  );
+  assert.equal(await page.locator("#time-left").textContent(), "15");
   await page.setViewportSize({ width: 375, height: 812 });
   await page.getByText("Words & settings", { exact: true }).click();
   await page.locator("#word-source").selectOption("custom");
@@ -217,7 +283,7 @@ try {
   assert.equal(await page.locator("#save-status").textContent(), "");
   assert.deepEqual(errors, []);
   console.log(
-    "PASS: timers, custom/Unicode/whole-text tests, modes, correction rules, raw WPM, repeat, shortcuts, settings persistence, corpus separation, real SQL saves, no-key flow, and mobile layout.",
+    "PASS: Enter restart from running/results, idle clocks, first-character start, mobile return, editor/key isolation, custom/Unicode/whole-text tests, modes, correction rules, raw WPM, repeat, settings persistence, corpus separation, real SQL saves, no-key flow, and mobile layout.",
   );
 } finally {
   await browser.close();

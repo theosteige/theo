@@ -406,7 +406,7 @@ function restart({ focus = true, repeat = false } = {}) {
   input.disabled = false;
   input.value = "";
   $("#typing-help").textContent =
-    "Type to begin · Tab then Enter to restart · Esc for settings";
+    "Type to begin · Enter to restart · Esc for settings";
   view.render(test, { reset: true, instant: true });
   updateInput();
   renderHistory();
@@ -442,14 +442,15 @@ input.addEventListener("beforeinput", (event) => {
   } else if (event.inputType === "insertText" && event.data !== null) {
     event.preventDefault();
     insert(event.data);
+  } else if (["insertLineBreak", "insertParagraph"].includes(event.inputType)) {
+    event.preventDefault();
+    restart();
   } else if (
     [
       "insertFromPaste",
       "insertFromDrop",
       "historyUndo",
       "historyRedo",
-      "insertLineBreak",
-      "insertParagraph",
     ].includes(event.inputType)
   )
     event.preventDefault();
@@ -501,7 +502,6 @@ input.addEventListener("keydown", (event) => {
       "Home",
       "End",
       "Delete",
-      "Enter",
     ].includes(event.key)
   )
     event.preventDefault();
@@ -521,8 +521,7 @@ input.addEventListener("blur", () => {
 });
 input.addEventListener("focus", () => {
   page.dataset.focused = "true";
-  $("#typing-help").textContent =
-    "Tab then Enter to restart · Esc for settings";
+  $("#typing-help").textContent = "Enter to restart · Esc for settings";
 });
 $("#typing-options").addEventListener("submit", (event) =>
   event.preventDefault(),
@@ -563,10 +562,20 @@ $("#practice-missed").addEventListener("click", () => {
   restart();
 });
 document.addEventListener("keydown", (event) => {
+  if (event.isComposing) return;
   const editing = event.target.closest(
     "input,textarea,select,button,summary,a",
   );
-  if (event.key === "Escape" && (event.target === input || !editing)) {
+  if (
+    event.key === "Enter" &&
+    !event.ctrlKey &&
+    !event.metaKey &&
+    !event.altKey &&
+    (event.target === input || !editing)
+  ) {
+    event.preventDefault();
+    if (!event.repeat) restart();
+  } else if (event.key === "Escape" && (event.target === input || !editing)) {
     event.preventDefault();
     $("#typing-preferences").open = true;
     $("#word-source").focus();
