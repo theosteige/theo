@@ -202,17 +202,6 @@
   width: fit-content;
   min-height: 40px;
 }
-.journal-key-field {
-  margin-top: 12px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 12px;
-  align-items: center;
-}
-#journal-key {
-  font: inherit;
-  max-width: 100%;
-}
 .typing-results {
   display: flex;
   flex-wrap: wrap;

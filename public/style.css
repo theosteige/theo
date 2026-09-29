@@ -82,6 +82,37 @@ h2 {
 p {
   margin: 0 0 16px;
 }
+.journal-key-field {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin: 12px 0 16px;
+  color: #1d1d1d;
+  font:
+    16px/1.6 system-ui,
+    sans-serif;
+}
+.journal-key-field label {
+  cursor: pointer;
+}
+.journal-key-field input {
+  appearance: none;
+  width: 14rem;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  padding: 6px 8px;
+  border: 1px solid #888;
+  border-radius: 0;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+}
+.journal-key-field input:focus-visible {
+  outline: 2px solid #0645ad;
+  outline-offset: 2px;
+}
 .intro {
   margin-bottom: 42px;
 }
