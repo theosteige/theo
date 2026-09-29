@@ -174,7 +174,7 @@ async function sameSecret(left, right) {
 }
 
 function validTypingResult(input) {
-  return (
+  const countsValid =
     input &&
     typeof input.id === "string" &&
     /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
@@ -191,11 +191,73 @@ function validTypingResult(input) {
     input.correctKeystrokes <= input.totalKeystrokes &&
     Number.isSafeInteger(input.correctCharacters) &&
     input.correctCharacters >= 0 &&
-    input.correctCharacters <= input.correctKeystrokes
+    input.correctCharacters <= input.correctKeystrokes;
+  if (!countsValid) return false;
+  if (input.metricsVersion === undefined) return true; // Existing deployed clients can finish their tests.
+  return (
+    input.metricsVersion === 2 &&
+    ["time", "words"].includes(input.mode) &&
+    Number.isSafeInteger(input.wordCount) &&
+    input.wordCount >= 1 &&
+    input.wordCount <= 500 &&
+    ["english", "custom"].includes(input.source) &&
+    (input.source === "english"
+      ? input.corpusId === "english-v1"
+      : /^[0-9a-f]{64}$/.test(input.corpusId)) &&
+    ["random", "shuffle", "ordered"].includes(input.order) &&
+    (input.source !== "english" || input.order === "random") &&
+    (input.source !== "custom" || (!input.punctuation && !input.numbers)) &&
+    typeof input.freedom === "boolean" &&
+    ["off", "word", "letter"].includes(input.stopOnError) &&
+    Number.isSafeInteger(input.elapsedMs) &&
+    input.elapsedMs >= 1 &&
+    input.elapsedMs <= 86400000 &&
+    (input.mode !== "time" || input.elapsedMs === input.duration * 1000) &&
+    Number.isSafeInteger(input.rawCharacters) &&
+    input.rawCharacters >= input.correctCharacters &&
+    input.rawCharacters <= input.totalKeystrokes &&
+    [
+      input.incorrectCharacters,
+      input.extraCharacters,
+      input.missedCharacters,
+    ].every((n) => Number.isSafeInteger(n) && n >= 0 && n <= 100000) &&
+    input.incorrectCharacters + input.extraCharacters <= input.rawCharacters
   );
 }
 
+function typingSettings(input) {
+  if (input.metricsVersion !== 2) return {};
+  const {
+    metricsVersion,
+    mode,
+    wordCount,
+    source,
+    corpusId,
+    order,
+    freedom,
+    stopOnError,
+    incorrectCharacters,
+    extraCharacters,
+    missedCharacters,
+  } = input;
+  return {
+    metricsVersion,
+    mode,
+    wordCount,
+    source,
+    corpusId,
+    order,
+    freedom,
+    stopOnError,
+    incorrectCharacters,
+    extraCharacters,
+    missedCharacters,
+  };
+}
+
 function typingResult(row) {
+  const settings = JSON.parse(row.settings || "{}");
+  const seconds = row.elapsed_ms ? row.elapsed_ms / 1000 : row.duration;
   return {
     id: row.id,
     playedAt: row.played_at,
@@ -205,8 +267,17 @@ function typingResult(row) {
     correctCharacters: row.correct_characters,
     correctKeystrokes: row.correct_keystrokes,
     totalKeystrokes: row.total_keystrokes,
-    wpm: Math.round((row.correct_characters * 12) / row.duration),
-    rawWpm: Math.round((row.total_keystrokes * 12) / row.duration),
+    ...(settings.metricsVersion === 2
+      ? {
+          ...settings,
+          elapsedMs: row.elapsed_ms,
+          rawCharacters: row.raw_characters,
+        }
+      : {}),
+    wpm: Math.round((row.correct_characters * 12) / seconds),
+    rawWpm: Math.round(
+      ((row.raw_characters ?? row.total_keystrokes) * 12) / seconds,
+    ),
     accuracy:
       Math.round((row.correct_keystrokes / row.total_keystrokes) * 1000) / 10,
   };
@@ -269,8 +340,8 @@ export function createHandler(now = () => new Date()) {
           const [, stored] = await env.DB.batch([
             env.DB.prepare(
               `INSERT INTO typing_results
-              (id,played_at,duration,punctuation,numbers,correct_characters,total_keystrokes,correct_keystrokes)
-              VALUES(?,?,?,?,?,?,?,?) ON CONFLICT(id) DO NOTHING`,
+              (id,played_at,duration,punctuation,numbers,correct_characters,total_keystrokes,correct_keystrokes,elapsed_ms,raw_characters,settings)
+              VALUES(?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(id) DO NOTHING`,
             ).bind(
               input.id,
               now().toISOString(),
@@ -280,6 +351,9 @@ export function createHandler(now = () => new Date()) {
               input.correctCharacters,
               input.totalKeystrokes,
               input.correctKeystrokes,
+              input.metricsVersion === 2 ? input.elapsedMs : null,
+              input.metricsVersion === 2 ? input.rawCharacters : null,
+              JSON.stringify(typingSettings(input)),
             ),
             env.DB.prepare("SELECT * FROM typing_results WHERE id=?").bind(
               input.id,

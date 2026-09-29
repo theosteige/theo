@@ -4,117 +4,160 @@ import {
   eraseCharacter,
   expireTest,
   resultForTest,
-} from "/typing-logic.js?v=20260928";
+  normalizeSettings,
+  customWords,
+  characters,
+} from "/typing-logic.js?v=20260928-v2";
+import { createTypingView } from "/typing-view.js?v=20260928-v2";
 
 const $ = (selector) => document.querySelector(selector);
 const page = $(".typing-page");
-const api = page.dataset.scoreApi;
 const input = $("#typing-input");
-const viewport = $("#words");
-const track = $("#word-track");
-const words = $("#word-lines");
-const caret = $("#typing-caret");
-let test;
-let interval;
-let run = 0;
-let history = [];
-let pendingResult = null;
-let saving = false;
+const api = page.dataset.scoreApi;
+const view = createTypingView(
+  $("#words"),
+  $("#word-track"),
+  $("#word-lines"),
+  $("#typing-caret"),
+);
+const STORAGE_KEY = "theo.typing.settings.v2";
+let preferences;
+try {
+  preferences = normalizeSettings(
+    JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"),
+  );
+} catch {
+  preferences = normalizeSettings();
+}
+let test,
+  interval,
+  run = 0,
+  history = [],
+  pendingResult = null,
+  saving = false;
+let corpusId = "english-v1",
+  corpusPromise = Promise.resolve(corpusId);
+let customCount = preferences.wordCount;
 
-function settings() {
-  return {
+function readSettings() {
+  return normalizeSettings({
+    mode: $("[name=mode]:checked").value,
     duration: Number($("[name=duration]:checked").value),
+    wordCount: Number($("[name=word-count]:checked")?.value ?? customCount),
     punctuation: $("#punctuation").checked,
     numbers: $("#numbers").checked,
-  };
+    source: $("#word-source").value,
+    customText: $("#custom-text").value,
+    order: $("#word-order").value,
+    freedom: $("#freedom").checked,
+    stopOnError: $("#stop-on-error").value,
+    smoothCaret: $("#smooth-caret").checked,
+    smoothScroll: $("#smooth-scroll").checked,
+  });
 }
 
-let renderedIndex = 0;
-
-function renderWord(index) {
-  const word = test.words[index];
-  const entry = test.entries[index] ?? "";
-  const element = document.createElement("span");
-  element.className = "typing-word";
-  if (index < test.index && entry !== word) element.classList.add("missed");
-  if (index === test.index) element.id = "active-word";
-  for (
-    let position = 0;
-    position < Math.max(word.length, entry.length);
-    position++
-  ) {
-    const letter = document.createElement("span");
-    letter.className = "typing-letter";
-    letter.textContent = word[position] ?? entry[position];
-    if (position < entry.length)
-      letter.classList.add(
-        entry[position] === word[position] ? "correct" : "incorrect",
-      );
-    element.append(letter);
+function applySettings(settings) {
+  for (const name of ["mode", "duration", "word-count"]) {
+    const value = name === "word-count" ? settings.wordCount : settings[name];
+    document.querySelectorAll(`[name=${name}]`).forEach((node) => {
+      node.checked = node.value === String(value);
+    });
   }
-  return element;
+  customCount = settings.wordCount;
+  if (!$("[name=word-count]:checked")) {
+    let label = $("#custom-count-option");
+    if (!label) {
+      label = document.createElement("label");
+      label.id = "custom-count-option";
+      $("#word-options").append(label);
+    }
+    const radio = document.createElement("input");
+    radio.type = "radio";
+    radio.name = "word-count";
+    radio.value = settings.wordCount;
+    radio.checked = true;
+    const text = document.createElement("span");
+    text.textContent = settings.wordCount;
+    label.replaceChildren(radio, text);
+  }
+  for (const [id, key] of [
+    ["punctuation", "punctuation"],
+    ["numbers", "numbers"],
+    ["freedom", "freedom"],
+    ["smooth-caret", "smoothCaret"],
+    ["smooth-scroll", "smoothScroll"],
+  ])
+    $("#" + id).checked = settings[key];
+  $("#word-source").value = settings.source;
+  $("#custom-text").value = settings.customText;
+  $("#word-order").value = settings.order;
+  $("#stop-on-error").value = settings.stopOnError;
 }
 
-function renderWords() {
-  const end = Math.min(test.words.length, test.index + 45);
-  const fragment = document.createDocumentFragment();
-  for (let index = words.children.length; index < end; index++)
-    fragment.append(renderWord(index));
-  words.append(fragment);
-  // Keep earlier words in place so line breaks never jump as a word is submitted.
-  for (
-    let index = Math.min(renderedIndex, test.index);
-    index <= Math.max(renderedIndex, test.index);
-    index++
-  ) {
-    words.children[index].replaceWith(renderWord(index));
-  }
-  renderedIndex = test.index;
-  const active = $("#active-word");
-  const lineHeight = parseFloat(getComputedStyle(viewport).lineHeight);
-  const position = test.entries[test.index].length;
-  const letter = active.children[position] ?? active.lastElementChild;
-  // Measure a real letter at either side of the insertion point. Empty inline
-  // elements use a different baseline and made the end-of-word cursor drop.
-  const letterBounds = letter.getBoundingClientRect();
-  const wordBounds = active.getBoundingClientRect();
-  const x =
-    active.offsetLeft +
-    (position < active.children.length
-      ? letterBounds.left
-      : letterBounds.right) -
-    wordBounds.left;
-  const y = active.offsetTop + (lineHeight - caret.offsetHeight) / 2;
-  caret.style.transform = `translate(${x}px, ${y}px)`;
-  track.style.transform = `translateY(${-Math.max(0, active.offsetTop - lineHeight)}px)`;
-  $("#current-word").textContent =
-    `Current word: ${test.words[test.index]}. Next: ${test.words.slice(test.index + 1, test.index + 6).join(" ")}`;
+function settingsUI() {
+  $("#time-options").hidden = preferences.mode !== "time";
+  $("#word-options").hidden = preferences.mode !== "words";
+  $("#custom-settings").hidden = preferences.source !== "custom";
+  $("#punctuation").disabled = $("#numbers").disabled =
+    preferences.source === "custom";
+  page.dataset.smoothCaret = preferences.smoothCaret;
+  page.dataset.smoothScroll = preferences.smoothScroll;
+}
+
+async function hashSource(settings) {
+  if (settings.source !== "custom") return "english-v1";
+  const bytes = await crypto.subtle.digest(
+    "SHA-256",
+    new TextEncoder().encode(customWords(settings.customText).join(" ")),
+  );
+  return Array.from(new Uint8Array(bytes), (n) =>
+    n.toString(16).padStart(2, "0"),
+  ).join("");
+}
+
+function matchingSettings(entry) {
+  const s = preferences;
+  return (
+    entry.metricsVersion === 2 &&
+    entry.mode === s.mode &&
+    (s.mode === "time"
+      ? entry.duration === s.duration
+      : entry.wordCount === s.wordCount) &&
+    entry.punctuation === (s.source === "english" && s.punctuation) &&
+    entry.numbers === (s.source === "english" && s.numbers) &&
+    entry.corpusId === corpusId &&
+    entry.order === (s.source === "custom" ? s.order : "random") &&
+    entry.freedom === s.freedom &&
+    entry.stopOnError === s.stopOnError
+  );
 }
 
 function renderHistory() {
-  const current = settings();
-  const matching = history.filter(
-    (entry) =>
-      entry.duration === current.duration &&
-      entry.punctuation === current.punctuation &&
-      entry.numbers === current.numbers,
-  );
+  const matching = history.filter(matchingSettings);
   $("#best-score").textContent =
-    `Best: ${matching.length ? Math.max(...matching.map((entry) => entry.wpm)) + " wpm" : "–"}`;
+    `Best: ${matching.length ? Math.max(...matching.map((e) => e.wpm)) + " wpm" : "–"}`;
   $("#history").hidden = !history.length;
   $("#history-rows").replaceChildren(
     ...history.slice(0, 20).map((entry) => {
       const row = document.createElement("tr");
-      const values = [
+      const description =
+        [
+          entry.source === "custom" && "custom",
+          entry.punctuation && "punctuation",
+          entry.numbers && "numbers",
+          entry.metricsVersion !== 2 && "previous scoring",
+        ]
+          .filter(Boolean)
+          .join(", ") || "English";
+      for (const value of [
         new Date(entry.playedAt).toLocaleDateString(),
-        `${entry.duration}s`,
+        entry.mode === "words"
+          ? `${entry.wordCount} words`
+          : `${entry.duration}s`,
         entry.wpm,
         `${entry.accuracy}%`,
-        [entry.punctuation && "punctuation", entry.numbers && "numbers"]
-          .filter(Boolean)
-          .join(", ") || "words",
-      ];
-      for (const value of values) {
+        description,
+      ]) {
         const cell = document.createElement("td");
         cell.textContent = value;
         row.append(cell);
@@ -129,7 +172,6 @@ async function loadHistory() {
     $("#history-status").textContent = "Journal unavailable in this preview.";
     return;
   }
-  $("#history-status").textContent = "Loading…";
   try {
     const response = await fetch(`${api}/typing`);
     if (!response.ok) throw new Error();
@@ -162,7 +204,6 @@ async function saveResult() {
     return;
   }
   const currentRun = run;
-  const result = pendingResult;
   saving = true;
   $("#retry-save").hidden = true;
   $("#save-status").textContent = "Saving…";
@@ -173,7 +214,7 @@ async function saveResult() {
         Authorization: `Bearer ${key}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(result),
+      body: JSON.stringify(pendingResult),
     });
     if (!response.ok)
       throw new Error(
@@ -181,11 +222,10 @@ async function saveResult() {
           ? "Journal key is incorrect."
           : "Could not save this result.",
       );
-    const body = await response.json();
-    history = [
-      body.result,
-      ...history.filter((entry) => entry.id !== body.result.id),
-    ].sort((a, b) => b.playedAt.localeCompare(a.playedAt));
+    const { result } = await response.json();
+    history = [result, ...history.filter((e) => e.id !== result.id)].sort(
+      (a, b) => b.playedAt.localeCompare(a.playedAt),
+    );
     renderHistory();
     $("#history-status").textContent = "";
     if (run === currentRun) {
@@ -194,8 +234,7 @@ async function saveResult() {
     }
   } catch (error) {
     if (run === currentRun) {
-      $("#save-status").textContent =
-        error.message || "Could not save this result.";
+      $("#save-status").textContent = error.message;
       $("#retry-save").hidden = false;
     }
   } finally {
@@ -203,142 +242,353 @@ async function saveResult() {
   }
 }
 
-function finish() {
+function renderResults(result) {
+  $("#result-wpm").textContent = result.wpm;
+  $("#result-raw").textContent = result.rawWpm;
+  $("#result-accuracy").textContent = `${result.accuracy}%`;
+  $("#result-duration").textContent =
+    `${(result.elapsedMs / 1000).toFixed(1)}s`;
+  $("#result-characters").textContent =
+    `${result.correctCharacters} correct · ${result.incorrectCharacters} incorrect · ${result.extraCharacters} extra · ${result.missedCharacters} missed`;
+  $("#review-words").replaceChildren(
+    ...test.entries.map((entry, index) => {
+      const word = document.createElement("span");
+      word.textContent = test.words[index];
+      word.className =
+        entry === test.words[index] ? "review-correct" : "review-error";
+      word.title = `Typed: ${entry || "(empty)"}`;
+      word.tabIndex = 0;
+      word.setAttribute(
+        "aria-label",
+        `${test.words[index]}. Typed ${entry || "nothing"}.`,
+      );
+      return word;
+    }),
+  );
+  $("#word-review").open = false;
+  const samples = [...test.samples, result];
+  $("#result-chart").hidden = samples.length < 2;
+  const max = Math.max(1, ...samples.map((s) => s.wpm));
+  $("#result-chart figcaption").textContent =
+    `WPM over time · 0–${max} wpm · ${(result.elapsedMs / 1000).toFixed(1)}s`;
+  $("#chart-line").setAttribute(
+    "d",
+    samples
+      .map(
+        (s, i) =>
+          `${i ? "L" : "M"}${10 + (580 * s.elapsedMs) / Math.max(1, result.elapsedMs)},${110 - (100 * s.wpm) / max}`,
+      )
+      .join(" "),
+  );
+  $("#practice-missed").hidden = !test.mistakes.size;
+}
+
+async function finish() {
   if (page.dataset.state === "finished") return;
   clearInterval(interval);
   page.dataset.state = "finished";
   input.disabled = true;
-  $("#settings").disabled = false;
   $("#test").hidden = true;
   $("#results").hidden = false;
   const result = resultForTest(test, performance.now());
-  $("#result-wpm").textContent = result.wpm;
-  $("#result-raw").textContent = result.rawWpm;
-  $("#result-accuracy").textContent = `${result.accuracy}%`;
-  $("#result-duration").textContent = `${result.duration}s`;
-  $("#result-characters").textContent =
-    `${result.correctCharacters} correct characters · ${result.totalKeystrokes - result.correctKeystrokes} incorrect keystrokes`;
-  pendingResult = { id: crypto.randomUUID(), ...result };
+  renderResults(result);
   $("#results-heading").focus({ preventScroll: true });
+  const currentRun = run,
+    s = test.settings;
+  const id = await corpusPromise;
+  if (currentRun !== run) return;
+  pendingResult = {
+    id: crypto.randomUUID(),
+    ...result,
+    duration: s.duration,
+    metricsVersion: 2,
+    mode: s.mode,
+    wordCount: s.wordCount,
+    source: s.source,
+    corpusId: id,
+    order: s.source === "custom" ? s.order : "random",
+    freedom: s.freedom,
+    stopOnError: s.stopOnError,
+    punctuation: s.source === "english" && s.punctuation,
+    numbers: s.source === "english" && s.numbers,
+  };
   saveResult();
 }
 
 function tick() {
+  if (!test) return;
   const now = performance.now();
   if (expireTest(test, now)) {
     finish();
     return;
   }
+  const result = resultForTest(test, now);
   $("#time-left").textContent =
-    test.startedAt === null
-      ? test.settings.duration
-      : Math.max(
-          0,
-          Math.ceil(test.settings.duration - (now - test.startedAt) / 1000),
-        );
-  $("#live-wpm").textContent = resultForTest(test, now).wpm;
+    test.settings.mode === "words"
+      ? `${test.index}/${test.words.length}`
+      : test.startedAt === null
+        ? test.settings.duration
+        : Math.max(
+            0,
+            Math.ceil(test.settings.duration - result.elapsedMs / 1000),
+          );
+  $("#progress-unit").textContent =
+    test.settings.mode === "time" ? "s" : " words";
+  $("#live-wpm").textContent = result.wpm;
+  $("#live-accuracy").textContent = result.accuracy;
+  if (
+    test.status === "running" &&
+    Math.floor(result.elapsedMs / 1000) >
+      Math.floor((test.samples.at(-1)?.elapsedMs ?? 0) / 1000)
+  )
+    test.samples.push(result);
 }
 
-function restart(focus = true) {
+function updateInput() {
+  input.value = test.entries[test.index];
+  input.setSelectionRange(input.value.length, input.value.length);
+  if (test.status === "finished") {
+    finish();
+    return;
+  }
+  if (test.status === "running" && page.dataset.state !== "running") {
+    page.dataset.state = "running";
+    interval = setInterval(tick, 100);
+  }
+  view.render(test);
+  $("#current-word").textContent =
+    `Current word: ${test.words[test.index]}. Next: ${test.words.slice(test.index + 1, test.index + 6).join(" ")}`;
+  tick();
+}
+
+function restart({ focus = true, repeat = false } = {}) {
+  const previousWords = repeat && test ? test.words : undefined;
   clearInterval(interval);
   run++;
   saving = false;
   pendingResult = null;
-  test = createTest(settings());
-  words.replaceChildren();
-  renderedIndex = 0;
+  preferences = readSettings();
+  settingsUI();
+  if (focus) $("#typing-preferences").open = false;
+  $("#settings-error").textContent = "";
+  try {
+    test = createTest(preferences, previousWords);
+  } catch (error) {
+    test = null;
+    input.disabled = true;
+    page.dataset.state = "invalid";
+    $("#test").hidden = false;
+    $("#results").hidden = true;
+    $("#settings-error").textContent = error.message;
+    $("#custom-text").setAttribute("aria-invalid", "true");
+    return;
+  }
+  $("#custom-text").removeAttribute("aria-invalid");
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(preferences));
+  } catch {
+    /* Storage is optional. */
+  }
+  const currentRun = run;
+  corpusPromise = hashSource(preferences);
+  corpusPromise.then((id) => {
+    if (run === currentRun) {
+      corpusId = id;
+      renderHistory();
+    }
+  });
   page.dataset.state = "ready";
-  $("#settings").disabled = false;
   $("#test").hidden = false;
   $("#results").hidden = true;
   $("#save-status").textContent = "";
   $("#retry-save").hidden = true;
+  $("#practice-missed").hidden = true;
   input.disabled = false;
   input.value = "";
   $("#typing-help").textContent =
-    "Type to begin. Space for the next word. Esc to restart.";
-  renderWords();
-  tick();
+    "Type to begin · Tab then Enter to restart · Esc for settings";
+  view.render(test, { reset: true, instant: true });
+  updateInput();
   renderHistory();
   if (focus) input.focus({ preventScroll: true });
 }
 
-input.addEventListener("input", (event) => {
-  if (event.isComposing) return;
+function insert(text) {
+  if (!test) return;
   const now = performance.now();
   if (expireTest(test, now)) {
     finish();
     return;
   }
+  for (const character of characters(text.replace(/\s/gu, " "))) {
+    if (view.canAppend(character)) typeCharacter(test, character, now);
+    // Render between batched/IME characters so the boundary guard sees the latest width.
+    if (test.status !== "finished") view.render(test);
+  }
+  updateInput();
+}
+
+input.addEventListener("beforeinput", (event) => {
+  if (event.isComposing) return;
+  if (event.inputType.startsWith("delete")) {
+    event.preventDefault();
+    eraseCharacter(
+      test,
+      performance.now(),
+      /Word|SoftLine|HardLine/.test(event.inputType),
+      view.firstVisibleIndex(),
+    );
+    updateInput();
+  } else if (event.inputType === "insertText" && event.data !== null) {
+    event.preventDefault();
+    insert(event.data);
+  } else if (
+    [
+      "insertFromPaste",
+      "insertFromDrop",
+      "historyUndo",
+      "historyRedo",
+      "insertLineBreak",
+      "insertParagraph",
+    ].includes(event.inputType)
+  )
+    event.preventDefault();
+});
+input.addEventListener("input", (event) => {
+  if (event.isComposing || !test) return;
   const previous = test.entries[test.index];
-  const value = input.value.replace(/\n/g, " ");
+  const value = input.value;
+  const oldChars = characters(previous),
+    newChars = characters(value);
   let common = 0;
   while (
-    common < previous.length &&
-    common < value.length &&
-    previous[common] === value[common]
+    common < oldChars.length &&
+    common < newChars.length &&
+    oldChars[common] === newChars[common]
   )
     common++;
-  for (let index = previous.length; index > common; index--)
-    eraseCharacter(test, now);
-  for (const character of value.slice(common))
-    typeCharacter(test, character, now);
-  input.value = test.entries[test.index];
-  if (test.status === "running" && page.dataset.state !== "running") {
-    page.dataset.state = "running";
-    $("#settings").disabled = true;
-    $("#typing-help").textContent =
-      "Esc to restart. The timer continues if you leave this page.";
-    interval = setInterval(tick, 100);
-  }
-  renderWords();
-  tick();
-});
-
-input.addEventListener("keydown", (event) => {
-  if (event.key === "Backspace" && !input.value) {
-    event.preventDefault();
+  for (let i = oldChars.length; i > common; i--)
     eraseCharacter(test, performance.now());
-    input.value = test.entries[test.index];
-    renderWords();
-    tick();
-  }
+  view.render(test);
+  insert(newChars.slice(common).join(""));
 });
-// Paste and drop are valid in the journal key field, but not measured typing input.
-for (const eventName of ["paste", "drop"])
-  input.addEventListener(eventName, (event) => {
+input.addEventListener("compositionend", () => {
+  if (!test) return;
+  const previous = test.entries[test.index];
+  const composed = input.value.startsWith(previous)
+    ? input.value.slice(previous.length)
+    : input.value;
+  input.value = previous;
+  insert(composed);
+});
+input.addEventListener("keydown", (event) => {
+  if (event.isComposing) return;
+  if (event.key === "Backspace") {
+    event.preventDefault();
+    eraseCharacter(
+      test,
+      performance.now(),
+      event.ctrlKey || event.altKey || event.metaKey,
+      view.firstVisibleIndex(),
+    );
+    updateInput();
+  } else if (
+    [
+      "ArrowLeft",
+      "ArrowRight",
+      "ArrowUp",
+      "ArrowDown",
+      "Home",
+      "End",
+      "Delete",
+      "Enter",
+    ].includes(event.key)
+  )
+    event.preventDefault();
+});
+for (const name of ["paste", "drop"])
+  input.addEventListener(name, (event) => {
     event.preventDefault();
     $("#typing-help").textContent =
-      "Type the words to take the test; pasted text does not count.";
+      "Paste practice text in Words & settings. Type here to take the test.";
   });
 input.addEventListener("blur", () => {
-  if (test.status !== "finished")
-    $("#typing-help").textContent =
-      "Click the words or tab back to continue. The timer keeps running.";
+  page.dataset.focused = "false";
+  $("#typing-help").textContent =
+    test?.status === "running"
+      ? "Click the words to continue · the timer keeps running"
+      : "Click the words or start typing to focus";
 });
 input.addEventListener("focus", () => {
+  page.dataset.focused = "true";
   $("#typing-help").textContent =
-    test.status === "ready"
-      ? "Type to begin. Space for the next word. Esc to restart."
-      : "Esc to restart. The timer continues if you leave this page.";
+    "Tab then Enter to restart · Esc for settings";
 });
 $("#typing-options").addEventListener("submit", (event) =>
   event.preventDefault(),
 );
-$("#typing-options").addEventListener("change", () => restart(false));
+$("#typing-options").addEventListener("change", () =>
+  restart({ focus: false }),
+);
 $("#restart").addEventListener("click", () => restart());
+$("#repeat-test").addEventListener("click", () => restart({ repeat: true }));
 $("#retry-save").addEventListener("click", saveResult);
-page.addEventListener("keydown", (event) => {
-  if (event.key === "Escape" && event.target !== $("#journal-key")) {
-    event.preventDefault();
+$("#use-text-length").addEventListener("click", () => {
+  try {
+    const count = customWords($("#custom-text").value).length;
+    if (count > 500)
+      throw new Error("Use up to 500 words for a whole-text test.");
+    applySettings({
+      ...readSettings(),
+      mode: "words",
+      wordCount: count,
+      order: "ordered",
+    });
     restart();
+  } catch (error) {
+    $("#settings-error").textContent = error.message;
+  }
+});
+$("#practice-missed").addEventListener("click", () => {
+  if (!test?.mistakes.size) return;
+  const missed = [...test.mistakes];
+  applySettings({
+    ...preferences,
+    mode: "words",
+    wordCount: Math.max(10, missed.length),
+    source: "custom",
+    customText: missed.join(" "),
+    order: "shuffle",
+  });
+  restart();
+});
+document.addEventListener("keydown", (event) => {
+  const editing = event.target.closest(
+    "input,textarea,select,button,summary,a",
+  );
+  if (event.key === "Escape" && (event.target === input || !editing)) {
+    event.preventDefault();
+    $("#typing-preferences").open = true;
+    $("#word-source").focus();
+  } else if (
+    !editing &&
+    !event.ctrlKey &&
+    !event.metaKey &&
+    !event.altKey &&
+    characters(event.key).length === 1 &&
+    test?.status !== "finished"
+  ) {
+    event.preventDefault();
+    input.focus({ preventScroll: true });
+    insert(event.key);
   }
 });
 document.addEventListener("visibilitychange", () => {
-  if (test.status === "running") tick();
+  if (test?.status === "running") tick();
 });
 window.addEventListener("resize", () => {
-  if (test.status !== "finished") renderWords();
+  if (test && test.status !== "finished") view.render(test, { instant: true });
 });
-restart(false);
+applySettings(preferences);
+restart({ focus: matchMedia("(pointer: fine)").matches });
 loadHistory();

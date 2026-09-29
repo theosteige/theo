@@ -37,7 +37,7 @@
     <meta property="og:title" content="Typing Test | Theo Steiger" />
     <title>Typing Test | Theo Steiger</title>
     <link rel="stylesheet" href="/style.css" />
-    <link rel="stylesheet" href="/typing.css?v=20260928-caret" />
+    <link rel="stylesheet" href="/typing.css?v=20260928-v2" />
   </head>
   <body>
     <header>
@@ -71,7 +71,24 @@
           <fieldset id="settings">
             <legend class="sr-only">Test settings</legend>
             <div class="typing-options">
-              <div class="duration-options" role="group" aria-label="Duration">
+              <div class="duration-options" role="group" aria-label="Test mode">
+                <label
+                  ><input type="radio" name="mode" value="time" checked /><span
+                    >time</span
+                  ></label
+                >
+                <label
+                  ><input type="radio" name="mode" value="words" /><span
+                    >words</span
+                  ></label
+                >
+              </div>
+              <div
+                class="duration-options"
+                id="time-options"
+                role="group"
+                aria-label="Duration"
+              >
                 <label
                   ><input type="radio" name="duration" value="15" /><span
                     >15s</span
@@ -96,6 +113,37 @@
                   ></label
                 >
               </div>
+              <div
+                class="duration-options"
+                id="word-options"
+                role="group"
+                aria-label="Word count"
+                hidden
+              >
+                <label
+                  ><input type="radio" name="word-count" value="10" /><span
+                    >10</span
+                  ></label
+                >
+                <label
+                  ><input
+                    type="radio"
+                    name="word-count"
+                    value="25"
+                    checked
+                  /><span>25</span></label
+                >
+                <label
+                  ><input type="radio" name="word-count" value="50" /><span
+                    >50</span
+                  ></label
+                >
+                <label
+                  ><input type="radio" name="word-count" value="100" /><span
+                    >100</span
+                  ></label
+                >
+              </div>
               <label class="toggle-option"
                 ><input id="punctuation" type="checkbox" /> punctuation</label
               >
@@ -103,19 +151,75 @@
                 ><input id="numbers" type="checkbox" /> numbers</label
               >
             </div>
+            <details id="typing-preferences">
+              <summary>Words &amp; settings</summary>
+              <div class="typing-preferences-grid">
+                <label for="word-source">Word source</label>
+                <select id="word-source">
+                  <option value="english">English</option>
+                  <option value="custom">Custom words</option>
+                </select>
+                <div id="custom-settings" class="custom-settings" hidden>
+                  <label for="custom-text">Your words or text</label>
+                  <textarea
+                    id="custom-text"
+                    rows="4"
+                    maxlength="12000"
+                    placeholder="[Custom words placeholder]"
+                    aria-describedby="custom-help settings-error"
+                  ></textarea>
+                  <p id="custom-help" class="meta">
+                    Separate words with spaces or new lines. Saved only in this
+                    browser.
+                  </p>
+                  <label for="word-order">Order</label>
+                  <select id="word-order">
+                    <option value="random">Random</option>
+                    <option value="shuffle">Shuffle each set</option>
+                    <option value="ordered">As written</option>
+                  </select>
+                  <button id="use-text-length" type="button">
+                    Test this whole text
+                  </button>
+                </div>
+                <label for="stop-on-error">Stop on error</label>
+                <select id="stop-on-error">
+                  <option value="off">Off</option>
+                  <option value="word">Word</option>
+                  <option value="letter">Letter</option>
+                </select>
+                <label class="toggle-option"
+                  ><input id="freedom" type="checkbox" /> Backtrack into correct
+                  words</label
+                >
+                <label class="toggle-option"
+                  ><input id="smooth-caret" type="checkbox" checked /> Smooth
+                  cursor</label
+                >
+                <label class="toggle-option"
+                  ><input id="smooth-scroll" type="checkbox" checked /> Smooth
+                  scrolling</label
+                >
+              </div>
+            </details>
+            <p id="settings-error" role="status"></p>
           </fieldset>
         </form>
         <section id="test" aria-label="Typing test">
           <div class="typing-status" aria-live="off">
-            <span><span id="time-left">30</span>s</span>
+            <span id="progress"
+              ><span id="time-left">30</span
+              ><span id="progress-unit">s</span></span
+            >
             <span><span id="live-wpm">0</span> wpm</span>
+            <span><span id="live-accuracy">100</span>%</span>
           </div>
           <div class="typing-surface">
             <div id="words" aria-hidden="true">
               <div id="word-track">
                 <div id="word-lines"></div>
-                <span id="typing-caret"></span>
               </div>
+              <span id="typing-caret"></span>
             </div>
             <label class="sr-only" for="typing-input"
               >Type the displayed words</label
@@ -133,7 +237,7 @@
           </div>
           <p id="current-word" class="sr-only"></p>
           <p id="typing-help" class="meta">
-            Type to begin. Space for the next word. Esc to restart.
+            Type to begin · Tab then Enter to restart · Esc for settings
           </p>
         </section>
         <section id="results" aria-labelledby="results-heading" hidden>
@@ -157,11 +261,34 @@
             </div>
           </dl>
           <p id="result-characters" class="meta"></p>
+          <figure id="result-chart" hidden>
+            <figcaption class="meta">WPM over time</figcaption>
+            <svg
+              viewBox="0 0 600 120"
+              role="img"
+              aria-label="Typing speed over the test"
+            >
+              <path
+                id="chart-line"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              />
+            </svg>
+          </figure>
+          <details id="word-review">
+            <summary>Review words</summary>
+            <div id="review-words"></div>
+          </details>
           <p id="save-status" role="status"></p>
           <button id="retry-save" type="button" hidden>Retry save</button>
         </section>
         <div class="typing-actions">
           <button id="restart" type="button">Restart test</button>
+          <button id="repeat-test" type="button">Repeat test</button>
+          <button id="practice-missed" type="button" hidden>
+            Practice missed words
+          </button>
           <span id="best-score" class="meta">Best: –</span>
         </div>
         <details class="typing-journal">
@@ -187,7 +314,7 @@
               <thead>
                 <tr>
                   <th scope="col">Date</th>
-                  <th scope="col">Time</th>
+                  <th scope="col">Test</th>
                   <th scope="col">WPM</th>
                   <th scope="col">Accuracy</th>
                   <th scope="col">Settings</th>
@@ -203,6 +330,6 @@
       </div>
     </main>
     <script src="/site.js"></script>
-    <script src="/typing.js?v=20260928-caret" type="module"></script>
+    <script src="/typing.js?v=20260928-v2" type="module"></script>
   </body>
 </html>

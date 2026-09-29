@@ -177,3 +177,73 @@ test("each requested duration saves independently and preflight permits authenti
     /Authorization/,
   );
 });
+
+const modern = {
+  ...valid,
+  metricsVersion: 2,
+  mode: "words",
+  wordCount: 25,
+  source: "custom",
+  corpusId: "a".repeat(64),
+  numbers: false,
+  order: "ordered",
+  freedom: false,
+  stopOnError: "off",
+  elapsedMs: 15000,
+  rawCharacters: 220,
+  incorrectCharacters: 10,
+  extraCharacters: 10,
+  missedCharacters: 5,
+};
+
+test("modern results persist custom-set identity and calculate speed from elapsed time", async (t) => {
+  const env = environment(t);
+  const response = await handle(
+    request({ ...modern, customText: "private practice words", wpm: 999 }),
+    env,
+  );
+  assert.equal(response.status, 201);
+  const { result } = await response.json();
+  assert.equal(result.wpm, 160);
+  assert.equal(result.rawWpm, 176);
+  assert.equal(result.accuracy, 90);
+  assert.equal(result.corpusId, modern.corpusId);
+  assert.equal(result.mode, "words");
+  assert.equal(result.wordCount, 25);
+  assert.equal(result.customText, undefined);
+  assert.equal(result.metricsVersion, 2);
+  assert.deepEqual((await (await handle(request(), env)).json()).results, [
+    result,
+  ]);
+});
+
+test("modern validation rejects inconsistent duration, settings and retained-character totals", async (t) => {
+  const env = environment(t);
+  for (const change of [
+    { elapsedMs: 0 },
+    { mode: "time", elapsedMs: 15000 },
+    { rawCharacters: 251 },
+    { rawCharacters: 199 },
+    { wordCount: 501 },
+    { metricsVersion: 3 },
+    { corpusId: "bad" },
+    { source: "english" },
+    { numbers: true },
+    { freedom: "yes" },
+    { stopOnError: "maybe" },
+    { order: "unknown" },
+    { incorrectCharacters: 999 },
+    { missedCharacters: -1 },
+  ]) {
+    assert.equal(
+      (await handle(request({ ...modern, ...change }), env)).status,
+      400,
+      JSON.stringify(change),
+    );
+  }
+  assert.equal(
+    (await handle(request({ ...modern, mode: "time", elapsedMs: 30000 }), env))
+      .status,
+    201,
+  );
+});

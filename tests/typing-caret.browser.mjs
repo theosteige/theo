@@ -1,20 +1,25 @@
-// Run with a local server on port 4321 and Playwright installed, or set
-// PLAYWRIGHT_MODULE to its module path and TYPING_BASE_URL to another preview.
+// With a local server: PLAYWRIGHT_MODULE=/path/to/playwright/index.mjs node tests/typing-caret.browser.mjs
 import assert from "node:assert/strict";
 const { chromium } = await import(
   process.env.PLAYWRIGHT_MODULE || "playwright"
 );
 const browser = await chromium.launch({ channel: "chrome", headless: true });
-
 try {
-  for (const width of [1200, 375]) {
+  for (const width of [1200, 375, 320])
     for (const reducedMotion of ["no-preference", "reduce"]) {
       const page = await browser.newPage({
         viewport: { width, height: 900 },
         reducedMotion,
       });
       const errors = [];
-      page.on("pageerror", (error) => errors.push(error.message));
+      page.on("pageerror", (e) => errors.push(e.message));
+      await page.addInitScript(() => {
+        let n = 127;
+        Math.random = () => {
+          n = (n * 16807) % 2147483647;
+          return n / 2147483647;
+        };
+      });
       await page.goto(
         `${process.env.TYPING_BASE_URL || "http://127.0.0.1:4321"}/typing/`,
       );
@@ -22,111 +27,152 @@ try {
       await page.getByText("2min", { exact: true }).click();
       await page.locator("#typing-input").focus();
       const settle = () =>
-        page.waitForFunction(() =>
-          ["typing-caret", "word-track"].every(
-            (id) => !document.getElementById(id).getAnimations().length,
-          ),
+        page.waitForFunction(
+          () =>
+            ![...document.querySelectorAll("#typing-caret,#word-track")].some(
+              (e) => e.getAnimations().length,
+            ),
         );
-      const geometry = () =>
-        page.evaluate(() => {
+      const aligned = async () => {
+        await settle();
+        const g = await page.evaluate(() => {
           const caret = document
             .querySelector("#typing-caret")
             .getBoundingClientRect();
-          const word = document
-            .querySelector("#active-word")
-            .getBoundingClientRect();
+          const word = document.querySelector("#active-word");
+          const pos = Array.from(
+            document.querySelector("#typing-input").value,
+          ).length;
+          const letter = (
+            word.children[pos] || word.lastElementChild
+          ).getBoundingClientRect();
           const viewport = document
             .querySelector("#words")
             .getBoundingClientRect();
           return {
-            x: caret.x,
             y: caret.y,
-            height: caret.height,
-            wordTop: word.top,
-            wordBottom: word.bottom,
-            viewTop: viewport.top,
-            viewBottom: viewport.bottom,
+            h: caret.height,
+            rowY: letter.y,
+            rowH: letter.height,
+            top: viewport.top,
+            bottom: viewport.bottom,
           };
         });
-      const aligned = async () => {
-        await settle();
-        const g = await geometry();
         assert.ok(
-          Math.abs(g.y + g.height / 2 - (g.wordTop + g.wordBottom) / 2) < 1,
-          `cursor stays centered on its word: ${JSON.stringify(g)}`,
+          Math.abs(g.y + g.h / 2 - g.rowY - g.rowH / 2) < 1,
+          `cursor centered: ${JSON.stringify(g)}`,
         );
         assert.ok(
-          g.y >= g.viewTop && g.y + g.height <= g.viewBottom,
-          "cursor stays inside the visible text area",
+          g.y >= g.top - 0.5 && g.y + g.h <= g.bottom + 0.5,
+          "cursor visible",
         );
         return g;
       };
-      const start = await aligned();
-      const firstWord = await page.locator("#active-word").innerText();
-      const caretNode = await page.locator("#typing-caret").elementHandle();
-      await page.keyboard.type(firstWord);
-      const end = await aligned();
-      assert.ok(
-        Math.abs(start.y - end.y) < 0.5,
-        "finishing a word never drops the cursor",
-      );
-      assert.ok(end.x > start.x, "cursor advances to the end of the word");
-      assert.ok(
-        await caretNode.evaluate(
-          (node) => node === document.querySelector("#typing-caret"),
-        ),
-        "one persistent cursor survives word updates",
-      );
-      await page.keyboard.type("x");
-      await aligned();
-      await page.keyboard.press("Backspace");
-      await aligned();
-      await page.keyboard.type(" ");
-      const next = await aligned();
-      assert.ok(
-        Math.abs(start.y - next.y) < 0.5,
-        "space between same-line words keeps cursor level",
-      );
-      await page.keyboard.press("Backspace");
-      assert.equal(await page.locator("#typing-input").inputValue(), firstWord);
-      await aligned();
-      await page.keyboard.type(" ");
-      // Move through several line wraps and scrolls; normal motion uses a short
-      // transition, while reduced motion reaches the same positions immediately.
-      for (let index = 0; index < 35; index++) {
-        const word = await page.locator("#active-word").innerText();
-        await page.keyboard.type(word + " ");
+      let checkedEdge = false;
+      for (let i = 0; i < 40; i++) {
         await aligned();
+        const word = await page.locator("#active-word").textContent();
+        const handle = await page
+          .locator("#active-word .typing-letter")
+          .first()
+          .elementHandle();
+        const before = await page
+          .locator("#word-lines")
+          .evaluate((e) => e.getBoundingClientRect().top);
+        for (const letter of word) {
+          await page.keyboard.type(letter);
+          const after = await page
+            .locator("#word-lines")
+            .evaluate((e) => e.getBoundingClientRect().top);
+          assert.ok(
+            Math.abs(before - after) < 0.5,
+            "ordinary keystrokes cannot move text rows",
+          );
+        }
+        assert.ok(
+          await handle.evaluate((e) => e.isConnected),
+          "letters are updated in place",
+        );
+        await aligned();
+        const atEdge = await page
+          .locator("#active-word")
+          .evaluate(
+            (e) =>
+              e.nextElementSibling &&
+              e.nextElementSibling.offsetTop > e.offsetTop,
+          );
+        if (atEdge && !checkedEdge) {
+          const top = await page
+            .locator("#active-word")
+            .evaluate((e) => e.offsetTop);
+          await page.keyboard.type("xxxxxxxxxxxxxxxxxxxx");
+          assert.equal(
+            await page.locator("#active-word").evaluate((e) => e.offsetTop),
+            top,
+            "extra characters cannot push the active word to another line",
+          );
+          await aligned();
+          await page.keyboard.press("Control+Backspace");
+          await page.keyboard.type(word);
+          checkedEdge = true;
+        }
+        await page.keyboard.type(" ");
       }
+      assert.ok(checkedEdge);
+      await aligned();
       const motion = await page.evaluate(() => ({
         caret: getComputedStyle(document.querySelector("#typing-caret"))
           .transitionDuration,
-        track: getComputedStyle(document.querySelector("#word-track"))
-          .transitionDuration,
-        scroll: new DOMMatrix(
-          getComputedStyle(document.querySelector("#word-track")).transform,
-        ).m42,
+        scroll: parseFloat(
+          document.querySelector("#word-track").style.marginTop,
+        ),
       }));
-      assert.equal(motion.caret, reducedMotion === "reduce" ? "0s" : "0.08s");
       assert.equal(
-        motion.track,
         motion.caret,
-        "text and cursor transitions stay synchronized",
+        reducedMotion === "reduce" ? "0s" : "0.085s, 0.085s",
       );
-      assert.ok(motion.scroll < 0, "test exercised scrolling");
-      await page.keyboard.press("Escape");
-      await aligned();
+      assert.ok(motion.scroll < 0);
+      await page.keyboard.press("Tab");
+      await page.keyboard.press("Enter");
       assert.equal(
         await page.locator(".typing-page").getAttribute("data-state"),
         "ready",
       );
+      await aligned();
+      await page.keyboard.press("Escape");
+      await page.locator("#word-source").selectOption("custom");
+      await page
+        .locator("#custom-text")
+        .fill("abcdefghijklmnopqrstuvwxyzabcdefghij finish");
+      await page.locator("#word-order").selectOption("ordered");
+      await page.locator("#typing-input").focus();
+      for (const letter of "abcdefghijklmnopqrstuvwxyzabcdefghij") {
+        await page.keyboard.type(letter);
+        await aligned();
+      }
+      assert.ok(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth,
+        ),
+      );
+      if (width === 1200) {
+        await page.evaluate(() => {
+          document.documentElement.style.fontSize = "200%";
+          window.dispatchEvent(new Event("resize"));
+        });
+        await aligned();
+        assert.ok(
+          await page.evaluate(
+            () => document.documentElement.scrollWidth <= innerWidth,
+          ),
+        );
+      }
       assert.deepEqual(errors, []);
       console.log(
-        `PASS: ${width}px, ${reducedMotion}: word endings, spaces, corrections, wrapping, scrolling, restart.`,
+        `PASS: ${width}px / ${reducedMotion}: stable rows, persistent letters, extra-character guard, caret, wraps, long custom words, restart.`,
       );
       await page.close();
     }
-  }
 } finally {
   await browser.close();
 }
