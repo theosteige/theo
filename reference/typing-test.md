@@ -9,6 +9,12 @@ seconds, with optional punctuation and numbers. Leaving the input does not pause
 the clock. Restart and Escape discard unfinished tests; Tab then Enter reaches
 the restart control from the typing input.
 
+Words are sampled randomly, with replacement, from a bundled list of roughly
+350 common English words. Each batch contains 80 words; another batch is added
+when fewer than 40 remain. Numbers replace every seventh word when enabled.
+Punctuation follows an eight-word pattern with capitalization, a comma, and a
+random sentence ending. The list is independent of Monkeytype's word lists.
+
 WPM counts characters in correct completed words (including their spaces), plus
 a correct final partial word, divided by five and by elapsed minutes. Raw WPM
 counts inserted characters, including corrections. Accuracy includes mistakes
@@ -45,3 +51,8 @@ unavailable.
 `node --test tests/*.test.mjs` includes timer, scoring, correction, word-generation,
 authentication, validation, idempotency, and real SQLite migration/storage tests.
 The SQLite tests use Node's built-in `node:sqlite` module (Node 22.13+).
+
+With the site served on port 4321, `node tests/typing-caret.browser.mjs` checks
+cursor alignment, transitions, line scrolling, corrections, and restart at
+desktop/mobile widths with normal and reduced motion. It requires Playwright;
+set `PLAYWRIGHT_MODULE` to its module path if it is installed outside this repo.

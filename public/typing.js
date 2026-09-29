@@ -10,7 +10,10 @@ const $ = (selector) => document.querySelector(selector);
 const page = $(".typing-page");
 const api = page.dataset.scoreApi;
 const input = $("#typing-input");
-const words = $("#words");
+const viewport = $("#words");
+const track = $("#word-track");
+const words = $("#word-lines");
+const caret = $("#typing-caret");
 let test;
 let interval;
 let run = 0;
@@ -47,14 +50,7 @@ function renderWord(index) {
       letter.classList.add(
         entry[position] === word[position] ? "correct" : "incorrect",
       );
-    if (index === test.index && position === entry.length)
-      letter.classList.add("caret");
     element.append(letter);
-  }
-  if (index === test.index && entry.length >= word.length) {
-    const caret = document.createElement("span");
-    caret.className = "typing-letter end caret";
-    element.append(caret);
   }
   return element;
 }
@@ -75,8 +71,22 @@ function renderWords() {
   }
   renderedIndex = test.index;
   const active = $("#active-word");
-  const lineHeight = parseFloat(getComputedStyle(words).lineHeight);
-  words.scrollTop = Math.max(0, active.offsetTop - lineHeight);
+  const lineHeight = parseFloat(getComputedStyle(viewport).lineHeight);
+  const position = test.entries[test.index].length;
+  const letter = active.children[position] ?? active.lastElementChild;
+  // Measure a real letter at either side of the insertion point. Empty inline
+  // elements use a different baseline and made the end-of-word cursor drop.
+  const letterBounds = letter.getBoundingClientRect();
+  const wordBounds = active.getBoundingClientRect();
+  const x =
+    active.offsetLeft +
+    (position < active.children.length
+      ? letterBounds.left
+      : letterBounds.right) -
+    wordBounds.left;
+  const y = active.offsetTop + (lineHeight - caret.offsetHeight) / 2;
+  caret.style.transform = `translate(${x}px, ${y}px)`;
+  track.style.transform = `translateY(${-Math.max(0, active.offsetTop - lineHeight)}px)`;
   $("#current-word").textContent =
     `Current word: ${test.words[test.index]}. Next: ${test.words.slice(test.index + 1, test.index + 6).join(" ")}`;
 }

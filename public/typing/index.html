@@ -37,7 +37,7 @@
     <meta property="og:title" content="Typing Test | Theo Steiger" />
     <title>Typing Test | Theo Steiger</title>
     <link rel="stylesheet" href="/style.css" />
-    <link rel="stylesheet" href="/typing.css?v=20260928" />
+    <link rel="stylesheet" href="/typing.css?v=20260928-caret" />
   </head>
   <body>
     <header>
@@ -111,7 +111,12 @@
             <span><span id="live-wpm">0</span> wpm</span>
           </div>
           <div class="typing-surface">
-            <div id="words" aria-hidden="true"></div>
+            <div id="words" aria-hidden="true">
+              <div id="word-track">
+                <div id="word-lines"></div>
+                <span id="typing-caret"></span>
+              </div>
+            </div>
             <label class="sr-only" for="typing-input"
               >Type the displayed words</label
             >
@@ -198,6 +203,6 @@
       </div>
     </main>
     <script src="/site.js"></script>
-    <script src="/typing.js?v=20260928" type="module"></script>
+    <script src="/typing.js?v=20260928-caret" type="module"></script>
   </body>
 </html>

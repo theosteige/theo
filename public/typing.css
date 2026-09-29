@@ -93,7 +93,9 @@
   overflow-wrap: anywhere;
 }
 .typing-word {
+  position: relative;
   display: inline-block;
+  vertical-align: top;
   margin-inline-end: 0.6em;
 }
 .typing-word.missed {
@@ -112,17 +114,26 @@
   background: #fff0f0;
   text-decoration: underline;
 }
-.typing-letter.caret::before {
-  content: "";
+#word-track,
+#word-lines {
+  position: relative;
+}
+#typing-caret {
   position: absolute;
-  left: -1px;
+  left: 0;
   top: 0;
   height: 1.2em;
-  border-left: 2px solid #0645ad;
+  width: 2px;
+  background: #0645ad;
+  pointer-events: none;
 }
-.typing-letter.end {
-  display: inline-block;
-  width: 0;
+@media (prefers-reduced-motion: no-preference) {
+  .typing-page[data-state="running"] #typing-caret {
+    transition: transform 80ms ease-out;
+  }
+  .typing-page[data-state="running"] #word-track {
+    transition: transform 80ms ease-out;
+  }
 }
 #typing-input {
   position: absolute;
