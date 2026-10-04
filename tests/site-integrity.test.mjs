@@ -7,6 +7,7 @@ const publicDirectory = new URL("../public/", import.meta.url);
 const expectedPages = [
   "blog/index.html",
   "card-memory/index.html",
+  "contrarian-takes/index.html",
   "design/index.html",
   "experience/index.html",
   "five-minute-intro/index.html",
@@ -21,6 +22,7 @@ const expectedPages = [
   "reading/index.html",
   "side-quests/index.html",
   "typing/index.html",
+  "writing/index.html",
 ];
 
 async function findFiles(directory, extension) {
