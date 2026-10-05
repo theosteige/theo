@@ -1,0 +1,142 @@
+<!doctype html>
+<!-- Throwaway preview: three podcast disclosure layouts, selected with ?variant=A/B/C. -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Podcast Thoughts — Layout Preview</title>
+  <link rel="icon" href="http://127.0.0.1:4321/favicon-blue-t.svg">
+  <link rel="stylesheet" href="http://127.0.0.1:4321/style.css?v=podcast-preview">
+  <style>
+    body { padding-bottom: 120px; }
+    main { max-width: 720px; }
+    .preview-intro { margin-bottom: 32px; }
+    .preview-intro h1 { margin-top: 8px; }
+    .preview-intro .meta { font-size: .88rem; }
+    .variant-picker { display: flex; flex-wrap: wrap; gap: 8px 20px; margin: 20px 0 12px; }
+    button.text-button { border: 0; background: none; padding: 4px 0; color: #0645ad; text-decoration: underline; font: inherit; text-align: left; cursor: pointer; }
+    .variant-picker button[aria-pressed="true"] { color: #1d1d1d; font-weight: 600; text-decoration: none; }
+    button:focus-visible, summary:focus-visible, a:focus-visible { outline: 2px solid #0645ad; outline-offset: 4px; }
+    .variant-description { color: #666; font-size: .88rem; }
+    .notes-list { padding-inline-start: 24px; margin: 24px 0 0; }
+    .notes-list > li { padding-inline-start: 4px; margin-bottom: 18px; }
+    summary { cursor: pointer; }
+    .native summary { font-weight: 600; padding-block: 4px; line-height: 1.45; }
+    .thoughts { margin-top: 16px; }
+    .thoughts p { margin-bottom: 16px; }
+    .listen-link { display: inline-block; margin-bottom: 8px; font-size: .88rem; }
+    .linked h3 { margin: 0 0 4px; font-size: 1rem; line-height: 1.45; }
+    .linked summary { width: fit-content; color: #0645ad; font-size: .88rem; padding-block: 4px; }
+    .linked summary .when-open, .linked details[open] summary .when-closed { display: none; }
+    .linked details[open] summary .when-open { display: inline; }
+    .index-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 32px; margin-top: 24px; }
+    .index-layout .notes-list { margin-top: 0; }
+    .index-layout .notes-list > li { margin-bottom: 12px; }
+    .index-layout .text-button { line-height: 1.45; }
+    .index-layout .text-button[aria-expanded="true"] { color: #1d1d1d; font-weight: 600; text-decoration: none; }
+    .reading-panel { min-width: 0; }
+    .reading-panel h3 { font-size: 1.15rem; line-height: 1.4; }
+    .reading-panel .empty { color: #666; }
+    .panel-controls { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px 20px; margin-bottom: 16px; }
+    .panel-controls a, .panel-controls button { font-size: .88rem; }
+    .switcher { position: fixed; z-index: 5; left: 50%; bottom: 16px; transform: translateX(-50%); width: min(420px, calc(100% - 32px)); display: grid; grid-template-columns: 44px minmax(0,1fr) 44px; align-items: center; border: 1px solid #bbb; background: white; padding: 4px; }
+    .switcher button { border: 0; background: none; min-height: 44px; color: #0645ad; font: inherit; cursor: pointer; }
+    .switcher span { text-align: center; font-size: .88rem; line-height: 1.4; }
+    [hidden] { display: none !important; }
+    @media (max-width: 600px) { .index-layout { grid-template-columns: 1fr; gap: 24px; } }
+  </style>
+</head>
+<body>
+<header>
+      <div><a href="http://127.0.0.1:4321/">Table of Contents</a></div>
+      <ul class="contact-list" aria-label="Contact links">
+        <li>
+          <button
+            class="contact-button"
+            type="button"
+            data-reveal="me@theosteiger.com"
+          >
+            Email
+          </button>
+        </li>
+        <li><a href="https://github.com/theosteige">GitHub</a></li>
+        <li>
+          <a href="https://www.linkedin.com/in/theodore-steiger/">LinkedIn</a>
+        </li>
+      </ul>
+    </header>
+<main>
+  <section class="preview-intro">
+    <p class="meta">Podcast thoughts · layout preview</p>
+    <h1>Podcasts</h1>
+    <p>I love podcasts! These are some of my favorites from the past ~6 years.</p>
+    <div class="variant-picker" role="group" aria-label="Choose a layout">
+      <button class="text-button" data-variant="A">A. Inline disclosures</button>
+      <button class="text-button" data-variant="B">B. Index + reading pane</button>
+      <button class="text-button" data-variant="C">C. Read thoughts links</button>
+    </div>
+    <p class="variant-description" id="variant-description"></p>
+    <a class="listen-link" href="http://127.0.0.1:4321/podcasts/">View the current Podcasts page</a>
+  </section>
+  <section aria-labelledby="thoughts-heading">
+    <h2 id="thoughts-heading">Thoughts</h2>
+    <div id="variant-content"></div>
+  </section>
+</main>
+<nav class="switcher" aria-label="Layout preview controls">
+  <button id="previous" aria-label="Previous layout">←</button>
+  <span id="variant-label" aria-live="polite"></span>
+  <button id="next" aria-label="Next layout">→</button>
+</nav>
+<script>
+const podcasts = [{"number": "1", "title": "How to Take Over the World — Steve Jobs (Part 1)", "href": "https://open.spotify.com/episode/40mBOeQLJvVra5yocENS8W", "note": "The podcast that started it all for me. At the start of my senior year of high school I discovered HTTOTW. This was the first podcast I listened to. Listening to this podcast was the trigger that changed the contents of my “media diet” for the better. It convinced me to read Steve Jobs by Walter Isaacson to further explore my fascination. I hadn’t read a book in years before that one. Reading it reminded me that I loved to read. I began listening to podcasts, reading articles, and reading more books. It helped me realize that rather than letting the algorithm spoon-feed me, it was my job to play a role in defining and exploring my real interests, not the interests bestowed upon me.\n            <br><br>\n            I was captivated by stories from this podcast that tied together to form a clear picture of this godlike figure who was previously nothing more than a name to me. Calling the CEO of HP at 12, figuring out the dial tones to make free calls abroad, calling the pope, Steve's time at Atari, and in India. The list goes on but these stories completely changed my outlook on productivity. One does not simply need to get a college degree, or achieve some checkpoint in terms of career progress to be productive, instead they must simply be working on interesting and worthwhile endeavors, regardless of the validation recieved from legacy institutions. Of course, Steve is an extreme example of this lesson in productivity, however for me extreme examples often play a key role in explaining concepts like the one I mention here.\n            <br><br>“When you grow up you tend to get told that the world is the way it is and your life is just to live your life inside the world. Try not to bash into the walls too much. Try to have a nice family, have fun, save a little money. That’s a very limited life. Life can be much broader once you discover one simple fact: everything around you that you call life was made up by people that were no smarter than you and you can change it, you can influence it, you can build your own things that other people can use... Once you learn that, you’ll never be the same again.”"}, {"number": "2", "title": "How to Take Over the World — Thomas Edison (Part 1)", "href": "https://open.spotify.com/episode/2GPkApesrhUpPJwsgvbOwM", "note": "Edison is another mythical character whose character this episode helped me internalize. At first I thought \"Oh yes, Edison. The lightbulb guy.\" However as I realized soon thereafter, this is far from the case. The Wizard of Menlo Park. I was impacted by Ben Wilsons description of Edisons work ethic. 19 hours a day (conservative estimate). 72 hour benders. The maniac was known not to make a conscious decision to sleep, but instead he would only sleep when pushed to real exhaustion. The biggest takeaway I had from this episode was the tinkerer philosophy that is now described as one of the most desireable traits in many career paths. Edison was always in motion, always tinkering on something new. Eventually, this lead to world altering inventions like the lightbulb. The core lesson here for me is that the ratio of success to failure is not actually relevant in most contexts. Instead, the sheer volume of successes tends to outshine this meaningless ratio. Because Edison did so much volume, its not suprising to me that after the thousands of attempt, he came out on the other side with just a few world changing inventions.\n              <br><br>Lastly, I will leave you with a quote from Edison that I find myself reciting every few weeks. It is my favorite quote of all time. His quote game is unrivaled. <br><br>\n              \"Everything on earth depends on will. I never had an idea in my life. I've got no imagination. I never dream. My so-called inventions already existed in the environment—I took them out. I've created nothing. Nobody does. There's no such thing as an idea being brain-born; everything comes from the outside. The industrious one coaxes it from the environment... The 'genius' hangs around his laboratory day and night. If anything happens he's there to catch it; if he wasn't, it might happen just the same, only it would never be his.\""}, {"number": "3", "title": "The Rest Is History — The Fall of the Aztecs: The Adventure Begins (Part 1)", "href": "https://open.spotify.com/episode/0SEzOejAtZ55rrVLwvWNmO", "note": "I am deeply obsessed with conquistadors. The conquistadors represent what in my opinion, is the most analogous position in history to entrepreneurship in the present day. Take Cortes for example. Prior to discovering and conquering the aztec empire, he was a member of lower nobility in Spain. He had some personal objections to pursuing a career in Spain, and was inspired by the tales of Columbus. This motivated him to venture into the Caribbean in search of new lands and riches. In Cortes’ expedition, he discovers a land with more gold than anyone in Europe had ever seen and a civilization at a scale previously unheard of. Both the Aztecs and conquistadors fascinate me. Putting yourself in the Aztecs position, the only similar analogy for the present day would be if a few thousand aliens visited earth with tools more powerful than anything we had ever seen, and with a vastly different religious belief system. The europeans have technology the Aztecs have never seen, and animals previously unheard of in South America. On the other hand, the Europeans have to reassess their world view to account for the millions of people who they have just discovered, who believe in totally different gods, and a have culture far different from anything in Europe at the time. <br><br>\n               I am going to spare the summary and details here, because the podcast does such a great job of telling the story. <br><br>\n               \"I and my companions suffer from a disease of the heart which can be cured only with gold.\"\n\n               [essay about Cortes]"}, {"number": "4", "title": "The Rest Is History — The Fall of the Incas: Empire of Gold (Part 1)", "href": "https://open.spotify.com/episode/7DZ7GCtxjotNjrZNkem6Sj", "note": "Thoughts coming soon."}, {"number": "5", "title": "Acquired — Nvidia Part I: The GPU Company (1993–2006)", "href": "https://open.spotify.com/episode/6G85ReuFsSkqIuwwwEhJeG", "note": "Thoughts coming soon."}, {"number": "6", "title": "David Senra — Tobi Lütke, Shopify", "href": "https://open.spotify.com/episode/6NK5LxOp6alyDtAFiS9REw", "note": "Thoughts coming soon."}, {"number": "7", "title": "How to Take Over the World — How to Raise a Genius: Laszlo Polgar", "href": "https://open.spotify.com/episode/3H7h33piLg6LrxGeQqlfUE", "note": "Thoughts coming soon."}, {"number": "8", "title": "Lex Fridman Podcast — George Hotz: Tiny Corp, Twitter, AI Safety, Self-Driving, GPT, AGI & God", "href": "https://open.spotify.com/episode/0TA2uCZUQDF8AdF5dUofAi", "note": "Thoughts coming soon."}, {"number": "9", "title": "My First Million — 5 Internet Goldmines to Spot the Next $1B Trend | Steph Smith", "href": "https://open.spotify.com/episode/36MWYn1m1f5pv73RFfGbWo", "note": "Thoughts coming soon."}, {"number": "10", "title": "TBPN — Hit the Dom Button, Unicorn Growth Continues, Sequoia's Lasting Success, Crypto Dawgs", "href": "https://open.spotify.com/episode/546RNrr3L0DYULYFnPmHf8", "note": "Thoughts coming soon."}];
+const labels = { A: 'Inline disclosures', B: 'Index + reading pane', C: 'Read thoughts links' };
+const descriptions = {
+  A: 'Click an episode title to reveal its thoughts. Several can stay open. My pick for the simplest fit.',
+  B: 'Keep the full index visible and read one episode at a time in a separate pane. Click the selected title again to close it.',
+  C: 'Episode titles still link directly to Spotify. A small “Read thoughts” disclosure opens the notes below.'
+};
+const keys = Object.keys(labels);
+let variant = keys.includes(new URL(location.href).searchParams.get('variant')) ? new URL(location.href).searchParams.get('variant') : 'A';
+const content = document.querySelector('#variant-content');
+const escape = text => text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
+const notes = book => `<div class="thoughts"><p>${book.note}</p></div>`;
+const listen = book => `<a class="listen-link" href="${book.href}">Listen on Spotify</a>`;
+function render() {
+  document.querySelector('#variant-description').textContent = descriptions[variant];
+  document.querySelector('#variant-label').textContent = `${variant} · ${labels[variant]}`;
+  document.querySelectorAll('[data-variant]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.variant === variant)));
+  if (variant === 'A') {
+    content.innerHTML = `<ol class="notes-list native">${podcasts.map(book => `<li><details><summary>${escape(book.title)}</summary>${notes(book)}${listen(book)}</details></li>`).join('')}</ol>`;
+  } else if (variant === 'C') {
+    content.innerHTML = `<ol class="notes-list linked">${podcasts.map(book => `<li><h3><a href="${book.href}">${escape(book.title)}</a></h3><details><summary><span class="when-closed">Read thoughts</span><span class="when-open">Hide thoughts</span></summary>${notes(book)}</details></li>`).join('')}</ol>`;
+  } else {
+    content.innerHTML = `<div class="index-layout"><ol class="notes-list">${podcasts.map((book, i) => `<li><button class="text-button" data-episode="${i}" aria-expanded="false" aria-controls="reading-panel">${escape(book.title)}</button></li>`).join('')}</ol><div id="reading-panel" class="reading-panel" aria-label="Selected podcast thoughts"><p class="empty">Choose an episode to read my thoughts.</p></div></div>`;
+    let selected = null;
+    const show = index => {
+      selected = index;
+      content.querySelectorAll('[data-episode]').forEach(button => button.setAttribute('aria-expanded', String(Number(button.dataset.episode) === index)));
+      const panel = content.querySelector('#reading-panel');
+      if (index === null) { panel.innerHTML = '<p class="empty">Choose an episode to read my thoughts.</p>'; return; }
+      const book = podcasts[index];
+      panel.innerHTML = `<h3 tabindex="-1">${escape(book.title)}</h3><div class="panel-controls">${listen(book)}<button class="text-button" id="close-panel">Close thoughts</button></div>${notes(book)}`;
+      panel.querySelector('#close-panel').addEventListener('click', () => { const old = selected; show(null); content.querySelector(`[data-episode="${old}"]`).focus(); });
+      if (matchMedia('(max-width: 600px)').matches) { panel.querySelector('h3').focus(); panel.scrollIntoView({ block: 'start' }); }
+    };
+    content.querySelectorAll('[data-episode]').forEach(button => button.addEventListener('click', () => { const index = Number(button.dataset.episode); show(selected === index ? null : index); }));
+  }
+}
+function choose(key) { variant = key; const url = new URL(location.href); url.searchParams.set('variant', key); history.replaceState(null, '', url); render(); }
+function cycle(offset) { choose(keys[(keys.indexOf(variant) + offset + keys.length) % keys.length]); }
+document.querySelectorAll('[data-variant]').forEach(button => button.addEventListener('click', () => choose(button.dataset.variant)));
+document.querySelector('#previous').addEventListener('click', () => cycle(-1));
+document.querySelector('#next').addEventListener('click', () => cycle(1));
+document.addEventListener('keydown', event => {
+  if (event.target.closest('input, textarea, [contenteditable="true"]')) return;
+  if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') { event.preventDefault(); cycle(event.key === 'ArrowLeft' ? -1 : 1); }
+});
+render();
+</script>
+</body>
+</html>

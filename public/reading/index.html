@@ -73,7 +73,7 @@
           />
           <figcaption>
             <!-- Replace this placeholder with your bookshelf introduction. -->
-            <p>Currently reading The Technological Republic. Last updated 09/27</p>
+            <p>Currently reading Whole Earth: The Many Lives of Stewart Brand by John Markoff. Last updated 10/05</p>
           </figcaption>
         </figure>
       </div>
@@ -85,7 +85,35 @@
           <button
             class="book-card"
             type="button"
-            aria-label="The Technological Republic by Alexander C. Karp &amp; Nicholas W. Zamiska. In progress."
+            aria-label="Whole Earth: The Many Lives of Stewart Brand by John Markoff. In progress."
+            aria-expanded="false"
+            aria-controls="whole-earth-details"
+            aria-describedby="whole-earth-thoughts"
+          >
+            <img
+              class="book-cover"
+              src="/images/reading/whole-earth.webp"
+              alt=""
+              width="296"
+              height="450"
+              loading="lazy"
+              decoding="async"
+            />
+            <span class="book-overlay" id="whole-earth-details">
+              <span class="book-title">Whole Earth: The Many Lives of Stewart Brand</span>
+              <span class="book-author">John Markoff</span>
+              <span class="book-overlay-status">In progress</span>
+              <!-- Replace this book's placeholder with your quick thoughts. -->
+              <span class="book-thoughts" id="whole-earth-thoughts">Thoughts coming soon.</span>
+            </span>
+          </button>
+          <p class="book-status">In progress</p>
+        </li>
+        <li class="book" data-status="finished">
+          <button
+            class="book-card"
+            type="button"
+            aria-label="The Technological Republic by Alexander C. Karp &amp; Nicholas W. Zamiska. Finished."
             aria-expanded="false"
             aria-controls="the-technological-republic-details"
             aria-describedby="the-technological-republic-thoughts"
@@ -102,12 +130,12 @@
             <span class="book-overlay" id="the-technological-republic-details">
               <span class="book-title">The Technological Republic</span>
               <span class="book-author">Alexander C. Karp &amp; Nicholas W. Zamiska</span>
-              <span class="book-overlay-status">In progress</span>
+              <span class="book-overlay-status">Finished</span>
               <!-- Replace this book's placeholder with your quick thoughts. -->
               <span class="book-thoughts" id="the-technological-republic-thoughts">Interesting perspective on where high talent human resources should be allocated, and the downsides of misallocation. Great insight into the org structure and principles of a fast moving company like Palantir. So far very enjoyable.</span>
             </span>
           </button>
-          <p class="book-status">In progress</p>
+          <p class="book-status">Finished</p>
         </li>
         <li class="book" data-status="finished">
           <button

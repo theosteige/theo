@@ -168,6 +168,51 @@ p {
   color: #666;
   font-size: 0.88rem;
 }
+.life-photo-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 13fr);
+  align-items: center;
+  gap: 18px;
+  margin: 28px 0 34px;
+}
+.friends-stack {
+  display: grid;
+  gap: 18px;
+}
+.friends-stack figure,
+.before-after {
+  margin: 0;
+}
+.friends-stack img {
+  width: 100%;
+  height: auto;
+  margin: 0;
+}
+.friends-stack figcaption {
+  color: #666;
+  font-size: 0.88rem;
+}
+.before-after-images,
+.before-after figcaption {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.before-after-images {
+  overflow: hidden;
+}
+.before-after-images img {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 9 / 16;
+  object-fit: cover;
+  margin: 0;
+}
+.before-after figcaption {
+  padding-top: 4px;
+  color: #666;
+  font-size: 0.88rem;
+  text-align: center;
+}
 .back-link {
   display: inline-block;
   margin-bottom: 24px;
