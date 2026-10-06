@@ -5,20 +5,15 @@ import test from "node:test";
 
 const publicDirectory = new URL("../public/", import.meta.url);
 const expectedPages = [
-  "blog/index.html",
   "card-memory/index.html",
-  "contrarian-takes/index.html",
   "design/index.html",
   "experience/index.html",
   "five-minute-intro/index.html",
   "index.html",
-  "joke/index.html",
   "mental-math/index.html",
-  "mood/index.html",
   "music/index.html",
   "piano/index.html",
   "podcasts/index.html",
-  "projects/index.html",
   "reading/index.html",
   "side-quests/index.html",
   "typing/index.html",
@@ -61,7 +56,7 @@ function referencesFrom(html) {
   return references;
 }
 
-test("the public route contract contains only the approved pages", async () => {
+test("the public route contract contains only published pages", async () => {
   const pages = await findFiles(publicDirectory, ".html");
   const relativePages = pages
     .map((page) => path.relative(publicDirectory.pathname, page.pathname))
