@@ -64,3 +64,10 @@ The baseline artifact from GitHub Actions run `37508975765` (commit
 source inventory after excluding local Vite cache files. All 242 file and page
 URL variants in that artifact returned HTTP 200 before this change, including
 all 18 page routes.
+
+Deployment run `37510141352` (commit
+`4991be816765b8f1859d0cff0058700574b17cc4`) succeeded. The after report verifies
+that 227 published file and page URL variants still return HTTP 200, while
+all 15 URL variants for the five draft pages return HTTP 404. All 13 listed
+page routes remain online. The 15 draft URLs were also checked without an
+inventory query string and returned 404.

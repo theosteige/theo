@@ -1,0 +1,1705 @@
+{
+  "origin": "https://theosteiger.com",
+  "checkedAt": "2026-10-06T18:18:05.192Z",
+  "results": [
+    {
+      "path": "/",
+      "kind": "page",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/"
+    },
+    {
+      "path": "/audio/mood/fakemink-crush-prod-ok_5fvYtsp6.mp3",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/audio/mood/fakemink-crush-prod-ok_5fvYtsp6.mp3"
+    },
+    {
+      "path": "/audio/mood/girlfriends-untitled-3.mp3",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/audio/mood/girlfriends-untitled-3.mp3"
+    },
+    {
+      "path": "/blog",
+      "kind": "page",
+      "expected": "offline",
+      "status": 404,
+      "finalUrl": "https://theosteiger.com/blog"
+    },
+    {
+      "path": "/blog/",
+      "kind": "page",
+      "expected": "offline",
+      "status": 404,
+      "finalUrl": "https://theosteiger.com/blog/"
+    },
+    {
+      "path": "/blog/index.html",
+      "kind": "page",
+      "expected": "offline",
+      "status": 404,
+      "finalUrl": "https://theosteiger.com/blog/index.html"
+    },
+    {
+      "path": "/card-memory",
+      "kind": "page",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/card-memory/"
+    },
+    {
+      "path": "/card-memory-logic.js",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/card-memory-logic.js"
+    },
+    {
+      "path": "/card-memory.css",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/card-memory.css"
+    },
+    {
+      "path": "/card-memory.js",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/card-memory.js"
+    },
+    {
+      "path": "/card-memory/",
+      "kind": "page",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/card-memory/"
+    },
+    {
+      "path": "/card-memory/index.html",
+      "kind": "page",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/card-memory/index.html"
+    },
+    {
+      "path": "/CNAME",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/CNAME"
+    },
+    {
+      "path": "/contrarian-takes",
+      "kind": "page",
+      "expected": "offline",
+      "status": 404,
+      "finalUrl": "https://theosteiger.com/contrarian-takes"
+    },
+    {
+      "path": "/contrarian-takes/",
+      "kind": "page",
+      "expected": "offline",
+      "status": 404,
+      "finalUrl": "https://theosteiger.com/contrarian-takes/"
+    },
+    {
+      "path": "/contrarian-takes/index.html",
+      "kind": "page",
+      "expected": "offline",
+      "status": 404,
+      "finalUrl": "https://theosteiger.com/contrarian-takes/index.html"
+    },
+    {
+      "path": "/design",
+      "kind": "page",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/design/"
+    },
+    {
+      "path": "/design.css",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/design.css"
+    },
+    {
+      "path": "/design.js",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/design.js"
+    },
+    {
+      "path": "/design/",
+      "kind": "page",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/design/"
+    },
+    {
+      "path": "/design/index.html",
+      "kind": "page",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/design/index.html"
+    },
+    {
+      "path": "/experience",
+      "kind": "page",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/experience/"
+    },
+    {
+      "path": "/experience/",
+      "kind": "page",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/experience/"
+    },
+    {
+      "path": "/experience/index.html",
+      "kind": "page",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/experience/index.html"
+    },
+    {
+      "path": "/favicon-32.png",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/favicon-32.png"
+    },
+    {
+      "path": "/favicon-512.png",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/favicon-512.png"
+    },
+    {
+      "path": "/favicon-blue-t.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/favicon-blue-t.svg"
+    },
+    {
+      "path": "/favicon.ico",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/favicon.ico"
+    },
+    {
+      "path": "/five-minute-intro",
+      "kind": "page",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/five-minute-intro/"
+    },
+    {
+      "path": "/five-minute-intro/",
+      "kind": "page",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/five-minute-intro/"
+    },
+    {
+      "path": "/five-minute-intro/index.html",
+      "kind": "page",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/five-minute-intro/index.html"
+    },
+    {
+      "path": "/images/cards/C-10.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/C-10.svg"
+    },
+    {
+      "path": "/images/cards/C-2.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/C-2.svg"
+    },
+    {
+      "path": "/images/cards/C-3.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/C-3.svg"
+    },
+    {
+      "path": "/images/cards/C-4.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/C-4.svg"
+    },
+    {
+      "path": "/images/cards/C-5.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/C-5.svg"
+    },
+    {
+      "path": "/images/cards/C-6.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/C-6.svg"
+    },
+    {
+      "path": "/images/cards/C-7.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/C-7.svg"
+    },
+    {
+      "path": "/images/cards/C-8.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/C-8.svg"
+    },
+    {
+      "path": "/images/cards/C-9.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/C-9.svg"
+    },
+    {
+      "path": "/images/cards/C-A.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/C-A.svg"
+    },
+    {
+      "path": "/images/cards/C-J.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/C-J.svg"
+    },
+    {
+      "path": "/images/cards/C-K.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/C-K.svg"
+    },
+    {
+      "path": "/images/cards/C-Q.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/C-Q.svg"
+    },
+    {
+      "path": "/images/cards/D-10.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/D-10.svg"
+    },
+    {
+      "path": "/images/cards/D-2.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/D-2.svg"
+    },
+    {
+      "path": "/images/cards/D-3.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/D-3.svg"
+    },
+    {
+      "path": "/images/cards/D-4.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/D-4.svg"
+    },
+    {
+      "path": "/images/cards/D-5.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/D-5.svg"
+    },
+    {
+      "path": "/images/cards/D-6.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/D-6.svg"
+    },
+    {
+      "path": "/images/cards/D-7.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/D-7.svg"
+    },
+    {
+      "path": "/images/cards/D-8.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/D-8.svg"
+    },
+    {
+      "path": "/images/cards/D-9.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/D-9.svg"
+    },
+    {
+      "path": "/images/cards/D-A.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/D-A.svg"
+    },
+    {
+      "path": "/images/cards/D-J.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/D-J.svg"
+    },
+    {
+      "path": "/images/cards/D-K.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/D-K.svg"
+    },
+    {
+      "path": "/images/cards/D-Q.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/D-Q.svg"
+    },
+    {
+      "path": "/images/cards/H-10.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/H-10.svg"
+    },
+    {
+      "path": "/images/cards/H-2.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/H-2.svg"
+    },
+    {
+      "path": "/images/cards/H-3.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/H-3.svg"
+    },
+    {
+      "path": "/images/cards/H-4.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/H-4.svg"
+    },
+    {
+      "path": "/images/cards/H-5.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/H-5.svg"
+    },
+    {
+      "path": "/images/cards/H-6.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/H-6.svg"
+    },
+    {
+      "path": "/images/cards/H-7.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/H-7.svg"
+    },
+    {
+      "path": "/images/cards/H-8.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/H-8.svg"
+    },
+    {
+      "path": "/images/cards/H-9.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/H-9.svg"
+    },
+    {
+      "path": "/images/cards/H-A.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/H-A.svg"
+    },
+    {
+      "path": "/images/cards/H-J.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/H-J.svg"
+    },
+    {
+      "path": "/images/cards/H-K.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/H-K.svg"
+    },
+    {
+      "path": "/images/cards/H-Q.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/H-Q.svg"
+    },
+    {
+      "path": "/images/cards/S-10.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/S-10.svg"
+    },
+    {
+      "path": "/images/cards/S-2.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/S-2.svg"
+    },
+    {
+      "path": "/images/cards/S-3.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/S-3.svg"
+    },
+    {
+      "path": "/images/cards/S-4.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/S-4.svg"
+    },
+    {
+      "path": "/images/cards/S-5.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/S-5.svg"
+    },
+    {
+      "path": "/images/cards/S-6.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/S-6.svg"
+    },
+    {
+      "path": "/images/cards/S-7.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/S-7.svg"
+    },
+    {
+      "path": "/images/cards/S-8.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/S-8.svg"
+    },
+    {
+      "path": "/images/cards/S-9.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/S-9.svg"
+    },
+    {
+      "path": "/images/cards/S-A.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/S-A.svg"
+    },
+    {
+      "path": "/images/cards/S-J.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/S-J.svg"
+    },
+    {
+      "path": "/images/cards/S-K.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/S-K.svg"
+    },
+    {
+      "path": "/images/cards/S-Q.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/cards/S-Q.svg"
+    },
+    {
+      "path": "/images/design/cannes-oxygen-tanks.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/design/cannes-oxygen-tanks.jpg"
+    },
+    {
+      "path": "/images/design/dance-or-die.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/design/dance-or-die.jpg"
+    },
+    {
+      "path": "/images/design/infohazard.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/design/infohazard.jpg"
+    },
+    {
+      "path": "/images/design/james-murphy-interview.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/design/james-murphy-interview.jpg"
+    },
+    {
+      "path": "/images/design/parts-where-wholes.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/design/parts-where-wholes.jpg"
+    },
+    {
+      "path": "/images/design/shibuya-halloween.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/design/shibuya-halloween.jpg"
+    },
+    {
+      "path": "/images/design/travis-virgil-kanye.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/design/travis-virgil-kanye.jpg"
+    },
+    {
+      "path": "/images/experience/CRB2-480.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/experience/CRB2-480.jpg"
+    },
+    {
+      "path": "/images/experience/CRB2-960.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/experience/CRB2-960.jpg"
+    },
+    {
+      "path": "/images/experience/CRB2.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/experience/CRB2.jpg"
+    },
+    {
+      "path": "/images/experience/IMG_2075-480.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/experience/IMG_2075-480.jpg"
+    },
+    {
+      "path": "/images/experience/IMG_2075-960.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/experience/IMG_2075-960.jpg"
+    },
+    {
+      "path": "/images/experience/IMG_2075.JPG",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/experience/IMG_2075.JPG"
+    },
+    {
+      "path": "/images/experience/IMG_2076-480.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/experience/IMG_2076-480.jpg"
+    },
+    {
+      "path": "/images/experience/IMG_2076-960.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/experience/IMG_2076-960.jpg"
+    },
+    {
+      "path": "/images/experience/IMG_2076.JPG",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/experience/IMG_2076.JPG"
+    },
+    {
+      "path": "/images/experience/Tapd-480.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/experience/Tapd-480.jpg"
+    },
+    {
+      "path": "/images/experience/Tapd-960.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/experience/Tapd-960.jpg"
+    },
+    {
+      "path": "/images/experience/Tapd.jpeg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/experience/Tapd.jpeg"
+    },
+    {
+      "path": "/images/home/baseball-480.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/home/baseball-480.jpg"
+    },
+    {
+      "path": "/images/home/baseball-960.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/home/baseball-960.jpg"
+    },
+    {
+      "path": "/images/home/baseball.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/home/baseball.jpg"
+    },
+    {
+      "path": "/images/home/body-after-480.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/home/body-after-480.jpg"
+    },
+    {
+      "path": "/images/home/body-after-960.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/home/body-after-960.jpg"
+    },
+    {
+      "path": "/images/home/body-after.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/home/body-after.jpg"
+    },
+    {
+      "path": "/images/home/body-before-480.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/home/body-before-480.jpg"
+    },
+    {
+      "path": "/images/home/body-before-960.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/home/body-before-960.jpg"
+    },
+    {
+      "path": "/images/home/body-before.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/home/body-before.jpg"
+    },
+    {
+      "path": "/images/home/card-trick-poster.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/home/card-trick-poster.jpg"
+    },
+    {
+      "path": "/images/home/computer-poster.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/home/computer-poster.jpg"
+    },
+    {
+      "path": "/images/home/dad-480.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/home/dad-480.jpg"
+    },
+    {
+      "path": "/images/home/dad-960.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/home/dad-960.jpg"
+    },
+    {
+      "path": "/images/home/dad.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/home/dad.jpg"
+    },
+    {
+      "path": "/images/home/fish-boat-480.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/home/fish-boat-480.jpg"
+    },
+    {
+      "path": "/images/home/fish-boat-960.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/home/fish-boat-960.jpg"
+    },
+    {
+      "path": "/images/home/fish-boat.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/home/fish-boat.jpg"
+    },
+    {
+      "path": "/images/home/fish-pond-480.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/home/fish-pond-480.jpg"
+    },
+    {
+      "path": "/images/home/fish-pond-960.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/home/fish-pond-960.jpg"
+    },
+    {
+      "path": "/images/home/fish-pond.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/home/fish-pond.jpg"
+    },
+    {
+      "path": "/images/home/fish-sunset-480.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/home/fish-sunset-480.jpg"
+    },
+    {
+      "path": "/images/home/fish-sunset-960.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/home/fish-sunset-960.jpg"
+    },
+    {
+      "path": "/images/home/fish-sunset.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/home/fish-sunset.jpg"
+    },
+    {
+      "path": "/images/home/friends-dinner-480.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/home/friends-dinner-480.jpg"
+    },
+    {
+      "path": "/images/home/friends-dinner.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/home/friends-dinner.jpg"
+    },
+    {
+      "path": "/images/home/friends-formal-480.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/home/friends-formal-480.jpg"
+    },
+    {
+      "path": "/images/home/friends-formal-960.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/home/friends-formal-960.jpg"
+    },
+    {
+      "path": "/images/home/friends-formal.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/home/friends-formal.jpg"
+    },
+    {
+      "path": "/images/home/img-6277-480.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/home/img-6277-480.jpg"
+    },
+    {
+      "path": "/images/home/img-6277.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/home/img-6277.jpg"
+    },
+    {
+      "path": "/images/home/mom-480.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/home/mom-480.jpg"
+    },
+    {
+      "path": "/images/home/mom.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/home/mom.jpg"
+    },
+    {
+      "path": "/images/home/skateboard-480.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/home/skateboard-480.jpg"
+    },
+    {
+      "path": "/images/home/skateboard.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/home/skateboard.jpg"
+    },
+    {
+      "path": "/images/mood/emirshiro-collage-1-480.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/mood/emirshiro-collage-1-480.jpg"
+    },
+    {
+      "path": "/images/mood/emirshiro-collage-1-960.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/mood/emirshiro-collage-1-960.jpg"
+    },
+    {
+      "path": "/images/mood/emirshiro-collage-1.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/mood/emirshiro-collage-1.jpg"
+    },
+    {
+      "path": "/images/mood/emirshiro-collage-2-480.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/mood/emirshiro-collage-2-480.jpg"
+    },
+    {
+      "path": "/images/mood/emirshiro-collage-2-960.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/mood/emirshiro-collage-2-960.jpg"
+    },
+    {
+      "path": "/images/mood/emirshiro-collage-2.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/mood/emirshiro-collage-2.jpg"
+    },
+    {
+      "path": "/images/mood/emirshiro-collage-3-480.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/mood/emirshiro-collage-3-480.jpg"
+    },
+    {
+      "path": "/images/mood/emirshiro-collage-3-960.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/mood/emirshiro-collage-3-960.jpg"
+    },
+    {
+      "path": "/images/mood/emirshiro-collage-3.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/mood/emirshiro-collage-3.jpg"
+    },
+    {
+      "path": "/images/mood/emirshiro-collage-4-480.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/mood/emirshiro-collage-4-480.jpg"
+    },
+    {
+      "path": "/images/mood/emirshiro-collage-4-960.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/mood/emirshiro-collage-4-960.jpg"
+    },
+    {
+      "path": "/images/mood/emirshiro-collage-4.jpg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/mood/emirshiro-collage-4.jpg"
+    },
+    {
+      "path": "/images/reading/100m-money-models.webp",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/reading/100m-money-models.webp"
+    },
+    {
+      "path": "/images/reading/7-powers.webp",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/reading/7-powers.webp"
+    },
+    {
+      "path": "/images/reading/against-the-gods.webp",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/reading/against-the-gods.webp"
+    },
+    {
+      "path": "/images/reading/bookshelf-600.webp",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/reading/bookshelf-600.webp"
+    },
+    {
+      "path": "/images/reading/bookshelf.webp",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/reading/bookshelf.webp"
+    },
+    {
+      "path": "/images/reading/build-a-large-language-model.webp",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/reading/build-a-large-language-model.webp"
+    },
+    {
+      "path": "/images/reading/build-a-reasoning-model.webp",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/reading/build-a-reasoning-model.webp"
+    },
+    {
+      "path": "/images/reading/chip-war.webp",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/reading/chip-war.webp"
+    },
+    {
+      "path": "/images/reading/deep-work.webp",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/reading/deep-work.webp"
+    },
+    {
+      "path": "/images/reading/doing-good-better.webp",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/reading/doing-good-better.webp"
+    },
+    {
+      "path": "/images/reading/edison.webp",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/reading/edison.webp"
+    },
+    {
+      "path": "/images/reading/essentialism.webp",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/reading/essentialism.webp"
+    },
+    {
+      "path": "/images/reading/freedoms-forge.webp",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/reading/freedoms-forge.webp"
+    },
+    {
+      "path": "/images/reading/how-to-win-friends.webp",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/reading/how-to-win-friends.webp"
+    },
+    {
+      "path": "/images/reading/if-you-were-god.webp",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/reading/if-you-were-god.webp"
+    },
+    {
+      "path": "/images/reading/introducing-logic.webp",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/reading/introducing-logic.webp"
+    },
+    {
+      "path": "/images/reading/made-in-america.webp",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/reading/made-in-america.webp"
+    },
+    {
+      "path": "/images/reading/modern-poker-theory.webp",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/reading/modern-poker-theory.webp"
+    },
+    {
+      "path": "/images/reading/poker-math-that-matters.webp",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/reading/poker-math-that-matters.webp"
+    },
+    {
+      "path": "/images/reading/slow-productivity.webp",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/reading/slow-productivity.webp"
+    },
+    {
+      "path": "/images/reading/so-good-they-cant-ignore-you.webp",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/reading/so-good-they-cant-ignore-you.webp"
+    },
+    {
+      "path": "/images/reading/status-anxiety.webp",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/reading/status-anxiety.webp"
+    },
+    {
+      "path": "/images/reading/the-algebra-of-happiness.webp",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/reading/the-algebra-of-happiness.webp"
+    },
+    {
+      "path": "/images/reading/the-art-of-doing-science-and-engineering.webp",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/reading/the-art-of-doing-science-and-engineering.webp"
+    },
+    {
+      "path": "/images/reading/the-creative-act.webp",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/reading/the-creative-act.webp"
+    },
+    {
+      "path": "/images/reading/the-drunkards-walk.webp",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/reading/the-drunkards-walk.webp"
+    },
+    {
+      "path": "/images/reading/the-technological-republic.webp",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/reading/the-technological-republic.webp"
+    },
+    {
+      "path": "/images/reading/the-wisdom-of-crowds.webp",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/reading/the-wisdom-of-crowds.webp"
+    },
+    {
+      "path": "/images/reading/this-is-water.webp",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/reading/this-is-water.webp"
+    },
+    {
+      "path": "/images/reading/titan.webp",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/reading/titan.webp"
+    },
+    {
+      "path": "/images/reading/to-sell-is-human.webp",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/reading/to-sell-is-human.webp"
+    },
+    {
+      "path": "/images/reading/whole-earth.webp",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/reading/whole-earth.webp"
+    },
+    {
+      "path": "/images/reading/zen-and-the-art-of-motorcycle-maintenance.webp",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/images/reading/zen-and-the-art-of-motorcycle-maintenance.webp"
+    },
+    {
+      "path": "/index.html",
+      "kind": "page",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/index.html"
+    },
+    {
+      "path": "/joke",
+      "kind": "page",
+      "expected": "offline",
+      "status": 404,
+      "finalUrl": "https://theosteiger.com/joke"
+    },
+    {
+      "path": "/joke/",
+      "kind": "page",
+      "expected": "offline",
+      "status": 404,
+      "finalUrl": "https://theosteiger.com/joke/"
+    },
+    {
+      "path": "/joke/index.html",
+      "kind": "page",
+      "expected": "offline",
+      "status": 404,
+      "finalUrl": "https://theosteiger.com/joke/index.html"
+    },
+    {
+      "path": "/licenses/playing-cards-CC0.txt",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/licenses/playing-cards-CC0.txt"
+    },
+    {
+      "path": "/licenses/playing-cards-NOTICE.txt",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/licenses/playing-cards-NOTICE.txt"
+    },
+    {
+      "path": "/mental-math",
+      "kind": "page",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/mental-math/"
+    },
+    {
+      "path": "/mental-math-save-policy.js",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/mental-math-save-policy.js"
+    },
+    {
+      "path": "/mental-math.css",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/mental-math.css"
+    },
+    {
+      "path": "/mental-math.js",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/mental-math.js"
+    },
+    {
+      "path": "/mental-math/",
+      "kind": "page",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/mental-math/"
+    },
+    {
+      "path": "/mental-math/index.html",
+      "kind": "page",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/mental-math/index.html"
+    },
+    {
+      "path": "/mood",
+      "kind": "page",
+      "expected": "offline",
+      "status": 404,
+      "finalUrl": "https://theosteiger.com/mood"
+    },
+    {
+      "path": "/mood/",
+      "kind": "page",
+      "expected": "offline",
+      "status": 404,
+      "finalUrl": "https://theosteiger.com/mood/"
+    },
+    {
+      "path": "/mood/index.html",
+      "kind": "page",
+      "expected": "offline",
+      "status": 404,
+      "finalUrl": "https://theosteiger.com/mood/index.html"
+    },
+    {
+      "path": "/music",
+      "kind": "page",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/music/"
+    },
+    {
+      "path": "/music/",
+      "kind": "page",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/music/"
+    },
+    {
+      "path": "/music/index.html",
+      "kind": "page",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/music/index.html"
+    },
+    {
+      "path": "/now-playing.js",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/now-playing.js"
+    },
+    {
+      "path": "/piano",
+      "kind": "page",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/piano/"
+    },
+    {
+      "path": "/piano/",
+      "kind": "page",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/piano/"
+    },
+    {
+      "path": "/piano/index.html",
+      "kind": "page",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/piano/index.html"
+    },
+    {
+      "path": "/podcasts",
+      "kind": "page",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/podcasts/"
+    },
+    {
+      "path": "/podcasts.css",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/podcasts.css"
+    },
+    {
+      "path": "/podcasts.js",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/podcasts.js"
+    },
+    {
+      "path": "/podcasts/",
+      "kind": "page",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/podcasts/"
+    },
+    {
+      "path": "/podcasts/index.html",
+      "kind": "page",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/podcasts/index.html"
+    },
+    {
+      "path": "/projects",
+      "kind": "page",
+      "expected": "offline",
+      "status": 404,
+      "finalUrl": "https://theosteiger.com/projects"
+    },
+    {
+      "path": "/projects/",
+      "kind": "page",
+      "expected": "offline",
+      "status": 404,
+      "finalUrl": "https://theosteiger.com/projects/"
+    },
+    {
+      "path": "/projects/index.html",
+      "kind": "page",
+      "expected": "offline",
+      "status": 404,
+      "finalUrl": "https://theosteiger.com/projects/index.html"
+    },
+    {
+      "path": "/reading",
+      "kind": "page",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/reading/"
+    },
+    {
+      "path": "/reading.css",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/reading.css"
+    },
+    {
+      "path": "/reading.js",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/reading.js"
+    },
+    {
+      "path": "/reading/",
+      "kind": "page",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/reading/"
+    },
+    {
+      "path": "/reading/index.html",
+      "kind": "page",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/reading/index.html"
+    },
+    {
+      "path": "/resume/theo-steiger-resume.pdf",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/resume/theo-steiger-resume.pdf"
+    },
+    {
+      "path": "/safari-pinned-tab.svg",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/safari-pinned-tab.svg"
+    },
+    {
+      "path": "/side-quests",
+      "kind": "page",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/side-quests/"
+    },
+    {
+      "path": "/side-quests/",
+      "kind": "page",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/side-quests/"
+    },
+    {
+      "path": "/side-quests/index.html",
+      "kind": "page",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/side-quests/index.html"
+    },
+    {
+      "path": "/site.js",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/site.js"
+    },
+    {
+      "path": "/style.css",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/style.css"
+    },
+    {
+      "path": "/typing",
+      "kind": "page",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/typing/"
+    },
+    {
+      "path": "/typing-logic.js",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/typing-logic.js"
+    },
+    {
+      "path": "/typing-view.js",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/typing-view.js"
+    },
+    {
+      "path": "/typing.css",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/typing.css"
+    },
+    {
+      "path": "/typing.js",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/typing.js"
+    },
+    {
+      "path": "/typing/",
+      "kind": "page",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/typing/"
+    },
+    {
+      "path": "/typing/index.html",
+      "kind": "page",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/typing/index.html"
+    },
+    {
+      "path": "/videos/home/card-trick.mp4",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/videos/home/card-trick.mp4"
+    },
+    {
+      "path": "/videos/home/computer.mp4",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/videos/home/computer.mp4"
+    },
+    {
+      "path": "/videos/mood/cannes-oxygen-tanks.mp4",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/videos/mood/cannes-oxygen-tanks.mp4"
+    },
+    {
+      "path": "/videos/mood/dance-or-die.mp4",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/videos/mood/dance-or-die.mp4"
+    },
+    {
+      "path": "/videos/mood/infohazard.mp4",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/videos/mood/infohazard.mp4"
+    },
+    {
+      "path": "/videos/mood/james-murphy-interview.mp4",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/videos/mood/james-murphy-interview.mp4"
+    },
+    {
+      "path": "/videos/mood/parts-where-wholes.mp4",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/videos/mood/parts-where-wholes.mp4"
+    },
+    {
+      "path": "/videos/mood/shibuya-halloween.mp4",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/videos/mood/shibuya-halloween.mp4"
+    },
+    {
+      "path": "/videos/mood/travis-virgil-kanye.mp4",
+      "kind": "asset",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/videos/mood/travis-virgil-kanye.mp4"
+    },
+    {
+      "path": "/writing",
+      "kind": "page",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/writing/"
+    },
+    {
+      "path": "/writing/",
+      "kind": "page",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/writing/"
+    },
+    {
+      "path": "/writing/index.html",
+      "kind": "page",
+      "expected": "published",
+      "status": 200,
+      "finalUrl": "https://theosteiger.com/writing/index.html"
+    }
+  ],
+  "deployment": {
+    "runId": 37510141352,
+    "commit": "4991be816765b8f1859d0cff0058700574b17cc4",
+    "artifactFiles": 202
+  }
+}
