@@ -1,5 +1,15 @@
 [
   {
+    "title": "Fundraising",
+    "asset": "/images/reading/fundraising.webp",
+    "source": "https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1632971936i/59118165.jpg"
+  },
+  {
+    "title": "Impro",
+    "asset": "/images/reading/impro.webp",
+    "source": "https://covers.openlibrary.org/b/isbn/9780878301171-L.jpg?default=false"
+  },
+  {
     "title": "Whole Earth: The Many Lives of Stewart Brand",
     "asset": "/images/reading/whole-earth.webp",
     "source": "https://images4.penguinrandomhouse.com/cover/9780735223943"
